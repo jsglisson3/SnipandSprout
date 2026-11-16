@@ -37,6 +37,14 @@ npm run preview    # the same, for a shareable preview: no security-policy tag, 
 
 Node 20 or newer. Nothing to install. `dist/` is generated: don't edit or commit it.
 
+## The demo
+
+Until launch, the site runs as a demo at https://snipandsprout.pages.dev (Cloudflare Pages project `snipandsprout`
+in Stray Wolf's account: build command `npm run build`, output `dist`, `NODE_VERSION=22`, kept out of search
+engines). Every push to `main` builds and publishes it. If a push doesn't show up there, check that the
+Cloudflare Workers and Pages app on GitHub still has this repository under Repository access
+(https://github.com/settings/installations, Configure).
+
 ## What's where
 
 | Path | What it is |
