@@ -49,8 +49,8 @@ Cloudflare Workers and Pages app on GitHub still has this repository under Repos
 
 | Path | What it is |
 |---|---|
-| `build.mjs` | The whole build. One function per page (Home, Shop, Workshops, Visit, About, 404), the shared header, footer and photo stage, the security policy, and the copy step. Facts that repeat (email, links, hours) are at the top. |
-| `src/site.css`, `src/site.js` | All styling and behaviour: open-now status in Central time, the photo that follows what you read, the calendar menu, the gallery, the private event form. Every page reads fine without the script. |
+| `build.mjs` | The whole build. One block per page (Home, Shop, Workshops, Visit, About, 404); the shared header and footer; the menu at the top of every page (a short numbered list set big like the sign at her Plant Bar, beside one photo with a ticket), the numbered sections of the inner pages and the ribbon of plant-marker sayings; the security policy; and the copy step. Facts that repeat (email, links, hours) are at the top. |
+| `src/site.css`, `src/site.js` | All styling and behaviour: open-now status in Central time (and today's line in the Visit hours), the calendar menu, the gallery, the private event form. Every page reads fine without the script. |
 | `src/shop-section.html`, `src/shop-section.css` | The Shop page's three tabs (DIY Terrarium Kits, Terrarium Bar, Plant Bar) in Dani's own words. No script: radio buttons and CSS. Prices and Square links are typed in here. |
 | `src/stray-badge.html` | The Stray Wolf footer badge, the dark logo version, copied unchanged from Stray Wolf's badge kit. Its styles are the kit's, in `site.css` under "Stray Wolf Technology footer badge". Holding it opens the Client Portal. |
 | `src/portal.html` | Her Client Portal page: Stray Wolf's standard page with her details. The build fills in her short name, the service address and the list of photos on her site. |
@@ -83,7 +83,7 @@ no MIME sniffing, no framing by other sites, and keeps the `.pages.dev` copy out
 1. Email: the site uses snipandsproutco@gmail.com. Her current site links hello@snipandsprout.co.
 2. Monday and Tuesday opening: 10 AM (her website) or 9 AM (recent Instagram posts). The site says 10.
 3. The Plant Bar details and the $12 bring-your-own-pot fee are still current.
-4. Photos with customers in them (`ig-group`, `ig-trio`, `ig-table`) are fine to use.
+4. Photos with customers in them (`ig-group`, `ig-trio`) are fine to use.
 5. The storefront photo (`ig-storefront`) came from a friend's post.
 6. The supplier's photos (Teardrop, the vessel thumbnails) are fine to use.
 7. The November 22 workshop's length (the calendar entry assumes one hour).

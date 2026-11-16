@@ -29,7 +29,7 @@
     const s = state();
     $$('[data-open]').forEach((el) => { el.classList.toggle('is-open', s.open); const t = $('[data-open-text]', el); if (t) t.textContent = s.short; });
     $$('[data-open-long]').forEach((el) => { el.textContent = s.long; });
-    $$('[data-hours3] tr').forEach((tr) => tr.classList.toggle('is-today', tr.dataset.days.split(',').includes(String(s.day))));
+    $$('[data-hours3] [data-days]').forEach((row) => row.classList.toggle('is-today', row.dataset.days.split(',').includes(String(s.day))));
     return s;
   };
   $$('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
@@ -41,33 +41,6 @@
     const io = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } }), { rootMargin: '0px 0px -8% 0px', threshold: 0.05 });
     ins.forEach((el) => io.observe(el));
   } else ins.forEach((el) => el.classList.add('in'));
-
-  /* ---------- the stage: the photograph follows what you are reading ---------- */
-  const stage = $('.stage');
-  const stakeEl = $('[data-stage-stake]');
-  const setStake = (el, text) => {
-    if (!el) return; const label = $('.stake__label', el);
-    if (label.textContent === text) return;
-    label.textContent = text; el.classList.remove('is-planting'); void el.offsetWidth; el.classList.add('is-planting');
-  };
-  /* Stacked (tablet upright, phone) the stage keeps its first photograph, so its marker stays with it;
-     the stylesheet decides when that is. */
-  const split = $('.split');
-  const stacked = () => !!split && getComputedStyle(split).display === 'block';
-  if (stage && 'IntersectionObserver' in window) {
-    const pics = $$('.stage__pics img');
-    const show = (sec) => {
-      if (stacked()) return;
-      const key = sec.dataset.stageFor; const pic = pics.find((p) => p.dataset.stage === key);
-      if (pic && !pic.classList.contains('is-on')) { pics.forEach((p) => p.classList.toggle('is-on', p === pic)); }
-      if (sec.dataset.stake) setStake(stakeEl, sec.dataset.stake);
-    };
-    const so = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) show(e.target); }), { rootMargin: '-42% 0px -42% 0px' });
-    $$('[data-stage-for]').forEach((s) => so.observe(s));
-    /* a tablet turned upright goes back to the first photograph, so its marker goes back too */
-    const firstStake = stakeEl ? $('.stake__label', stakeEl).textContent : '';
-    addEventListener('resize', () => { if (firstStake && stacked()) setStake(stakeEl, firstStake); });
-  }
 
   paintHours();
   setInterval(paintHours, 30000);
