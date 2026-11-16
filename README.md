@@ -44,6 +44,7 @@ Node 20 or newer. Nothing to install. `dist/` is generated: don't edit or commit
 | `build.mjs` | The whole build. One function per page (Home, Shop, Workshops, Visit, About, 404), the shared header, footer and photo stage, the security policy, and the copy step. Facts that repeat (email, links, hours) are at the top. |
 | `src/site.css`, `src/site.js` | All styling and behaviour: open-now status in Central time, the photo that follows what you read, the calendar menu, the gallery, the private event form. Every page reads fine without the script. |
 | `src/shop-section.html`, `src/shop-section.css` | The Shop page's three tabs (DIY Terrarium Kits, Terrarium Bar, Plant Bar) in Dani's own words. No script: radio buttons and CSS. Prices and Square links are typed in here. |
+| `src/stray-badge.html` | The Stray Wolf footer badge, the dark logo version, copied unchanged from Stray Wolf's badge kit. Its styles are the kit's, in `site.css` under "Stray Wolf Technology footer badge". Holding it opens the Client Portal. |
 | `src/portal.html` | Her Client Portal page: Stray Wolf's standard page with her details. The build fills in her short name, the service address and the list of photos on her site. |
 | `src/_headers`, `src/robots.txt`, `src/favicon.svg` | Cloudflare's response headers, the search-engine file, the tab icon. |
 | `img/`, `img/shop/` | Every photo the site uses, already cropped and sized (WebP). |

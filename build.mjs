@@ -52,7 +52,7 @@ const I = {
   bag: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h12l-1 10H5Z"/><path d="M7.5 7V6a2.5 2.5 0 0 1 5 0v1"/></svg>',
   cal: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3.5 5.5h13v11h-13ZM3.5 9h13M7 3.5v3M13 3.5v3"/></svg>',
   leaf: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M10 17V8"/><path d="M10 11c-3.4 0-5.5-2-5.5-5 3 0 5.5 1.8 5.5 5ZM10 9c0-3 2-5 5.5-5 0 3-2.2 5-5.5 5Z"/></svg>',
-  mark: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#4b5446"/><g fill="none" stroke="#f5f1ea" stroke-width="1.7" stroke-linecap="round"><path d="M16 25V12"/><path d="M16 17c-4 0-6.5-2.4-6.5-6 3.4 0 6.5 2.2 6.5 6ZM16 14c0-3.6 2.5-6 6.5-6 0 3.6-2.6 6-6.5 6Z" fill="#f5f1ea" fill-opacity=".2"/></g></svg>',
+  mark: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#585f53"/><g fill="none" stroke="#f5f1ea" stroke-width="1.7" stroke-linecap="round"><path d="M16 25V12"/><path d="M16 17c-4 0-6.5-2.4-6.5-6 3.4 0 6.5 2.2 6.5 6ZM16 14c0-3.6 2.5-6 6.5-6 0 3.6-2.6 6-6.5 6Z" fill="#f5f1ea" fill-opacity=".2"/></g></svg>',
 };
 
 const HOURS3 = `<table class="hours3" data-hours3>
@@ -66,23 +66,22 @@ const HOURS3 = `<table class="hours3" data-hours3>
 
 const NEIGHBORS = `<div class="neighbors"><span>In Bloom Floral Company</span><span>Two Friends Community Books</span><span>KaGie's</span></div>`;
 
-const nav = (file) => `<header class="nav">
+const nav = (file) => `<header class="nav"><div class="nav__in">
   <a class="brand" href="index.html" aria-label="Snip &amp; Sprout Co. home">${I.mark}<span>Snip &amp; Sprout Co.</span></a>
   <nav class="nav__links" aria-label="Main">
     ${[['workshops.html', 'Workshops'], ['visit.html', 'Visit'], ['about.html', 'About']].map(([h, t]) => `<a href="${h}"${h === file ? ' aria-current="page"' : ''}>${t}</a>`).join('\n    ')}
-    <a class="btn" href="shop.html"${file === 'shop.html' ? ' aria-current="page"' : ''}>Shop</a>
   </nav>
-</header>`;
+  <div class="nav__end">
+    <span class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></span>
+    <a class="btn btn--sm" href="shop.html"${file === 'shop.html' ? ' aria-current="page"' : ''}>Shop</a>
+  </div>
+</div></header>`;
 
 const stage = (pics, stake) => `<aside class="stage" aria-label="Photographs from the shop">
     <div class="stage__pics">
       ${pics.map((p, i) => `<img src="img/${p.src}" width="${p.w}" height="${p.h}" alt="${p.alt}" data-stage="${p.key}"${p.pos ? ` style="object-position:${p.pos}"` : ''}${i === 0 ? ' class="is-on" fetchpriority="high"' : ' loading="lazy"'}>`).join('\n      ')}
     </div>
     <span class="stake stage__stake" data-stage-stake><span class="stake__label">${stake}</span></span>
-    <div class="stage__bar">
-      <span class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></span>
-      <a href="${C.maps}" target="_blank" rel="noopener">413 E. Emma Ave., Springdale</a>
-    </div>
   </aside>`;
 
 // The one inline script: marks the page as script-enabled before first paint, so entrances don't flash.
@@ -122,7 +121,7 @@ const head = (p) => `<!doctype html>
 <meta property="og:description" content="${p.desc}">
 <meta property="og:image" content="img/hero-dani.webp">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#262c20">
+<meta name="theme-color" content="#f7f4ee">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
@@ -136,21 +135,40 @@ const head = (p) => `<!doctype html>
 
 // The Client Portal's script goes on every page: it is how Dani's Edit mode works on her own site, and
 // it makes the footer badge and the header logo the hidden doors to her portal (press and hold).
-const siteNotes = `<script src="site-notes.js" data-site="${C.site}" data-api="${PREVIEW ? 'demo' : C.api}" data-login-url="${PORTAL}" data-door=".stray" data-door-logo=".brand" data-caption-example="the new terrariums" defer></script>`;
+const siteNotes = `<script src="site-notes.js" data-site="${C.site}" data-api="${PREVIEW ? 'demo' : C.api}" data-login-url="${PORTAL}" data-door-logo=".brand" data-caption-example="the new terrariums" defer></script>`;
 // The shop list (vendor/shop.js) fills every [data-shop] box from the items kept in Stray Wolf Admin.
 const shopList = `<script src="shop.js" data-site="${C.site}" data-api="${C.api}" data-book="Reserve a seat" defer></script>`;
 
-const foot = (p) => `<footer class="foot"><div class="wrap foot__line">
-  <span>Snip &amp; Sprout Co. Plants, pottery and workshops in downtown Springdale.</span>
-  <nav class="foot__links" aria-label="Elsewhere">
-    <a href="${C.ig}" target="_blank" rel="noopener">Instagram</a>
-    <a href="${C.etsy}" target="_blank" rel="noopener">Etsy</a>
-    <a href="mailto:${C.email}">Email Dani</a>
-    <a href="${PORTAL}">Owner portal</a>
-  </nav>
-  <span class="foot__right"><span>© <span data-year>2026</span> · Payments by Square</span>
-    <a class="stray" href="${C.stray}" target="_blank" rel="noopener"><span class="stray__mark" aria-hidden="true">SW</span>Site by Stray Wolf</a></span>
-</div></footer>
+const foot = (p) => `<footer class="foot">
+<div class="wrap foot__grid">
+  <div class="foot__brand">
+    <a class="foot__logo" href="index.html">${I.mark.replace('fill="#585f53"', 'fill="#f7f4ee"').replace(/#f5f1ea/g, '#2f342b')}<span>Snip &amp; Sprout Co.</span></a>
+    <p>An indoor plant boutique in downtown Springdale. Plants, pottery, the Plant Bar, the Terrarium Bar and workshops.</p>
+  </div>
+  <div class="foot__col">
+    <p class="kicker">Visit</p>
+    <address>413 E. Emma Ave.<br>Springdale, AR 72764</address>
+    <a href="${C.maps}" target="_blank" rel="noopener">Get directions</a>
+  </div>
+  <div class="foot__col">
+    <p class="kicker">Hours</p>
+    ${HOURS3}
+  </div>
+  <div class="foot__col">
+    <p class="kicker">Elsewhere</p>
+    <ul class="foot__list">
+      <li><a href="${C.ig}" target="_blank" rel="noopener">Instagram</a></li>
+      <li><a href="${C.etsy}" target="_blank" rel="noopener">Etsy</a></li>
+      <li><a href="mailto:${C.email}">Email Dani</a></li>
+      <li><a href="${PORTAL}">Owner portal</a></li>
+    </ul>
+  </div>
+</div>
+<div class="wrap foot__base">
+  <span>© <span data-year>2026</span> Snip &amp; Sprout Co. · Payments by Square</span>
+  ${read('src/stray-badge.html').replace(/^<!--[\s\S]*?-->\n/, '').trim()}
+</div>
+</footer>
 <nav class="tabbar" aria-label="Quick links">
   ${[['index.html', 'Home', I.home], ['shop.html', 'Shop', I.bag], ['workshops.html', 'Workshops', I.cal], ['visit.html', 'Visit', I.pin], ['about.html', 'About', I.leaf]].map(([h, t, ic]) => `<a href="${h}"${h === p.file ? ' aria-current="page"' : ''}>${ic}<span>${t}</span></a>`).join('\n  ')}
 </nav>
@@ -162,7 +180,7 @@ ${siteNotes}${p.shop ? '\n' + shopList : ''}
 
 const written = new Map();   // file -> its HTML, kept so the portal can list the photos on each page
 const page = (p, body) => {
-  const html = secure(head(p) + body + foot(p));
+  const html = secure(head(p) + nav(p.file) + body + foot(p));
   written.set(p.file, html);
   writeFileSync(dist + p.file, html);
 };
@@ -172,7 +190,6 @@ const splitPage = (p, sheet, after = '') => page(p, `<main id="main">
 <div class="split">
   ${stage(p.pics, p.stake)}
   <div class="sheet">
-    ${nav(p.file)}
     <div class="sheet__in">
 ${sheet}
     </div>
@@ -184,14 +201,14 @@ ${after}</main>
 /* ---------------- shared pieces ---------------- */
 const slip = `<div class="slip" data-in>
       <h3>Sunday, November 22</h3>
-      <div class="slip__row"><span>Starts</span><i></i><span>1 PM</span></div>
-      <div class="slip__row"><span>Where</span><i></i><span>413 E. Emma Ave.</span></div>
+      <div class="slip__row"><span>Starts</span><span>1 PM</span></div>
+      <div class="slip__row"><span>Where</span><span>413 E. Emma Ave.</span></div>
       <h3>Choose your terrarium</h3>
       <p>Open, Closed, Skull, Teardrop Glass or Pumpkin</p>
       <h3>On the table for you</h3>
-      <div class="slip__row"><span>All supplies</span><i></i><span>included</span></div>
-      <div class="slip__row"><span>Hands-on help</span><i></i><span>included</span></div>
-      <div class="slip__row"><span>Your terrarium</span><i></i><span>yours to keep</span></div>
+      <div class="slip__row"><span>All supplies</span><span>included</span></div>
+      <div class="slip__row"><span>Hands-on help</span><span>included</span></div>
+      <div class="slip__row"><span>Your terrarium</span><span>yours to keep</span></div>
       <div class="slip__total"><span>A seat at the table</span><span>from $40</span></div>
     </div>`;
 
@@ -239,6 +256,7 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
 
       <section class="ways" id="ways" aria-labelledby="ways-title">
         <div class="ways__head">
+          <p class="kicker" data-in>Make something</p>
           <h2 class="h1" id="ways-title" data-in>Three ways to make something green</h2>
           <p data-in>One goes home with you in a bag. Two happen right here at the bar.</p>
         </div>
@@ -291,6 +309,7 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
       </section>`, `
 <section class="band" id="workshop" aria-labelledby="ws-title"><div class="wrap band__grid">
   <div class="band__text">
+    <p class="kicker" data-in>The next workshop</p>
     <h2 class="display" id="ws-title" data-in>November Terrarium Workshop</h2>
     <p data-in>Gather. Create. Grow. Pull up a chair at the table in the back on Sunday, November 22 at 1 PM. Seating is limited.</p>
     <div data-in>${workshopActsHome}</div>
@@ -299,7 +318,8 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
 </div></section>
 
 <section class="slips" aria-labelledby="rev-title"><div class="wrap">
-  <div class="slips__head">
+  <div class="section-head">
+    <p class="kicker" data-in>Google reviews</p>
     <h2 class="display" id="rev-title" data-in>Kind words</h2>
     <p data-in>Left for the shop on Google.</p>
   </div>
@@ -323,6 +343,7 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
     <p class="frame__cap" data-frame-cap aria-live="polite">A spooky-season terrarium</p>
   </div>
   <div class="reel__text">
+    <p class="kicker" data-in>From the shop</p>
     <h2 class="display" id="reel-title" data-in>Made at Snip &amp; Sprout</h2>
     <p data-in>Every one leaves a little different, because the person who made it is. Tap the picture to see the next.</p>
     <p data-in>No time to build your own? Dani makes custom terrariums to order. <a class="link" href="mailto:${C.email}?subject=Custom%20terrarium">Ask about a custom terrarium</a></p>
@@ -330,7 +351,7 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
   </div>
 </div></section>
 
-<section class="visit" id="visit" aria-labelledby="visit-title">
+<section class="visit" id="visit" aria-labelledby="visit-title"><div class="visit__in">
   <img src="img/bar-wide.webp" width="1448" height="1086" alt="The Plant Bar inside the shop: the sign, a tray of plant markers, pots and a monstera" loading="lazy">
   <div class="visit__card" data-in>
     <div class="visit__pad">
@@ -342,6 +363,7 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
     </div>
     <a class="btn btn--wide" href="${C.maps}" target="_blank" rel="noopener">Get directions ${I.out}</a>
   </div>
+</div>
 </section>
 `);
 
@@ -350,7 +372,7 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
 // and style picker are plain radio buttons and CSS. It lives in src/shop-section.html and .css.
 page({ file: 'shop.html', body: 'shop-page', shop: true, css: ['shop-section.css', 'shop.css'], title: 'Shop · DIY Terrarium Kits, Terrarium Bar and Plant Bar · Snip & Sprout Co.',
   desc: 'Take-home DIY terrarium kits, the in-shop Terrarium Bar and the walk-in Plant Bar at Snip & Sprout Co. in Springdale. Secure checkout through Square.' },
-  `<div class="navbar">${nav('shop.html')}</div>\n<main id="main">\n${read('src/shop-section.html')}</main>\n`);
+  `<main id="main">\n${read('src/shop-section.html')}</main>\n`);
 
 /* ---------------- Workshops ---------------- */
 splitPage({ file: 'workshops.html', shop: true, css: ['shop.css'], title: 'Workshops · Snip & Sprout Co., Springdale',
