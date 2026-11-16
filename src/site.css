@@ -31,8 +31,8 @@
   --t-small: .9375rem;
   --gap: 12px;
   --pad: clamp(22px, 4.4vw, 68px);
-  --gutter: clamp(20px, 4.4vw, 68px);
-  --max: 85rem;
+  --gutter: calc(var(--gap) + var(--pad));   /* full-width sections start where the sheet's text starts */
+  --max: 200svh;                             /* and stop growing where the two halves do */
   --ease: cubic-bezier(.2,.7,.2,1);
 }
 *,*::before,*::after{ box-sizing:border-box; }
@@ -177,9 +177,9 @@ ul{ padding:0; list-style:none; }
 .count span{ font-size:var(--t-small); color:var(--on-dark-soft); }
 .sheet .count span{ color:var(--muted); }
 .band__acts{ display:flex; flex-wrap:wrap; align-items:center; gap:14px 26px; position:relative; }
-.band__acts .textbtn, .band__acts .link{ color:var(--on-dark); }
+.band .band__acts .textbtn, .band .band__acts .link{ color:var(--on-dark); }
 .cal{ position:relative; }
-.cal__menu{ position:absolute; left:0; top:calc(100% + 10px); z-index:5; background:var(--paper); color:var(--ink); min-width:240px; display:none; flex-direction:column; box-shadow:0 14px 34px rgba(0,0,0,.28); }
+.cal__menu{ position:absolute; left:0; top:calc(100% + 10px); z-index:5; background:var(--paper); color:var(--ink); min-width:15rem; display:none; flex-direction:column; box-shadow:0 14px 34px rgba(0,0,0,.28); }
 .cal.is-open .cal__menu{ display:flex; }
 .cal__menu a{ padding:14px 18px; text-decoration:none; font-weight:600; }
 .cal__menu a:hover{ background:var(--sage); }
@@ -197,9 +197,9 @@ ul{ padding:0; list-style:none; }
 
 /* ---------- plant match ---------- */
 .match{ background:var(--sage); }
-.match__grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); min-height:88svh; max-width:1680px; margin:0 auto; }
+.match__grid{ display:grid; grid-template-columns:minmax(0,1fr) minmax(0,1fr); min-height:88svh; max-width:105rem; margin:0 auto; }
 .match__plate{ padding:40px; display:flex; align-items:center; justify-content:center; position:relative; }
-.match__plate figure{ position:relative; width:100%; max-width:640px; }
+.match__plate figure{ position:relative; width:100%; max-width:40rem; }
 .match__plate img{ width:100%; aspect-ratio:1; object-fit:cover; }
 .match__plate .stake{ position:absolute; left:22px; bottom:0; }
 .match__body{ padding:clamp(40px,6vw,96px) var(--gutter) clamp(40px,5vw,72px) clamp(20px,4vw,64px); display:flex; flex-direction:column; gap:28px; justify-content:space-between; }
@@ -208,7 +208,7 @@ ul{ padding:0; list-style:none; }
 .tabs{ display:flex; gap:26px; }
 .tabs button{ background:none; border:0; border-bottom:2px solid transparent; padding:6px 0; cursor:pointer; font-size:1.125rem; color:var(--muted); transition:border-color .25s var(--ease); }
 .tabs button[aria-selected="true"]{ color:var(--ink); font-weight:700; border-bottom-color:currentColor; }
-.tabs button.is-done::after{ content:" ✓"; }
+.tabs button.is-done::after{ content:""; display:inline-block; width:.32em; height:.62em; margin-left:.5em; border:solid currentColor; border-width:0 2px 2px 0; transform:translateY(-.12em) rotate(45deg); }
 .tabpanel{ display:flex; flex-direction:column; gap:18px; min-height:190px; }
 .tabpanel[hidden]{ display:none; }
 .match .chip span{ background:var(--paper); }
@@ -230,19 +230,19 @@ ul{ padding:0; list-style:none; }
 .slips__head{ display:flex; flex-direction:column; gap:14px; margin-bottom:clamp(48px,6vw,84px); }
 .slips__head p{ color:var(--on-dark-soft); }
 .slips__fan{ display:flex; justify-content:center; align-items:flex-start; }
-.slipq{ width:min(360px,32%); background:var(--paper); color:var(--ink); padding:32px 30px; display:flex; flex-direction:column; justify-content:space-between; gap:36px; transition:transform .35s var(--ease); margin:0; }
+.slipq{ width:min(22.5rem,32%); background:var(--paper); color:var(--ink); padding:32px 30px; display:flex; flex-direction:column; justify-content:space-between; gap:36px; transition:transform .35s var(--ease); margin:0; }
 .slipq blockquote{ margin:0; font-family:var(--head); font-size:var(--t-h3); line-height:1.14; letter-spacing:-.01em; }
 .slipq figcaption{ font-size:var(--t-small); }
 .slipq figcaption b{ display:block; font-size:var(--t-body); }
-.slipq:nth-child(1){ min-height:330px; transform:rotate(-4deg); }
-.slipq:nth-child(2){ min-height:400px; transform:rotate(2deg) translateY(30px); z-index:1; }
-.slipq:nth-child(3){ min-height:360px; transform:rotate(5deg); z-index:2; }
+.slipq:nth-child(1){ min-height:20.5rem; transform:rotate(-4deg); }
+.slipq:nth-child(2){ min-height:25rem; transform:rotate(2deg) translateY(30px); z-index:1; }
+.slipq:nth-child(3){ min-height:22.5rem; transform:rotate(5deg); z-index:2; }
 .slipq:hover{ transform:rotate(0) translateY(-8px); z-index:2; }
 
 /* ---------- one frame, contents change ---------- */
 .reel{ background:var(--paper); padding:clamp(96px,12vw,170px) 0; }
 .reel__grid{ display:grid; grid-template-columns:minmax(0,5fr) minmax(0,6fr); gap:clamp(32px,6vw,110px); align-items:center; }
-.frame{ position:relative; aspect-ratio:4/5; overflow:hidden; background:var(--surface); cursor:pointer; border:0; padding:0; width:100%; display:block; }
+.frame{ position:relative; aspect-ratio:4/5; max-width:64svh; overflow:hidden; background:var(--surface); cursor:pointer; border:0; padding:0; width:100%; display:block; }
 .frame img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .7s ease; }
 .frame img.is-on{ opacity:1; }
 .frame__cap{ margin-top:16px; font-size:var(--t-small); min-height:1.5em; }
@@ -252,7 +252,7 @@ ul{ padding:0; list-style:none; }
 /* ---------- visit card on a photograph ---------- */
 .visit{ position:relative; min-height:100svh; background:var(--forest); padding:60px; display:flex; justify-content:flex-end; align-items:flex-start; }
 .visit > img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:30% 50%; }
-.visit__card{ position:relative; z-index:1; width:400px; max-width:100%; background:var(--paper); display:flex; flex-direction:column; }
+.visit__card{ position:relative; z-index:1; width:25rem; max-width:100%; background:var(--paper); display:flex; flex-direction:column; }
 .visit__pad{ padding:32px 32px 26px; display:flex; flex-direction:column; gap:20px; }
 .visit__card address{ font-style:normal; }
 .hours3{ width:100%; border-collapse:collapse; font-variant-numeric:tabular-nums; }
@@ -349,13 +349,32 @@ body:not(.home) .foot{ padding-top:64px; background:var(--bg); }
   .brand svg{ width:26px; height:26px; }
 }
 
-/* ---------- tablet and phone: the photograph leads, the sheet slides over it ---------- */
-@media (max-width: 1100px){
+/* the two halves at their narrowest (a tablet on its side, a small laptop window): the header tightens so
+   the Shop button stays inside the sheet's margin, and the sheet's own margin eases off below 1100 */
+@media (min-width: 960px) and (max-width: 1200px) and (orientation: landscape), (min-width: 1101px) and (max-width: 1200px){
+  .brand{ font-size:1.25rem; gap:8px; }
+  .brand svg{ width:22px; height:22px; }
+  .nav{ gap:10px; }
+  .nav__links{ gap:10px; }
+  .nav__links a{ font-size:1rem; }
+  .nav__links .btn{ padding:8px 13px; }
+}
+@media (min-width: 960px) and (max-width: 1100px) and (orientation: landscape){
+  :root{ --pad:28px; }
+}
+
+/* ---------- tablet and phone: the photograph leads, the sheet slides over it ----------
+   Stacked on anything narrow, and on an upright tablet. A tablet on its side (960 wide and up) keeps the
+   two halves, because a photograph only 58% of a short screen high would lose its subject.
+   site.js reads the stacked state from .split's display, so this query is the only place it is decided. */
+@media (max-width: 959px), (max-width: 1100px) and (orientation: portrait){
+  :root{ --gutter:var(--pad); }
   .split{ display:block; padding:0; }
-  .stage{ top:0; height:58svh; width:100%; z-index:0; }
+  .sheet__in p{ max-width:40em; }
+  .slipq blockquote{ font-size:1.375rem; }
+  .stage{ top:0; height:max(58svh,300px); width:100%; z-index:0; }
   .stage__pics img:not(:first-child){ display:none; }
   .stage__pics img:first-child{ opacity:1; }
-  .reel__text{ order:-1; }
   .stage__stake{ left:18px; bottom:84px; }
   .stage__bar{ bottom:28px; left:var(--gap); right:var(--gap); }
   .sheet{ position:relative; z-index:1; margin-top:-16px; min-height:0; }
@@ -368,20 +387,14 @@ body:not(.home) .foot{ padding-top:64px; background:var(--bg); }
   .match__grid{ grid-template-columns:1fr; min-height:0; }
   .match__plate{ padding:var(--gutter) var(--gutter) 0; }
   .match__body{ padding:36px var(--gutter) 56px; }
-  .slips__fan{ flex-direction:column; align-items:center; gap:0; }
-  .slipq{ width:min(440px,94%); min-height:0 !important; }
-  .slipq:nth-child(1){ transform:rotate(-2.5deg); }
-  .slipq:nth-child(2){ transform:rotate(1.5deg); margin:-14px 0 0 0; }
-  .slipq:nth-child(3){ transform:rotate(-1.5deg); margin:-14px 0 0 0; }
-  .reel__grid{ grid-template-columns:1fr; }
-  .frame{ max-width:520px; }
+  .slipq{ padding:26px 22px; }
   .visit{ min-height:0; padding:calc(70svh - 80px) 16px 0; background:var(--paper); display:block; }
   .visit > img{ height:70svh; }
   .visit__card{ width:auto; }
   .foot__line{ grid-template-columns:1fr; }
   .foot__links, .foot__right{ justify-content:flex-start; }
 }
-@media (min-width: 1101px){
+@media (min-width: 1101px), (min-width: 960px) and (orientation: landscape){
   .row .stake--inline{ display:none; }
 }
 @media (max-width: 700px){
@@ -396,6 +409,16 @@ body:not(.home) .foot{ padding-top:64px; background:var(--bg); }
   .count b{ font-size:3.25rem; }
   .form{ grid-template-columns:1fr; }
   .tabs{ gap:20px; }
+  .statement{ font-size:1.375rem; }
+  .slipq blockquote{ font-size:1.5rem; }
+  .reel__text{ order:-1; }
+  .slips__fan{ flex-direction:column; align-items:center; gap:0; }
+  .slipq{ width:min(440px,94%); min-height:0 !important; padding:32px 30px; }
+  .slipq:nth-child(1){ transform:rotate(-2.5deg); }
+  .slipq:nth-child(2){ transform:rotate(1.5deg); margin:-14px 0 0 0; }
+  .slipq:nth-child(3){ transform:rotate(-1.5deg); margin:-14px 0 0 0; }
+  .reel__grid{ grid-template-columns:1fr; }
+  .frame{ max-width:520px; }
   .match__cells{ grid-template-columns:1fr; }
   .cell{ min-height:60px; }
   .stage__bar{ font-size:.875rem; padding:8px 14px; }
@@ -416,6 +439,9 @@ body:not(.home) .foot{ padding-top:64px; background:var(--bg); }
 .faq summary:hover{ background:var(--sage); }
 .faq details p{ padding:0 18px 16px; }
 .inphoto{ width:100%; }
+.pair{ display:grid; grid-template-columns:1fr 1fr; gap:var(--gap); }
+.pair img{ width:100%; aspect-ratio:4/5; object-fit:cover; }
+.pair figcaption{ grid-column:1 / -1; margin-top:-2px; }
 
 /* ---------- the shop list (vendor/shop.js): items and classes Dani keeps in Stray Wolf Admin ----------
    shop.css is Stray Wolf's shared file and takes these variables; the few rules after them are this

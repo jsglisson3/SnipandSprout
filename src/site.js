@@ -60,9 +60,14 @@
     if (label.textContent === text) return;
     label.textContent = text; el.classList.remove('is-planting'); void el.offsetWidth; el.classList.add('is-planting');
   };
+  /* Stacked (tablet upright, phone) the stage keeps its first photograph, so its marker stays with it;
+     the stylesheet decides when that is. */
+  const split = $('.split');
+  const stacked = () => !!split && getComputedStyle(split).display === 'block';
   if (stage && 'IntersectionObserver' in window) {
     const pics = $$('.stage__pics img');
     const show = (sec) => {
+      if (stacked()) return;
       const key = sec.dataset.stageFor; const pic = pics.find((p) => p.dataset.stage === key);
       if (pic && !pic.classList.contains('is-on')) { pics.forEach((p) => p.classList.toggle('is-on', p === pic)); }
       const text = sec.hasAttribute('data-stake-live') ? chosenStake : sec.dataset.stake;
@@ -70,6 +75,9 @@
     };
     const so = new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) show(e.target); }), { rootMargin: '-42% 0px -42% 0px' });
     $$('[data-stage-for]').forEach((s) => so.observe(s));
+    /* a tablet turned upright goes back to the first photograph, so its marker goes back too */
+    const firstStake = stakeEl ? $('.stake__label', stakeEl).textContent : '';
+    addEventListener('resize', () => { if (firstStake && stacked()) setStake(stakeEl, firstStake); });
   }
 
   /* ---------- plant markers: pick the one that goes in your pot ---------- */
@@ -78,7 +86,7 @@
     const b = e.target.closest('button'); if (!b) return;
     $$('button', stakes).forEach((x) => x.setAttribute('aria-pressed', x === b));
     chosenStake = b.textContent;
-    setStake(stakeEl, chosenStake); setStake($('[data-stake-inline]'), chosenStake);
+    if (!stacked()) setStake(stakeEl, chosenStake); setStake($('[data-stake-inline]'), chosenStake);
   });
 
   /* ---------- the planner ---------- */

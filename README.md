@@ -79,6 +79,7 @@ no MIME sniffing, no framing by other sites, and keeps the `.pages.dev` copy out
 6. The supplier's photos (Teardrop, the vessel thumbnails) are fine to use.
 7. The November 22 workshop's length (the calendar entry assumes one hour).
 8. Her logo file. The header uses a drawn stand-in for her mark.
+9. About says the shop has been in downtown Springdale since August 2026 (from her grand opening post).
 
 ## Launch (only after Dani says yes)
 

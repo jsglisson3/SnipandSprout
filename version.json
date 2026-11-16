@@ -1,6 +1,7 @@
 {
-  "version": "V1",
+  "version": "V2",
   "changes": [
+    { "version": "V2", "date": "2026-11-16", "note": "Design pass: tablet layouts, one left edge on every page, big-screen scaling, two more shop photos and a fuller top on About, the next date on Workshops, and the calendar link on Workshops now visible." },
     { "version": "V1", "date": "2026-11-15", "note": "First draft of the new website: Home, Shop, Workshops, Visit, About and the Client Portal." }
   ]
 }

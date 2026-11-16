@@ -490,6 +490,7 @@ splitPage({ file: 'workshops.html', shop: true, css: ['shop.css'], title: 'Works
           <a class="btn" href="#next">The next workshop ${I.arrow}</a>
           <a class="link" href="#private">Private events</a>
         </div>
+        <p class="hero__now" data-in><b>Next: Sunday, November 22 at 1 PM.</b><span>Seats from $40, with all supplies included.</span></p>
       </section>
 
       <section id="next" data-stage-for="next" data-stake="Sunday, Nov 22" aria-labelledby="next-title">
@@ -619,6 +620,11 @@ splitPage({ file: 'about.html', title: 'About Dani · Snip & Sprout Co.',
       <section class="hero" data-stage-for="hero" data-stake="Downtown Springdale">
         <h1 class="h1" data-in>Rooted in a love of plants and community</h1>
         <p class="hero__lede" data-in>An indoor plant boutique in Northwest Arkansas, for first pothos and big collections alike.</p>
+        <div class="hero__acts" data-in>
+          <a class="btn" href="index.html#plan">Plan your visit ${I.arrow}</a>
+          <a class="link" href="workshops.html">See workshops</a>
+        </div>
+        <p class="hero__now" data-in><b>In downtown Springdale since August 2026.</b><span>413 E. Emma Ave., under one roof with three neighbors.</span></p>
       </section>
 
       <section data-stage-for="story" data-stake="Get your hands dirty" aria-labelledby="story-title">
@@ -628,6 +634,11 @@ splitPage({ file: 'about.html', title: 'About Dani · Snip & Sprout Co.',
           <p data-in>So the shop carries carefully chosen plants and handmade pottery, with guidance at every step. And it was always meant to be more than a place to buy plants: somewhere to slow down, learn something new, get your hands dirty and leave feeling a little more connected.</p>
           <p class="statement" data-in>“You are SO welcome here!”</p>
           <p data-in>That's Dani, to anyone who has kept a fiddle leaf fig alive for years, and anyone who has loved one a little too hard.</p>
+          <figure class="pair" data-in>
+            <img src="img/ig-shop-window.webp" width="720" height="900" alt="Dani laughing in the shop, plants on the shelves and in the big front window" loading="lazy">
+            <img src="img/ig-ferns.webp" width="640" height="800" alt="Young ferns, just arrived at the shop" loading="lazy">
+            <figcaption class="small muted">Inside the shop on Emma Avenue.</figcaption>
+          </figure>
         </div>
       </section>
 

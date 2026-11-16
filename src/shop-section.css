@@ -178,12 +178,12 @@
 .sns-visit p{ font-size: 1.125rem; line-height:1.45; }
 .sns-hours{ display:grid; gap: 4px; margin:0; font-size: 1.125rem; }
 .sns-hours > div{ display:flex; justify-content:space-between; gap: 18px; }
-.sns-hours dt{ margin:0; } .sns-hours dd{ margin:0; font-variant-numeric: tabular-nums; }
+.sns-hours dt{ margin:0; white-space:nowrap; } .sns-hours dd{ margin:0; white-space:nowrap; font-variant-numeric: tabular-nums; }
 .sns-visit__link{ display:inline-flex; align-items:center; gap: 8px; color: var(--sns-ink); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(63,68,57,.35); text-underline-offset: 5px; }
 .sns-visit__link:hover{ text-decoration-color: currentColor; }
 .sns-visit__link svg{ width:16px; height:16px; transition: transform .2s var(--sns-ease); }
 .sns-visit__link:hover svg{ transform: translate(2px, -2px); }
-@media (max-width: 900px){
+@media (max-width: 1100px){
   .sns-visit{ grid-template-columns: 1fr 1fr; }
   .sns-visit__title{ grid-column: 1 / -1; }
 }
