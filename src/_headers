@@ -1,0 +1,13 @@
+# Cloudflare Pages response headers (the same trust kit as Stray Wolf's other sites).
+# The content security policy itself is a tag in each page, written by build.mjs.
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Content-Security-Policy: frame-ancestors 'self' https://straywolftech.com
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(), usb=()
+
+# The .pages.dev copy of the site is never listed by search engines.
+https://:project.pages.dev/*
+  X-Robots-Tag: noindex

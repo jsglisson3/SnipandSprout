@@ -1,0 +1,353 @@
+.sns-shop{
+  /* The Shop section (src/shop-section.html). First built for her Squarespace page, which is why the
+     type variables fall back from her old theme's names and why there is no JavaScript: the tabs and
+     the style picker are radio buttons styled with CSS. Colours are her palette. */
+  --sns-head: var(--heading-font-font-family, "Instrument Serif", Georgia, serif);
+  --sns-body: var(--body-font-font-family, "Newsreader", Georgia, serif);
+  --sns-ink: #3f4439;
+  --sns-text: #3f4439;
+  --sns-btn-bg: #585f53;
+  --sns-btn-ink: #f5f1ea;
+  --sns-tile: #e9e3d8;
+  /* The shop's own materials */
+  --sns-olive: #3a4332;
+  --sns-olive-deep: #262c20;
+  --sns-sage: #d6dcc9;
+  --sns-cream: #efeae1;
+  --sns-paper: #f5f1ea;
+  --sns-moss: #7f9165;
+  --sns-rose: #d4bfb9;
+  --sns-clay: #b98c74;
+  --sns-ease: cubic-bezier(.2,.7,.2,1);
+
+  box-sizing: border-box;
+  max-width: var(--max); margin: 0 auto; position: relative;
+  padding: clamp(20px, 3vw, 44px) var(--gutter) clamp(40px, 5vw, 72px);
+  color: var(--sns-text);
+  font-family: var(--sns-body);
+  font-size: 1.0625rem; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+.sns-shop *, .sns-shop *::before, .sns-shop *::after{ box-sizing: inherit; }
+.sns-shop h1, .sns-shop h2, .sns-shop h3, .sns-shop p, .sns-shop figure, .sns-shop fieldset, .sns-shop ul, .sns-shop ol{ margin:0; padding:0; }
+.sns-shop ul, .sns-shop ol{ list-style:none; }
+.sns-shop img{ display:block; max-width:100%; }
+.sns-shop a{ color: inherit; }
+.sns-shop :focus-visible{ outline: 3px solid var(--sns-clay); outline-offset: 3px; }
+/* the radio buttons behind the tabs and the style picker: present for keyboards and screen readers, invisible */
+.sns-r{ position:absolute; opacity:0; width:1px; height:1px; margin:0; pointer-events:none; } /* visually hidden radio, not a rule. taste-skill-ignore */
+.sns-shop button{ font-family: var(--sns-body); color: inherit; }
+
+/* ---- Head ---- */
+.sns-head{ display:grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px 14px; align-items:end; }
+.sns-shop .sns-title{
+  font-family: var(--sns-head); font-weight: 400; color: var(--sns-ink);
+  font-size: clamp(4rem, 2rem + 9vw, 8.5rem); line-height: .85; letter-spacing: -.02em; margin-left:-.03em;
+}
+.sns-shop .sns-title{ white-space: nowrap; }
+/* the intro starts where the in-shop columns start, set large in her body face */
+.sns-intro{ grid-column: 2 / 4; display:flex; flex-direction:column; align-items:flex-start; gap: 20px; padding-bottom: .6em; }
+.sns-shop .sns-lede{ font-family: var(--sns-head); font-weight: 400; color: var(--sns-ink); font-size: clamp(1.65rem, .9rem + 1.35vw, 2.3rem); line-height: 1.24; max-width: 30em; text-wrap: pretty; }
+/* the Square line, set apart as a promise rather than a footnote */
+.sns-shop .sns-pay{ display:inline-flex; align-items:center; gap: 8px; color: var(--sns-ink); font-weight: 400; font-size: 1rem; line-height:1.3; opacity: .8; }
+.sns-pay__mark{ display:grid; place-items:center; color: var(--sns-olive); flex:none; }
+.sns-pay__mark svg{ width: 16px; height: 16px; }
+
+/* a seedling beside the title: Snip & Sprout. It grows in once when the page opens. */
+.sns-sprout{ display:inline-block; width: .6em; height: .84em; margin-left: .04em; vertical-align: baseline; position: relative; top: .035em; }
+.sns-sprout svg{ display:block; width:100%; height:100%; overflow:visible; }
+.sns-sprout path{ fill:none; stroke: var(--sns-moss); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; }
+.sns-sprout .sns-lf__body{ fill: #c4cfae; }
+.sns-sprout .sns-stem{ stroke-dasharray: 1; stroke-dashoffset: 1; animation: sns-draw .8s cubic-bezier(.4,0,.2,1) .3s forwards; }
+.sns-sprout .sns-lf{ transform-box: fill-box; transform: scale(0); animation: sns-unfurl .9s var(--sns-ease) forwards; } /* a leaf growing from its base, not a panel entering. taste-skill-ignore */
+.sns-sprout .sns-lf.is-l{ transform-origin: 100% 100%; animation-delay: .85s; }
+.sns-sprout .sns-lf.is-r{ transform-origin: 0% 100%; animation-delay: 1.05s; }
+@keyframes sns-draw{ to{ stroke-dashoffset: 0; } }
+@keyframes sns-unfurl{ from{ transform: scale(0) rotate(-18deg); } to{ transform: none; } } /* taste-skill-ignore */
+
+/* ---- The three offerings as photo tabs ---- */
+.sns-tabs{ display:grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-top: 52px; }
+.sns-tab{ position:relative; display:flex; flex-direction:column; width:100%; margin:0; padding:0; cursor:pointer; text-align:left; background: transparent; }
+.sns-tab__cap{ flex: 1 0 auto; }
+.sns-tab__pic{ display:block; width:100%; aspect-ratio: 4 / 5; max-height: 52vh; overflow:hidden; background: var(--sns-sage); }
+.sns-tab__pic img{ width:100%; height:100%; object-fit:cover; transition: transform .7s var(--sns-ease); }
+.sns-tab:hover .sns-tab__pic img{ transform: scale(1.04); }
+.sns-tab__cap{ display:flex; flex-direction:column; gap: 3px; padding: 14px 18px 16px; background: var(--sns-sage); color: var(--sns-ink); transition: background-color .25s var(--sns-ease), color .25s var(--sns-ease); }
+.sns-tab__top{ display:flex; align-items:baseline; justify-content:space-between; gap: 12px; }
+.sns-tab__name{ font-family: var(--sns-head); font-weight:400; font-size: 1.7rem; line-height:1.05; }
+.sns-tab__price{ flex:none; font-size: 1rem; font-weight: 600; white-space:nowrap; }
+.sns-tab__where{ font-size: 1rem; opacity:.85; }
+.sns-tab:has(.sns-r:checked) .sns-tab__cap{ background: var(--sns-olive); color: var(--sns-paper); }
+.sns-tab__cap{ position:relative; }
+.sns-tab__cap::after{ content:""; position:absolute; left:50%; bottom:-9px; width:18px; height:18px; background: var(--sns-olive); opacity:0; transform: translateX(-50%) translateY(-6px) rotate(45deg); transition: opacity .25s var(--sns-ease), transform .3s var(--sns-ease); }
+.sns-tab:has(.sns-r:checked) .sns-tab__cap::after{ opacity:1; transform: translateX(-50%) rotate(45deg); }
+.sns-tab:has(.sns-r:focus-visible){ outline: 3px solid var(--sns-clay); outline-offset: 3px; }
+
+/* ---- Panels ---- */
+.sns-panel{ margin-top: 72px; }
+.sns-row{ display:grid; grid-template-columns: 6fr 5fr; gap: clamp(28px, 4vw, 64px); align-items:start; }
+
+/* pictures: each figure is the photo with its caption underneath */
+.sns-pics{ display:grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+.sns-pics figure{ display:grid; grid-template-rows: auto auto; min-width:0; --ar: 1; }
+.sns-pics figure > img, .sns-pics figure > .sns-draw{ grid-area: 1 / 1; width:100%; height:auto; aspect-ratio: var(--ar); }
+.sns-pics > .is-big{ grid-column: 1 / -1; --ar: 4 / 5; }
+.sns-pics > .is-small{ --ar: 1; }
+.sns-pics > .is-wide{ grid-column: 1 / -1; --ar: 16 / 9; }
+.sns-pics figure > img{ object-fit:cover; background: var(--sns-sage); transition: opacity .45s var(--sns-ease); }
+.sns-pics figure > img.is-out{ opacity:0; }
+.sns-pics figure > .sns-ph{ grid-area: 1 / 1; display:block; width:100%; aspect-ratio: var(--ar); background: var(--sns-sage); }
+.sns-band figure > .sns-ph{ grid-area: 1 / 1; display:block; width:100%; aspect-ratio: 21 / 8; background: var(--sns-sage); }
+/* a white-background product shot on the stage sits on cream, like the picker tiles */
+.sns-pics figure > .sns-layer{ grid-area: 1 / 1; width:100%; aspect-ratio: var(--ar); transition: opacity .4s var(--sns-ease), visibility .4s; }
+.sns-pics figure > img.sns-layer{ object-fit:cover; }
+.sns-pics figure > img.sns-layer.is-product{ object-fit:contain; padding: 6%; background: var(--sns-cream); }
+.sns-draw{ display:grid; place-items:center; padding: 14% 17%; background: var(--sns-cream); }
+.sns-draw svg{ width:100%; height:100%; }
+.sns-pics figcaption, .sns-band figcaption{ grid-area: 2 / 1; padding: 9px 2px 0; font-size: .95rem; line-height:1.35; font-style: italic; color: var(--sns-ink); opacity: .8; }
+
+@media (min-width: 901px){
+  .sns-row > .sns-pics{ align-self: stretch; }
+  .sns-pics:has(> figure:only-child){ grid-template-rows: 1fr; }
+  .sns-pics > figure:only-child{ grid-template-rows: 1fr auto; }
+  .sns-pics > figure:only-child > img, .sns-pics > figure:only-child > .sns-layer{ height: 100%; aspect-ratio: auto; object-position: 50% 55%; }
+  .sns-pics > figure:only-child > .sns-layer.s-Closed{ object-position: 0% 55%; }   /* the lantern sits at the left edge of this photo */
+}
+
+/* text */
+.sns-text{ display:flex; flex-direction:column; gap: 20px; min-width:0; position:sticky; top: 24px; }
+.sns-text h2{ font-family: var(--sns-head); font-weight:400; color: var(--sns-ink); font-size: clamp(2.4rem, 1.6rem + 2.2vw, 3.4rem); line-height: .98; letter-spacing:-.01em; }
+.sns-shop .sns-lead{ font-size: 1.25rem; line-height:1.4; color: var(--sns-ink); }
+.sns-shop .sns-notice{ display:flex; gap: 12px; align-items:flex-start; padding: 14px 16px; background: var(--sns-sage); color: #262a21; font-weight: 600; line-height:1.4; }
+.sns-notice svg{ width:22px; height:22px; flex:none; margin-top:2px; }
+
+/* style picker */
+.sns-styles{ border:0; }
+.sns-styles legend{ padding:0; margin-bottom: 10px; font-weight:600; color: var(--sns-ink); }
+.sns-styles__row{ display:grid; grid-template-columns: repeat(4, 1fr); gap: 10px; }
+.sns-style{ position:relative; display:block; cursor:pointer; margin:0; }
+.sns-style__pic{ aspect-ratio:1; background-color: var(--sns-tile); overflow:hidden; display:grid; place-items:center; padding: 8%; transition: transform .18s var(--sns-ease);
+  background-repeat:no-repeat; background-position:center; background-size: contain; background-origin: content-box; background-blend-mode: multiply; }
+.sns-style__pic svg{ width:100%; height:100%; }
+.sns-style__name{ display:block; text-align:center; padding: 7px 4px 8px; background: var(--sns-tile); font-size: .95rem; line-height:1.2; transition: background-color .18s var(--sns-ease), color .18s var(--sns-ease); }
+.sns-style__pic.sns-v-Skull{ background-size: cover; background-position: 50% 60%; background-origin: border-box; background-blend-mode: normal; }   /* a photo in its setting, not a cut-out product shot */
+.sns-style:hover .sns-style__pic{ transform: translateY(-3px); }
+.sns-style:has(.sns-r:checked) .sns-style__name{ background: var(--sns-olive); color: var(--sns-paper); }
+.sns-style:has(.sns-r:checked) .sns-style__pic{ outline: 2px solid var(--sns-olive); outline-offset: -2px; }
+.sns-style:has(.sns-r:focus-visible){ outline: 3px solid var(--sns-clay); outline-offset: 2px; }
+
+/* buy: what you get on the left, the price on the right */
+.sns-shop .sns-buy{
+  display:flex; align-items:center; justify-content:space-between; gap: 16px;
+  width:100%; min-height: 62px; padding: 14px 20px 14px 22px;
+  background: var(--sns-btn-bg); color: var(--sns-btn-ink);
+  font-family: var(--sns-body); font-size: 1.125rem; font-weight: 600; line-height:1.25; text-decoration:none;
+  transition: transform .18s var(--sns-ease), filter .18s var(--sns-ease);
+}
+.sns-buy:hover{ transform: translateY(-2px); filter: brightness(.96); }
+.sns-buy:active{ transform: translateY(1px); }
+.sns-buy__price{ display:inline-flex; align-items:center; gap: 8px; flex:none; font-weight: 500; white-space:nowrap; }
+/* the price sits in its own darker end of the button, so it never reads as a gap in the sentence */
+.sns-buy:not(.is-email) .sns-buy__price{ align-self: stretch; margin: -14px -20px -14px 0; padding: 0 20px 0 18px; background: rgba(0,0,0,.13); }
+.sns-buy__amount:empty{ display:none; }
+.sns-buy svg{ width:18px; height:18px; flex:none; transition: transform .2s var(--sns-ease); }
+.sns-buy:hover svg{ transform: translate(2px, -2px); }
+.sns-buy.is-email svg{ display:none; }
+/* under the buy button: the next step on Square, then a quiet reassurance line */
+.sns-shop .sns-fine{ margin-top: -6px; color: var(--sns-ink); }
+.sns-shop .sns-fine__do{ font-size: 1rem; line-height:1.5; }
+.sns-chip{ display:inline-block; padding: 1px 9px 2px; margin: 0 2px; background: var(--sns-sage); color: var(--sns-olive-deep); font-weight: 600; line-height:1.35; }
+.sns-shop .sns-fine__meta{ display:flex; flex-wrap:wrap; gap: 4px 18px; margin-top: 6px; font-size: .8125rem; letter-spacing: .01em; opacity: .75; } /* .75 is the faintest that still reads clearly (4.5:1) */
+.sns-fine__meta span{ display:inline-flex; align-items:center; gap: 5px; white-space:nowrap; }
+.sns-fine__meta svg{ width:12px; height:12px; flex:none; }
+
+/* back up to the three choices */
+.sns-shop .sns-back{ margin-top: 40px; display:flex; justify-content:center; }
+.sns-back a{ display:inline-flex; align-items:center; gap: 8px; padding: 10px 6px; color: var(--sns-ink); font-size: 1rem; text-decoration: underline; text-decoration-color: rgba(63,68,57,.35); text-underline-offset: 5px; transition: text-decoration-color .2s var(--sns-ease); }
+.sns-back a:hover{ text-decoration-color: currentColor; }
+.sns-back svg{ width:18px; height:18px; transition: transform .2s var(--sns-ease); }
+.sns-back a:hover svg{ transform: translateY(-3px); }
+#shop.sns-shop{ scroll-margin-top: 110px; }
+@media (prefers-reduced-motion: no-preference){ html:has(#shop.sns-shop){ scroll-behavior: smooth; } }
+
+/* come see us */
+.sns-visit{ margin-top: 80px; padding: clamp(28px, 4vw, 56px); background: var(--sns-sage); color: var(--sns-ink); display:grid; grid-template-columns: 1.3fr 1fr 1fr 1fr; gap: 28px 40px; align-items:start; }
+.sns-shop .sns-visit__title{ font-family: var(--sns-head); font-weight:400; font-size: clamp(2.4rem, 1.6rem + 2.2vw, 3.4rem); line-height:.98; letter-spacing:-.01em; }
+.sns-visit__col{ display:flex; flex-direction:column; align-items:flex-start; gap: 10px; }
+.sns-shop .sns-visit h3{ font-size: .95rem; font-weight: 600; letter-spacing: .02em; }
+.sns-visit p{ font-size: 1.125rem; line-height:1.45; }
+.sns-hours{ display:grid; gap: 4px; margin:0; font-size: 1.125rem; }
+.sns-hours > div{ display:flex; justify-content:space-between; gap: 18px; }
+.sns-hours dt{ margin:0; } .sns-hours dd{ margin:0; font-variant-numeric: tabular-nums; }
+.sns-visit__link{ display:inline-flex; align-items:center; gap: 8px; color: var(--sns-ink); font-weight: 600; text-decoration: underline; text-decoration-color: rgba(63,68,57,.35); text-underline-offset: 5px; }
+.sns-visit__link:hover{ text-decoration-color: currentColor; }
+.sns-visit__link svg{ width:16px; height:16px; transition: transform .2s var(--sns-ease); }
+.sns-visit__link:hover svg{ transform: translate(2px, -2px); }
+@media (max-width: 900px){
+  .sns-visit{ grid-template-columns: 1fr 1fr; }
+  .sns-visit__title{ grid-column: 1 / -1; }
+}
+@media (max-width: 600px){
+  .sns-visit{ grid-template-columns: 1fr; margin-top: 56px; }
+}
+.sns-shop ::selection{ background: var(--sns-sage); color: var(--sns-olive-deep); }
+
+/* lists */
+.sns-inbox h3{ font-family: var(--sns-head); font-weight:400; color: var(--sns-ink); font-size: 1.85rem; line-height:1.05; margin-bottom: 10px; }
+.sns-inbox ul{ display:grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
+.sns-inbox > ul > li{ padding-left: 16px; position:relative; }
+.sns-inbox > ul > li::before{ content:""; position:absolute; left:0; top:.6em; width:7px; height:7px; border-radius:50%; background: var(--sns-moss); }
+.sns-steps{ display:grid; gap: 10px; counter-reset: sns; }
+.sns-steps li{ display:grid; grid-template-columns: 32px 1fr; gap: 12px; align-items:start; counter-increment: sns; }
+.sns-steps li::before{ content: counter(sns); width:32px; height:32px; border-radius:50%; background: var(--sns-moss); color: var(--sns-paper); display:grid; place-items:center; font-family: var(--sns-head); line-height:1; }
+.sns-steps li span{ padding-top: 4px; }
+
+/* the wide band under the Plant Bar */
+.sns-band{ display:grid; grid-template-columns: 1fr; gap: 16px; margin-top: 16px; }
+.sns-band figure{ display:grid; grid-template-rows: auto auto; min-width:0; }
+.sns-band figure > img{ grid-area: 1 / 1; width:100%; height:auto; aspect-ratio: 21 / 8; object-fit:cover; background: var(--sns-sage); }
+
+/* ---- Phone and narrow ---- */
+@media (max-width: 900px){
+  .sns-head{ grid-template-columns: 1fr; gap: 16px; }
+  .sns-intro{ grid-column: auto; padding-bottom:0; gap: 14px; }
+  .sns-shop .sns-lede{ font-size: clamp(1.45rem, 1.1rem + 1.2vw, 1.8rem); line-height: 1.26; }
+  /* On a phone the heading comes first, then the big photo, then the rest, then the two small photos. */
+  .sns-row{ display:flex; flex-wrap:wrap; gap: 18px 16px; }
+  .sns-row > *, .sns-text > *, .sns-pics > .is-big{ flex: 0 0 100%; }
+  .sns-pics > .is-small{ flex: 0 0 calc(50% - 8px); }
+  .sns-pics > .is-wide{ flex: 0 0 100%; order: 5; }
+  .sns-pics, .sns-text{ display:contents; }
+  .sns-text > h2{ order: 1; } .sns-text > .sns-lead{ order: 2; }
+  .sns-pics > .is-big{ order: 3; }
+  .sns-text > *{ order: 4; }
+  .sns-text > h2, .sns-text > .sns-lead{ order: 1; }
+  .sns-text > .sns-lead{ order: 2; }
+  .sns-pics > .is-small{ order: 5; }
+  .sns-panel{ margin-top: 48px; }
+  .sns-band figure > img, .sns-band figure > .sns-ph{ aspect-ratio: 4 / 3; }
+  .sns-band figure > img{ object-position: 0% 50%; } /* keep the whole Plant Bar sign in frame; the caption points at it */
+  .sns-shop .sns-buy{ position: sticky; bottom: 12px; z-index: 2; }
+  .sns-tab__cap::after{ display:none; }
+}
+@media (max-width: 600px){
+  .sns-tabs{ grid-template-columns: 1fr; gap: 8px; margin-top: 28px; }
+  .sns-tab{ display:grid; grid-template-columns: 84px 1fr; background: var(--sns-sage); }
+  .sns-tab__pic{ aspect-ratio: 1; max-height:none; }
+  .sns-tab__cap{ padding: 10px 14px; justify-content:center; }
+  .sns-tab__name{ font-size: 1.4rem; }
+  .sns-tab__where{ font-size: .95rem; }
+  .sns-tab:has(.sns-r:checked){ background: var(--sns-olive); }
+  .sns-inbox ul{ grid-template-columns: 1fr; }
+  .sns-styles__row{ gap: 6px; }
+}
+
+/* ---- Where it happens: made at home vs made in the shop ---- */
+.sns-shop .sns-group{ display:flex; flex-direction:column; align-items:center; gap: 4px; padding-bottom: 12px; border-bottom: 3px solid var(--sns-btn-bg); color: var(--sns-ink); font-size: 1rem; line-height:1.25; text-align:center; }
+.sns-group__t{ display:inline-flex; align-items:center; gap: 10px; }
+.sns-group b{ font-family: var(--sns-head); font-weight:400; font-size: 1.75rem; line-height:1; }
+.sns-group svg{ width:24px; height:24px; flex:none; }
+.sns-group__n{ opacity: .85; }
+.sns-group.is-home{ grid-column: 1; grid-row: 1; }
+.sns-group.is-shop{ grid-column: 2 / 4; grid-row: 1; }
+.sns-tabs > .sns-tab{ grid-row: 2; }
+.sns-shop .sns-where{ align-self:flex-start; display:inline-flex; align-items:center; gap: 8px; padding: 7px 12px 7px 10px; margin-bottom: -4px; background: var(--sns-btn-bg); color: var(--sns-btn-ink); font-size: .95rem; font-weight: 600; letter-spacing: .02em; line-height: 1.2; }
+.sns-where svg{ width:18px; height:18px; flex:none; }
+@media (max-width: 900px){
+  .sns-text > .sns-where{ order: 1; flex: 0 0 auto; margin-bottom: 0; }
+}
+@media (max-width: 600px){
+  .sns-group.is-home, .sns-group.is-shop, .sns-tabs > .sns-tab{ grid-column: auto; grid-row: auto; }
+  .sns-group.is-shop{ margin-top: 14px; }
+  .sns-group b{ font-size: 1.45rem; }
+  .sns-shop .sns-group{ align-items:flex-start; text-align:left; }
+  .sns-group__n{ padding-left: 34px; }
+}
+
+
+/* ---- Motion: a quiet rise on load and whenever a tab opens ---- */
+@keyframes sns-rise{ from{ opacity:0; transform: translateY(14px); } to{ opacity:1; transform:none; } }
+.sns-shop .sns-title, .sns-intro, .sns-tabs{ animation: sns-rise .7s var(--sns-ease) both; }
+.sns-intro{ animation-delay: .12s; } .sns-tabs{ animation-delay: .2s; }
+.sns-panel .sns-pics > *{ animation: sns-rise .6s var(--sns-ease) both; }
+.sns-panel .sns-pics > :nth-child(2){ animation-delay:.08s } .sns-panel .sns-pics > :nth-child(3){ animation-delay:.16s }
+.sns-panel .sns-text > *{ animation: sns-rise .55s var(--sns-ease) both; }
+.sns-panel .sns-text > :nth-child(2){ animation-delay:.05s } .sns-panel .sns-text > :nth-child(3){ animation-delay:.1s }
+.sns-panel .sns-text > :nth-child(4){ animation-delay:.15s } .sns-panel .sns-text > :nth-child(5){ animation-delay:.2s }
+.sns-panel .sns-text > :nth-child(n+6){ animation-delay:.25s }
+.sns-panel .sns-band > *{ animation: sns-rise .6s var(--sns-ease) .2s both; }
+.sns-panel .sns-style{ animation: sns-rise .5s var(--sns-ease) both; }
+.sns-panel .sns-style:nth-child(2){ animation-delay:.06s } .sns-panel .sns-style:nth-child(3){ animation-delay:.12s } .sns-panel .sns-style:nth-child(4){ animation-delay:.18s }
+@supports (animation-timeline: view()){
+  @media (prefers-reduced-motion: no-preference){
+    .sns-shop .sns-panel .sns-pics > .is-small, .sns-shop .sns-panel .sns-band > *, .sns-shop .sns-panel .sns-text > .sns-inbox, .sns-shop .sns-visit{
+      animation: sns-reveal linear both; animation-timeline: view(); animation-range: entry 0% entry 55%;
+    }
+  }
+}
+@keyframes sns-reveal{ from{ opacity:.4; transform: translateY(32px); } to{ opacity:1; transform:none; } }
+@media (prefers-reduced-motion: reduce){
+  .sns-shop *{ transition: none !important; animation: none !important; }
+  .sns-sprout .sns-stem{ stroke-dashoffset: 0; }
+  .sns-sprout .sns-lf{ transform: none; }
+}
+
+/* Intro: two lines, split where home turns into shop. The size follows the column's width (cqi), so the
+   second line fits on one line from tablet up. On a phone it runs as one paragraph in even lines. */
+@supports (font-size: 1cqi){
+  .sns-intro{ container-type: inline-size; }
+  .sns-shop .sns-lede{ max-width: none; font-size: clamp(1.2rem, 3.65cqi, 2.3rem); }
+  .sns-shop .sns-lede__l{ display: block; }
+  @media (max-width: 600px){
+    .sns-shop .sns-lede{ font-size: clamp(1.45rem, 1.1rem + 1.2vw, 1.8rem); text-wrap: balance; }
+    .sns-shop .sns-lede__l{ display: inline; }
+  }
+}
+
+/* ---- No-script switching ---- */
+.sns-shop .sns-sw.is-alt{ display:none; }
+.sns-pics figure > .sns-layer:not(.s-Closed){ opacity:0; visibility:hidden; }
+.sns-pics figure.sns-stage > figcaption{ grid-row: 2; }
+@supports selector(:has(*)){
+  .sns-panel{ display:none; }
+  .sns-shop:has(#sns-t-kit:checked) #sns-panel-kit,
+  .sns-shop:has(#sns-t-tbar:checked) #sns-panel-tbar,
+  .sns-shop:has(#sns-t-pbar:checked) #sns-panel-pbar{ display:block; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Open"]:checked) .sns-sw.s-Closed{ display:none; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Open"]:checked) .sns-sw.s-Open{ display:block; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Open"]:checked) .sns-buy.s-Open{ display:flex; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Skull"]:checked) .sns-sw.s-Closed{ display:none; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Skull"]:checked) .sns-sw.s-Skull{ display:block; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Skull"]:checked) .sns-buy.s-Skull{ display:flex; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Teardrop"]:checked) .sns-sw.s-Closed{ display:none; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Teardrop"]:checked) .sns-sw.s-Teardrop{ display:block; }
+  .sns-shop #sns-panel-kit:has(.sns-r[value="Teardrop"]:checked) .sns-buy.s-Teardrop{ display:flex; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Open"]:checked) .sns-sw.s-Closed{ display:none; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Open"]:checked) .sns-sw.s-Open{ display:block; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Open"]:checked) .sns-buy.s-Open{ display:flex; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Open"]:checked) .sns-layer{ opacity:0; visibility:hidden; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Open"]:checked) .sns-layer.s-Open{ opacity:1; visibility:visible; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Skull"]:checked) .sns-sw.s-Closed{ display:none; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Skull"]:checked) .sns-sw.s-Skull{ display:block; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Skull"]:checked) .sns-buy.s-Skull{ display:flex; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Skull"]:checked) .sns-layer{ opacity:0; visibility:hidden; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Skull"]:checked) .sns-layer.s-Skull{ opacity:1; visibility:visible; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Teardrop"]:checked) .sns-sw.s-Closed{ display:none; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Teardrop"]:checked) .sns-sw.s-Teardrop{ display:block; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Teardrop"]:checked) .sns-buy.s-Teardrop{ display:flex; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Teardrop"]:checked) .sns-layer{ opacity:0; visibility:hidden; }
+  .sns-shop #sns-panel-tbar:has(.sns-r[value="Teardrop"]:checked) .sns-layer.s-Teardrop{ opacity:1; visibility:visible; }
+  }
+/* Browsers without :has (under 5% of visitors) see all three sections one after another, with the Closed style. */
+
+/* ---- Also in the shop: the live list from shop.js. Hidden until the list has drawn an item. ---- */
+.sns-shelf{ display:none; margin-top: 80px; }
+.sns-shelf:has([data-shop-ready]){ display:block; }
+.sns-shop .sns-shelf__title{ font-family: var(--sns-head); font-weight:400; color: var(--sns-ink); font-size: clamp(2.4rem, 1.6rem + 2.2vw, 3.4rem); line-height:.98; letter-spacing:-.01em; margin-bottom: 28px; }
+.sns-shop .sns-shelf .sw-shop-cat{ font-family: var(--sns-head); font-weight:400; font-size: 1.75rem; line-height:1.1; margin-bottom: 16px; }
+
+/* ---- Vessel photos for the picker ---- */
+.sns-v-Closed{ background-image: url("img/shop/vessel-closed.webp"); }
+.sns-v-Open{ background-image: url("img/shop/vessel-open.webp"); }
+.sns-v-Skull{ background-image: url("img/shop/vessel-skull.webp"); }
+.sns-v-Teardrop{ background-image: url("img/shop/vessel-teardrop.webp"); }

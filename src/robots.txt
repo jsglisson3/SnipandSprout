@@ -1,0 +1,5 @@
+# While the site is a draft, every page also carries a "noindex" tag (DRAFT in build.mjs),
+# so nothing is listed by search engines until that is switched off at launch.
+User-agent: *
+Allow: /
+Disallow: /portal/

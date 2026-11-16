@@ -1,0 +1,25 @@
+/*
+ * Stray Wolf shop list: plain styles that take the site's own fonts.
+ * Set these on the page (or on [data-shop]) to match the site: --shop-accent (button), --shop-on-accent (its text),
+ * --shop-ink, --shop-muted, --shop-line, --shop-card (card background), --shop-radius.
+ */
+.sw-shop{--_accent:var(--shop-accent,#2f5d50);--_on:var(--shop-on-accent,#fff);--_ink:var(--shop-ink,inherit);--_muted:var(--shop-muted,#6b665f);
+  --_line:var(--shop-line,rgb(0 0 0 / .12));--_card:var(--shop-card,#fff);--_r:var(--shop-radius,12px);display:grid;gap:40px;color:var(--_ink)}
+.sw-shop,.sw-shop *{box-sizing:border-box}
+.sw-shop-cat{margin:0 0 16px}
+.sw-shop-list{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,240px),1fr));gap:20px}
+.sw-shop-item{display:flex;flex-direction:column;background:var(--_card);border:1px solid var(--_line);border-radius:var(--_r);overflow:hidden}
+.sw-shop-photo{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;background:var(--_line)}
+.sw-shop-body{display:flex;flex-direction:column;gap:6px;padding:16px 18px 18px;flex:1}
+.sw-shop-name{margin:0;font-size:1.1em;line-height:1.3}
+.sw-shop-when{margin:0;font-size:.9em;font-weight:600;color:var(--_accent)}
+.sw-shop-desc{margin:0;font-size:.95em;color:var(--_muted)}
+.sw-shop-foot{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:center;justify-content:space-between;margin-top:auto;padding-top:10px}
+.sw-shop-price{margin:0;font-size:1.1em;font-variant-numeric:tabular-nums}
+.sw-shop-was{color:var(--_muted);font-size:.85em;margin-right:4px}
+.sw-shop-buy{display:inline-flex;align-items:center;justify-content:center;min-height:44px;padding:10px 20px;border-radius:999px;background:var(--_accent);color:var(--_on);text-decoration:none;font-weight:600}
+.sw-shop-buy:hover{filter:brightness(1.08)}
+.sw-shop-buy:focus-visible{outline:2px solid var(--_accent);outline-offset:3px}
+.sw-shop-soldout{font-size:.9em;color:var(--_muted);border:1px solid var(--_line);border-radius:999px;padding:6px 14px}
+.is-sold .sw-shop-photo{opacity:.6}
+.sw-shop-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}

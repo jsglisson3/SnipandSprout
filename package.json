@@ -1,0 +1,13 @@
+{
+  "name": "snip-and-sprout",
+  "private": true,
+  "type": "module",
+  "description": "Snip & Sprout Co. website",
+  "scripts": {
+    "build": "node build.mjs",
+    "preview": "node build.mjs --preview"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

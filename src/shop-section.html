@@ -1,0 +1,141 @@
+<!-- The Shop section: three tabs (DIY Terrarium Kits, Terrarium Bar, Plant Bar) in Dani's own words.
+     No script: the tabs and the style picker are radio buttons, shown and hidden by shop-section.css.
+     Prices and Square links are typed in here; change them here when they change in Square. -->
+<section class="sns-shop" id="shop" aria-labelledby="sns-shop-title">
+  <div class="sns-head">
+    <h1 class="sns-title" id="sns-shop-title">Shop<span class="sns-sprout"><svg viewBox="0 0 100 140" aria-hidden="true" focusable="false"><path class="sns-stem" pathLength="1" d="M50 138C49 116 53 92 50 64"/><g class="sns-lf is-l"><path class="sns-lf__body" d="M50 66C48.8 48.0 26.6 37.7 9 40C15.6 54.9 35.5 68.9 50 66Z"/><path d="M50 66Q32.2 53.3 16.4 44.7"/></g><g class="sns-lf is-r"><path class="sns-lf__body" d="M50 62C71.3 65.5 90.2 42.2 93 21C73.6 24.7 51.1 44.3 50 62Z"/><path d="M50 62Q70.3 44.5 85.3 28.4"/></g></svg></span></h1>
+    <div class="sns-intro">
+      <p class="sns-lede"><span class="sns-lede__l">Take a DIY kit home and make it at your kitchen table,</span> <span class="sns-lede__l">or come make yours with us in the shop at the Terrarium Bar or the Plant Bar.</span></p>
+      <p class="sns-pay"><span class="sns-pay__mark"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="12" cy="15.5" r="1.4" fill="currentColor"/></svg></span><span>Checkout made easy through Square.</span></p>
+    </div>
+  </div>
+
+  <div class="sns-tabs" role="radiogroup" aria-label="Shop">
+    <p class="sns-group is-home"><span class="sns-group__t"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V20H4z M10 20v-5.5h4V20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><b>Made at home</b></span><span class="sns-group__n">Pick up your kit at the shop</span></p>
+    <label class="sns-tab"><input class="sns-r" type="radio" name="sns-tab" id="sns-t-kit" checked>
+      <span class="sns-tab__pic"><img src="img/shop/tab-kits.webp" alt="" width="900" height="1125" decoding="async"></span>
+      <span class="sns-tab__cap"><span class="sns-tab__top"><span class="sns-tab__name">DIY Terrarium Kits</span></span><span class="sns-tab__where">Prepared for pickup, made at home</span></span>
+    </label>
+    <p class="sns-group is-shop"><span class="sns-group__t"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11v9h14v-9 M3.5 11h17L19 5H5z M9.5 20v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><b>Made in the shop</b></span><span class="sns-group__n">At 413 E. Emma Ave.</span></p>
+    <label class="sns-tab"><input class="sns-r" type="radio" name="sns-tab" id="sns-t-tbar">
+      <span class="sns-tab__pic"><img src="img/shop/tab-tbar.webp" alt="" width="900" height="1125" decoding="async"></span>
+      <span class="sns-tab__cap"><span class="sns-tab__top"><span class="sns-tab__name">Terrarium Bar</span></span><span class="sns-tab__where">In the shop, one day’s notice</span></span>
+    </label>
+    <label class="sns-tab"><input class="sns-r" type="radio" name="sns-tab" id="sns-t-pbar">
+      <span class="sns-tab__pic"><img src="img/shop/tab-pbar.webp" alt="" width="900" height="1125" decoding="async"></span>
+      <span class="sns-tab__cap"><span class="sns-tab__top"><span class="sns-tab__name">Plant Bar</span></span><span class="sns-tab__where">In the shop, just walk in</span></span>
+    </label>
+  </div>
+
+  <!-- 1. DIY Terrarium Kits -->
+  <div class="sns-panel" id="sns-panel-kit">
+    <div class="sns-row">
+      <div class="sns-pics">
+        <figure class="is-big"><img src="img/shop/kit-finished.webp" alt="A finished closed terrarium in a lantern-shaped glass vessel: ferns, moss, white stones and a tiny deer" width="1003" height="1254" decoding="async"><figcaption>A finished Closed kit</figcaption></figure>
+      </div>
+      <div class="sns-text">
+        <p class="sns-where"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11.5 12 5l8 6.5V20H4z M10 20v-5.5h4V20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Take-home kit</span></p>
+        <h2>DIY Terrarium Kits</h2>
+        <p class="sns-lead">We prepare your kit, you pick it up at 413 E. Emma Ave., and you make it at home.</p>
+        <p>Create a little world of your own, right at home! Our DIY Terrarium Kits let you bring the Snip &amp; Sprout experience to your kitchen table. Enjoy a relaxing creative afternoon, plan an at-home date night, or gift a kit to your favorite plant lover. Choose your terrarium style and get ready to make something uniquely yours.</p>
+        <p class="sns-notice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16v12H4zM4 7l8 6 8-6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>Kits are prepared to order and ready for pickup at the shop.</span></p>
+        <fieldset class="sns-styles"><legend>Choose your style</legend><div class="sns-styles__row"><label class="sns-style"><input class="sns-r" type="radio" name="sns-kit-style" value="Closed" checked><span class="sns-style__pic sns-v-Closed"></span><span class="sns-style__name">Closed</span></label><label class="sns-style"><input class="sns-r" type="radio" name="sns-kit-style" value="Open"><span class="sns-style__pic sns-v-Open"></span><span class="sns-style__name">Open</span></label><label class="sns-style"><input class="sns-r" type="radio" name="sns-kit-style" value="Skull"><span class="sns-style__pic sns-v-Skull"></span><span class="sns-style__name">Skull</span></label><label class="sns-style"><input class="sns-r" type="radio" name="sns-kit-style" value="Teardrop"><span class="sns-style__pic sns-v-Teardrop"></span><span class="sns-style__name">Teardrop</span></label></div></fieldset>
+        <a class="sns-buy sns-sw s-Closed" href="https://square.link/u/mRlQoXY9" target="_blank" rel="noopener"><span class="sns-buy__label">Buy the Closed kit on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">$55</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Closed"><p class="sns-fine__do">Choose <span class="sns-chip">Closed</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <a class="sns-buy sns-sw s-Open is-alt" href="https://square.link/u/mRlQoXY9" target="_blank" rel="noopener"><span class="sns-buy__label">Buy the Open kit on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">$55</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Open is-alt"><p class="sns-fine__do">Choose <span class="sns-chip">Open</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <a class="sns-buy sns-sw s-Skull is-alt" href="https://square.link/u/mRlQoXY9" target="_blank" rel="noopener"><span class="sns-buy__label">Buy the Skull kit on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">$55</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Skull is-alt"><p class="sns-fine__do">Choose <span class="sns-chip">Skull</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <a class="sns-buy sns-sw s-Teardrop is-alt" href="https://square.link/u/mRlQoXY9" target="_blank" rel="noopener"><span class="sns-buy__label">Buy the Teardrop kit on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">$55</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Teardrop is-alt"><p class="sns-fine__do">Choose <span class="sns-chip">Teardrop</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <div class="sns-inbox"><h3>In every kit</h3>
+          <ul><li>Your glass vessel</li><li>Live plants</li><li>Drainage layer</li><li>Terrarium soil</li><li>Perlite and orchid bark</li><li>Natural moss</li><li>Terrarium tools</li><li>Tiny decorations</li><li>The how-to card</li></ul>
+        </div>
+      </div>
+    </div>
+    <p class="sns-back"><a href="#shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back to the top of the Shop</span></a></p>
+  </div>
+
+  <!-- 2. Terrarium Bar -->
+  <div class="sns-panel" id="sns-panel-tbar">
+    <div class="sns-row">
+      <div class="sns-pics">
+        <figure class="is-big sns-stage"><img class="sns-layer s-Open is-product" src="img/shop/tbar-open.webp" alt="The empty geometric glass terrarium, a dodecahedron with black edges" width="1100" height="1375" decoding="async"><img class="sns-layer s-Skull" src="img/shop/tbar-skull.webp" alt="A stone skull planter with a plant growing from the top, among pumpkins and autumn leaves" width="1100" height="1375" decoding="async"><img class="sns-layer s-Teardrop" src="img/shop/tbar-teardrop.webp" alt="A hanging teardrop glass terrarium with a succulent inside" width="1100" height="1375" decoding="async"><img class="sns-layer s-Closed" src="img/shop/tbar-closed.webp" alt="Dani holding the empty lantern-style glass terrarium in the shop" width="1100" height="1375" decoding="async"><figcaption class="sns-sw s-Closed">The Closed vessel, waiting for you at our table</figcaption><figcaption class="sns-sw s-Open is-alt">The Open vessel</figcaption><figcaption class="sns-sw s-Skull is-alt">The Skull vessel</figcaption><figcaption class="sns-sw s-Teardrop is-alt">The Teardrop vessel</figcaption></figure>
+      </div>
+      <div class="sns-text">
+        <p class="sns-where"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11v9h14v-9 M3.5 11h17L19 5H5z M9.5 20v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>In-shop experience</span></p>
+        <h2>Terrarium Bar</h2>
+        <p class="sns-lead">Made here in the shop, at our table. Give us a day’s notice and your vessel will be ready.</p>
+        <p>Come create your own miniature world at our in-shop Terrarium Bar! Choose your terrarium style, then visit Snip &amp; Sprout to build and personalize it with plants and decorative details. It’s a fun, hands-on experience for a creative outing with friends or a little time to yourself—and you’ll leave with a terrarium you made your own.</p>
+        <p class="sns-notice"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 7.5V12l3 2" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>At least one day’s advance notice is required so we can prepare your vessel before your visit.</span></p>
+        <fieldset class="sns-styles"><legend>Choose your style</legend><div class="sns-styles__row"><label class="sns-style"><input class="sns-r" type="radio" name="sns-tbar-style" value="Closed" checked><span class="sns-style__pic sns-v-Closed"></span><span class="sns-style__name">Closed</span></label><label class="sns-style"><input class="sns-r" type="radio" name="sns-tbar-style" value="Open"><span class="sns-style__pic sns-v-Open"></span><span class="sns-style__name">Open</span></label><label class="sns-style"><input class="sns-r" type="radio" name="sns-tbar-style" value="Skull"><span class="sns-style__pic sns-v-Skull"></span><span class="sns-style__name">Skull</span></label><label class="sns-style"><input class="sns-r" type="radio" name="sns-tbar-style" value="Teardrop"><span class="sns-style__pic sns-v-Teardrop"></span><span class="sns-style__name">Teardrop</span></label></div></fieldset>
+        <a class="sns-buy sns-sw s-Closed" href="https://square.link/u/k3Tq3ItM" target="_blank" rel="noopener"><span class="sns-buy__label">Reserve your Closed terrarium on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">from $45</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Closed"><p class="sns-fine__do">Choose <span class="sns-chip">Closed</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <a class="sns-buy sns-sw s-Open is-alt" href="https://square.link/u/k3Tq3ItM" target="_blank" rel="noopener"><span class="sns-buy__label">Reserve your Open terrarium on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">from $45</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Open is-alt"><p class="sns-fine__do">Choose <span class="sns-chip">Open</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <a class="sns-buy sns-sw s-Skull is-alt" href="https://square.link/u/k3Tq3ItM" target="_blank" rel="noopener"><span class="sns-buy__label">Reserve your Skull terrarium on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">from $45</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Skull is-alt"><p class="sns-fine__do">Choose <span class="sns-chip">Skull</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <a class="sns-buy sns-sw s-Teardrop is-alt" href="https://square.link/u/k3Tq3ItM" target="_blank" rel="noopener"><span class="sns-buy__label">Reserve your Teardrop terrarium on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">from $45</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine sns-sw s-Teardrop is-alt"><p class="sns-fine__do">Choose <span class="sns-chip">Teardrop</span> under Vessel Type.</p><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+      </div>
+    </div>
+    <p class="sns-back"><a href="#shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back to the top of the Shop</span></a></p>
+  </div>
+
+  <!-- 3. Plant Bar -->
+  <div class="sns-panel" id="sns-panel-pbar">
+    <div class="sns-row">
+      <div class="sns-pics">
+        <figure class="is-big"><img src="img/shop/pbar-dani.webp" alt="Dani potting a plant at the Plant Bar, the hand-lettered Plant Bar sign beside her" width="1100" height="1375" decoding="async"><figcaption>Dani at the bar</figcaption></figure>
+        <figure class="is-small"><img src="img/shop/pbar-markers.webp" alt="Wooden plant markers in a tray: Crazy plant lady, Emotional support plant, You grow girl, Happy birthday" width="800" height="800" decoding="async"><figcaption>Pick a marker to go with it</figcaption></figure>
+        <figure class="is-small"><img src="img/shop/pbar-hands.webp" alt="Hands settling a plant into its pot at the Plant Bar, the sign behind" width="800" height="800" decoding="async"><figcaption>Pot it up at the station</figcaption></figure>
+      </div>
+      <div class="sns-text">
+        <p class="sns-where"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 11v9h14v-9 M3.5 11h17L19 5H5z M9.5 20v-5h5v5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>In-shop experience</span></p>
+        <h2>Plant Bar</h2>
+        <p class="sns-lead">Made here in the shop, at our planting station. Walk in any time we’re open.</p>
+        <p>Stop by our Plant Bar and get your hands a little dirty! Pick out a plant and pot, then use our planting station to put it all together and add your personal touch. Whether you’re treating yourself, making a thoughtful gift, or enjoying a spontaneous outing, our Plant Bar is an easy way to get creative with something green.</p>
+        <p class="sns-notice"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 20V9l7-5 7 5v11zM10 20v-6h4v6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg><span>No advance notice required—walk in during shop hours!</span></p>
+        <a class="sns-buy" href="https://square.link/u/7rDPQQKD" target="_blank" rel="noopener"><span class="sns-buy__label">Buy a Plant Bar visit on Square</span> <span class="sns-buy__price"><span class="sns-buy__amount">$22</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></a>
+        <div class="sns-fine"><p class="sns-fine__meta"><span><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="5" y="10.5" width="14" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 10.5V8a3.5 3.5 0 0 1 7 0v2.5" fill="none" stroke="currentColor" stroke-width="2"/></svg>Secure checkout</span></p></div>
+        <div class="sns-inbox"><h3>How it works</h3>
+          <ol class="sns-steps">
+            <li><span><b>Pick your pot.</b> Choose one that really speaks to you.</span></li>
+            <li><span><b>Pick your plant.</b> Find the perfect little plant to call it home.</span></li>
+            <li><span><b>Pot it up.</b> Add soil and settle your new plant&nbsp;in.</span></li>
+            <li><span><b>Make it yours.</b> Add moss, a plant marker, or a little extra décor.</span></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="sns-band is-solo">
+      <figure class="is-wide"><img src="img/shop/pbar-station.webp" alt="The Plant Bar: the framed sign, a tray of wooden plant markers and a row of pastel pots under a monstera" width="1400" height="787" decoding="async"><figcaption>The bar, ready for you. The four steps are on the sign.</figcaption></figure>
+    </div>
+    <p class="sns-back"><a href="#shop"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 19V5M6 11l6-6 6 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Back to the top of the Shop</span></a></p>
+  </div>
+
+  <!-- Also in the shop: anything else Dani keeps in her shop list (Stray Wolf Admin, Shop), drawn here by
+       shop.js with its own Square checkout button. The block stays hidden until that list has an item. -->
+  <div class="sns-shelf">
+    <h2 class="sns-shelf__title" id="sns-shelf-title">Also in the shop</h2>
+    <div data-shop data-kind="item" role="region" aria-labelledby="sns-shelf-title"></div>
+  </div>
+
+  <!-- Come see us -->
+  <div class="sns-visit" aria-labelledby="sns-visit-title">
+    <h2 class="sns-visit__title" id="sns-visit-title">Come see us</h2>
+    <div class="sns-visit__col">
+      <h3>Find us</h3>
+      <p>413 E. Emma Ave.<br>Springdale, AR 72764</p>
+      <a class="sns-visit__link" href="https://www.google.com/maps/search/?api=1&amp;query=413%20E.%20Emma%20Ave.%2C%20Springdale%2C%20AR%2072764" target="_blank" rel="noopener"><span>Get directions</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+    <div class="sns-visit__col">
+      <h3>Shop hours</h3>
+      <dl class="sns-hours"><div><dt>Mon – Tue</dt><dd>10am – 3pm</dd></div><div><dt>Wed – Fri</dt><dd>9am – 6pm</dd></div><div><dt>Sat – Sun</dt><dd>9am – 2pm</dd></div></dl>
+    </div>
+    <div class="sns-visit__col">
+      <h3>Follow along</h3>
+      <a class="sns-visit__link" href="https://www.instagram.com/snipandsprout.co/" target="_blank" rel="noopener"><span>@snipandsprout.co</span><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 17 17 7M9 7h8v8" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
+    </div>
+  </div>
+</section>

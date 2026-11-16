@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en" class="swn-locked">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#24221F">
+<title>Client Portal · Stray Wolf Technology</title>
+<!--
+  Dani's Client Portal for sending Stray Wolf changes and photos (Site Notes, by Stray Wolf Technology).
+  Stray Wolf's standard portal page with her details filled in. build.mjs fills in the marked places
+  and writes it to /portal/. Hidden from search engines. Opens from the "Owner portal" link in the
+  footer, or by holding the header logo or the "Site by Stray Wolf" badge for a little over a second.
+  "On your site now" in each box shows what the site says today (copied from the pages, Nov 15 2026).
+  When the site changes, update it here too. Never make anything up.
+  Photos box: opens the Photos page (site-notes.js). "On your site now" there is the list in
+  <template data-site-photos> at the bottom: every photo on the site's pages, with the pages it's on.
+  Update it when photos are added.
+  Numbers card: stays hidden until Google Analytics is set up for this site (the notes service needs the
+  GA4 property ID saved as ga:snip-and-sprout). "Phone calls" and "Form requests" count GA4 events named
+  phone_call_click and generate_lead. Wording follows the admin's Analytics tab.
+-->
+<style>
+  @font-face{font-family:"SW Zilla";src:url("brand/zilla-slab-600.woff2") format("woff2");font-weight:600;font-display:swap}
+  @font-face{font-family:"SW Zilla";src:url("brand/zilla-slab-700.woff2") format("woff2");font-weight:700;font-display:swap}
+  @font-face{font-family:"SW Mono";src:url("brand/plex-mono-500.woff2") format("woff2");font-weight:500;font-display:swap}
+  :root{--paper:#F4F2EE;--card:#fff;--stone:#EEE9E1;--ink:#24221F;--muted:#625c53;--soft:#8a8277;--line:#e4ded4;--accent:#C2541B;--accent-hi:#D9531E;--accent-soft:#FBEEE6;
+        --sage:#5F7152;--sage-soft:#EDF2E8;--char:#24221F;
+        --slab:"SW Zilla","Zilla Slab",Georgia,serif;--mono:"SW Mono","IBM Plex Mono",ui-monospace,Menlo,monospace}
+  *{box-sizing:border-box}
+  html.swn-locked main{visibility:hidden}
+  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  a{color:inherit}
+  .wrap{max-width:900px;margin:0 auto;padding:0 20px}
+
+  /* ---------- header ---------- */
+  .sw-head{position:sticky;top:0;z-index:5;background:rgba(244,242,238,.9);-webkit-backdrop-filter:saturate(1.2) blur(10px);backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid var(--line)}
+  .sw-head .wrap{max-width:1180px;display:flex;align-items:center;gap:16px;min-height:60px}
+  .sw-brand{display:block;line-height:0}
+  .sw-brand img{height:30px;width:auto}
+  .sw-head .gap{flex:1}
+  .secure{display:inline-flex;align-items:center;gap:7px;font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sage);background:var(--sage-soft);border:1px solid #d6dfcd;border-radius:999px;padding:7px 12px 7px 9px;white-space:nowrap}
+  .secure svg{width:13px;height:13px;flex:none}
+  .head-acts{display:flex;align-items:center;gap:6px}.head-acts:empty{display:none}
+  .head-acts button{display:inline-flex;align-items:center;gap:6px;font:600 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0 13px;min-height:36px;cursor:pointer}
+  .head-acts button:hover{border-color:var(--ink)}
+  .head-acts svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+
+  /* ---------- welcome ---------- */
+  .hero{position:relative;display:flex;align-items:center;gap:26px;padding:40px 0 30px;isolation:isolate}
+  .hero::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none;
+     background:
+      linear-gradient(180deg,rgba(244,242,238,0) 50%,var(--paper)),
+      conic-gradient(from 210deg at 14% 0%,rgba(36,34,31,.03) 0 38deg,transparent 38deg 66deg,rgba(36,34,31,.02) 66deg 118deg,transparent 118deg),
+      conic-gradient(from 125deg at 86% 6%,rgba(217,83,30,.04) 0 34deg,transparent 34deg 78deg,rgba(36,34,31,.025) 78deg 124deg,transparent 124deg)}
+  .plate{flex:none;display:grid;place-items:center;width:150px;height:150px;background:var(--card);border-radius:22px;padding:18px;
+         box-shadow:0 0 0 1px var(--line),0 16px 34px -20px rgba(36,34,31,.35)}
+  .plate img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
+  .kicker{display:flex;align-items:center;gap:10px;font:500 11.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);margin:0 0 10px}
+  .kicker::after{content:"";width:28px;height:1px;background:currentColor;opacity:.5}
+  h1{font:700 clamp(28px,3.6vw,38px)/1.1 var(--slab);letter-spacing:-.005em;margin:0 0 8px;text-wrap:balance}
+  .lead{margin:0;color:var(--muted);max-width:540px;font-size:16px}
+  .trust{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--soft);font-size:13px}
+  .trust li{display:inline-flex;align-items:center;gap:6px}
+  .trust svg{width:14px;height:14px;color:var(--sage)}
+  .hero > div:nth-child(2){flex:1;min-width:0}
+
+  /* ---------- a few numbers from Google Analytics ---------- */
+  /* the website numbers: one wide strip, same width as the Edit mode card */
+  .stats{display:grid;grid-template-columns:minmax(190px,.9fr) 2.4fr;gap:10px 26px;align-items:center;background:var(--card);border-radius:18px;padding:18px 22px 12px;margin:0 0 16px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3)}
+  .stats[hidden]{display:none}
+  .stats p{margin:0}
+  .stats-k{font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage)}
+  .stats-when{margin-top:5px!important;font-size:12.5px;color:var(--soft)}
+  .stats-sum{margin-top:10px!important;font-size:15px;line-height:1.4;color:var(--muted)}.stats-sum:empty{display:none}
+  .stats-sum b{color:var(--ink);font-weight:700;white-space:nowrap}.stats-sum b.out{color:var(--accent)}
+  .stats-nums{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
+  .stats-nums li{display:flex;flex-direction:column;align-items:flex-start;padding:2px 0 2px 18px;border-left:1px solid var(--line);min-width:0}
+  .stats-nums b{font:700 28px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
+  .stats-nums span{margin-top:6px;font-size:14px;font-weight:650;color:var(--ink);line-height:1.25}
+  .stats-nums i{font-style:normal;font-size:12px;color:var(--soft);line-height:1.35;margin-top:1px}
+  .stats-nums small{margin-top:6px;font-weight:600;font-size:12px;line-height:1.3;color:var(--soft)}
+  .stats-nums small:empty{display:none}
+  .stats-nums small.up{color:#3f7a3a}.stats-nums small.down{color:#b4361c}
+  .stats-f{grid-column:1/-1;padding-top:8px;border-top:1px dashed var(--line);font-size:11px;line-height:1.4;color:var(--soft);display:flex;justify-content:space-between;align-items:center;gap:8px}
+  .stats-f .ga{display:inline-flex;align-items:center;gap:7px}.stats-f .ga svg{width:13px;height:13px;flex:none}
+  .stats-f .sample{flex:none;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent);border:1px solid var(--accent-soft);border-radius:999px;padding:3px 6px}
+
+  /* ---------- Edit mode: the main action, in the same calm white card as the boxes ---------- */
+  .edit{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:14px 18px;align-items:center;color:var(--ink);border-radius:18px;padding:18px 18px 18px 20px;margin:0 0 36px;text-decoration:none;cursor:pointer;
+        background:var(--card);box-shadow:0 0 0 1px var(--line),0 10px 26px -18px rgba(36,34,31,.28);transition:box-shadow .18s}
+  .edit:hover{box-shadow:0 0 0 2px var(--accent),0 12px 26px -16px rgba(194,84,27,.4)}
+  .edit .ic{width:46px;height:46px;border-radius:13px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center}
+  .edit .ic svg{width:23px;height:23px}
+  .edit .k{font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent);margin:0 0 6px}
+  .edit b{display:block;font:700 20px/1.2 var(--slab)}
+  .edit em{font-style:normal}
+  .edit .t{color:var(--muted);font-size:14.5px;line-height:1.45;margin:4px 0 0}
+  .edit .go{position:relative;display:flex;justify-content:center;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:650;font-size:15.5px;border-radius:11px;min-height:46px;padding:0 18px;white-space:nowrap;transition:background .15s}
+  .edit .go svg{width:18px;height:18px;transition:transform .2s}
+  .edit:hover .go{background:#a94816}.edit:hover .go svg{transform:translateX(3px)}
+  .edit:focus-visible{outline:3px solid var(--accent-hi);outline-offset:4px}
+  .edit[data-edit-mode="soon"]{box-shadow:0 0 0 1px var(--line)}
+  .edit[data-edit-mode="soon"] .go{background:var(--stone);color:var(--muted)}
+  .edit .soon,.edit[data-edit-mode="soon"] .ready{display:none}.edit[data-edit-mode="soon"] .soon{display:inline}
+  /* their website, framed, inside the Edit mode card (light and subtle) */
+  .edit.has-shot{grid-template-columns:minmax(0,1.05fr) 1fr;gap:22px;padding:16px 22px 16px 16px}
+  .shot{position:relative;border-radius:10px;overflow:hidden;background:var(--stone);box-shadow:0 0 0 1px var(--line),0 10px 24px -16px rgba(36,34,31,.4)}
+  .shot .bar{display:flex;align-items:center;gap:5px;height:24px;padding:0 9px;background:#f1ede7;border-bottom:1px solid var(--line)}
+  .shot .bar i{width:7px;height:7px;border-radius:50%;background:#d8d1c6}
+  .shot .bar span{margin-left:8px;flex:1;height:14px;border-radius:7px;background:#fff;font:500 9.5px/14px var(--mono);color:#7d766c;padding:0 8px;letter-spacing:.02em;overflow:hidden;white-space:nowrap}
+  .shot img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top}
+  .has-shot .side{display:flex;flex-direction:column;gap:14px;min-width:0}
+  .has-shot .live{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage);background:var(--sage-soft);border:1px solid #d6dfcd;border-radius:999px;padding:6px 10px}
+  .has-shot .live::before{content:"";width:7px;height:7px;border-radius:50%;background:#6f9a5c;box-shadow:0 0 0 3px rgba(111,154,92,.2)}
+  .has-shot .go{align-self:flex-start}
+  @media (max-width:760px){.edit.has-shot{grid-template-columns:1fr;padding:14px}.has-shot .go{align-self:stretch}}
+
+  /* ---------- Your requests: what they've asked for, and where each one stands (filled in by site-notes.js) ---------- */
+  .edit:has(+ .rq:not([hidden])){margin-bottom:16px}
+  .rq{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:hidden}
+  .rq-hd{display:flex;gap:12px;align-items:baseline;justify-content:space-between;padding:18px 22px 12px}
+  .rq-hd h2{font:700 22px/1.2 var(--slab);margin:0}
+  .rq-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}
+  .rq-all,.rq-no{font:650 14px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:none;border:0;padding:8px 0;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:3px}
+  .rq-all{color:var(--accent)}.rq-no{color:var(--muted);padding:8px 6px}
+  .rq-list{list-style:none;margin:0;padding:0}
+  .rq-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:start;padding:14px 22px;border-top:1px solid var(--line)}
+  .rq-row > b{font-size:16px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
+  .rq-m{grid-column:1;color:var(--muted);font-size:13.5px}
+  .rq-tag{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;border-radius:999px;padding:6px 10px;border:1px solid var(--line);color:var(--muted);background:var(--stone)}
+  .rq-tag::before{content:"";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.8}
+  .rq-tag.working{color:#a94816;background:var(--accent-soft);border-color:#f1d3c0}
+  .rq-tag.done{color:#4d5e42;background:var(--sage-soft);border-color:#d6dfcd}
+  .rq-tag.question{color:#fff;background:var(--char);border-color:var(--char)}
+  .rq-said{grid-column:1/-1;margin:6px 0 0;padding-left:12px;border-left:3px solid var(--line);font-size:14.5px;line-height:1.45;color:var(--muted);overflow-wrap:anywhere}
+  .rq-said b,.rq-q b{color:var(--ink);font-weight:600}
+  .rq-q{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:10px 12px;align-items:center;justify-content:space-between;margin-top:8px;padding:12px 14px;background:var(--stone);border-radius:12px;font-size:15px}
+  .rq-q p{flex:1 1 240px;min-width:0;margin:0;overflow-wrap:anywhere}
+  .rq-q.open{justify-content:flex-start}
+  .rq-q textarea{flex:1 1 100%;min-height:64px;resize:vertical;font:inherit;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px}
+  .rq-q textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}
+  .rq-go{flex:none;min-height:40px;padding:0 16px;font:650 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#fff;background:var(--accent);border:0;border-radius:10px;cursor:pointer}
+  .rq-go:hover{background:#a94816}.rq-go[disabled]{opacity:.6;cursor:default}
+  .rq-err{flex:1 1 100%;margin:0;color:#b4361c;font-size:14px}
+  .rq button:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}
+  @media (min-width:1800px){.rq-hd h2{font-size:24px}.rq-row > b{font-size:17px}}
+  @media (min-width:2400px){.rq-hd h2{font-size:27px}.rq-hd p,.rq-said,.rq-q{font-size:16px}.rq-row > b{font-size:18.5px}.rq-m{font-size:14.5px}.rq-tag{font-size:12px}.rq-go{font-size:15.5px;min-height:46px}}
+  @media (max-width:560px){.rq-hd{padding:16px 16px 10px}.rq-hd h2{font-size:20px}.rq-row{grid-template-columns:minmax(0,1fr);padding:14px 16px}.rq-row .rq-tag{grid-row:1;justify-self:start}.rq-q .rq-go{flex:1 1 100%;min-height:46px}.rq-q.open .rq-no{flex:1 1 100%}}
+
+  /* ---------- Your shop: what their website sells, kept by them (filled in by site-notes.js; hidden with no shop) ---------- */
+  .rq:not([hidden]):has(+ .sp:not([hidden])),.edit:has(+ .rq[hidden] + .sp:not([hidden])){margin-bottom:16px}
+  .sp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:hidden}
+  .sp-hd{display:flex;gap:12px 16px;align-items:center;justify-content:space-between;padding:18px 22px 14px}
+  .sp-hd h2{font:700 22px/1.2 var(--slab);margin:0}
+  .sp-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}
+  .sp-add{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px 0 13px;font:650 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #f1d3c0;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
+  .sp-add:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+  .sp-add[hidden]{display:none}
+  .sp svg{flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .sp-add svg{width:16px;height:16px;stroke-width:2.4}
+  .sp-cat{margin:0;padding:16px 22px 4px;border-top:1px solid var(--line);font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage)}
+  .sp-items{list-style:none;margin:0;padding:0}
+  .sp-cat + .sp-items > .sp-row:first-child{border-top:0}
+  .sp-row{display:grid;grid-template-columns:52px minmax(0,1fr) 136px 132px 92px;grid-template-areas:"pic what price tag act";gap:6px 16px;align-items:center;padding:12px 22px;border-top:1px solid var(--line)}
+  .sp-row.open{background:#faf8f4}
+  .sp-pic{grid-area:pic;display:grid;place-items:center;width:52px;height:52px;border-radius:10px;background:var(--stone) center/cover no-repeat;color:var(--soft)}
+  .sp-pic svg{width:20px;height:20px;stroke-width:1.8}
+  .sp-row.off .sp-pic{opacity:.55}.sp-row.off .sp-what b{color:var(--muted)}
+  .sp-what{grid-area:what;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
+  .sp-what b{font-size:16px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
+  .sp-m{max-width:100%;color:var(--muted);font-size:13.5px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .sp-sq{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:600;color:var(--sage);text-decoration:none;white-space:nowrap}
+  .sp-sq:hover{text-decoration:underline;text-underline-offset:3px}
+  .sp-sq svg{width:13px;height:13px;stroke-width:2.2}
+  .sp-link,.sp-diff button{font:650 13.5px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .sp-price{grid-area:price;display:flex;flex-direction:column;gap:3px;min-width:0}
+  .sp-box{display:flex;align-items:center;gap:3px;height:40px;padding:0 10px;background:#fff;border:1px solid #d8d1c6;border-radius:10px;cursor:text}
+  .sp-box span{color:var(--soft);font-weight:600}
+  .sp-box input{flex:1;width:100%;min-width:0;border:0;padding:0;background:none;outline:none;font:600 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink)}
+  .sp-box input::placeholder{color:var(--soft);font-weight:400}
+  .sp-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}
+  .sp-box.diff{border-color:#e39a6c;background:var(--accent-soft)}
+  .sp-diff{font-size:12.5px;line-height:1.35;color:#a94816}.sp-diff button{font-size:12.5px}
+  .sp-tag{grid-area:tag;justify-self:start}
+  .sp-tag.live{color:#4d5e42;background:var(--sage-soft);border-color:#d6dfcd}
+  .sp-tag.sold{color:#a94816;background:var(--accent-soft);border-color:#f1d3c0}
+  .sp-btn{grid-area:act;justify-self:end;min-height:38px;padding:0 15px;font:650 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;cursor:pointer}
+  .sp-btn:hover{border-color:var(--ink)}
+  .sp-none{margin:0;padding:16px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}
+  .sp-foot{margin:0;padding:12px 22px 14px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.45;color:var(--soft)}
+  /* adding or changing one item: under its row, or at the top for a new one */
+  .sp-open{list-style:none}
+  .sp-form{padding:18px 22px 20px;background:#faf8f4;border-top:1px solid var(--line)}
+  .sp-row.open + .sp-open .sp-form{border-top:1px dashed var(--line)}
+  .sp-hd2 h3{font:700 18px/1.25 var(--slab);margin:0}
+  .sp-hd2 p{margin:2px 0 14px;color:var(--muted);font-size:14px}
+  .sp-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
+  .sp-f{display:flex;flex-direction:column;gap:5px;min-width:0}
+  .sp-f.wide{grid-column:1/-1}
+  .sp-f label{font-size:14px;font-weight:650}
+  .sp-f input,.sp-f select,.sp-f textarea{width:100%;min-height:44px;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid #d8d1c6;border-radius:10px;padding:9px 12px}
+  .sp-f textarea{min-height:68px;resize:vertical}
+  .sp-f input[type=file]{min-height:0;padding:6px 8px;font-size:14px;color:var(--muted)}
+  .sp-f input[type=file]::file-selector-button{margin-right:10px;padding:7px 13px;font:650 13.5px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--stone);border:1px solid var(--line);border-radius:8px;cursor:pointer}
+  .sp-f input:focus,.sp-f select:focus,.sp-f textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}
+  .sp-f small{color:var(--soft);font-size:12.5px;line-height:1.35}
+  .sp-file{display:flex;align-items:center;gap:10px}.sp-file .sp-pic{flex:none;width:44px;height:44px}
+  .sp-ft{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:16px}
+  .sp-ft .gap{flex:1}
+  .sp-form > .rq-err{margin-top:12px}
+  .sp-del{font:650 14px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#b4361c;background:none;border:0;padding:8px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+  .sp-sure{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:14px}
+  .sp-sure .sp-del{min-height:40px;padding:0 14px;color:#fff;background:#b4361c;border-radius:10px;text-decoration:none}
+  .sp-sure .sp-del:hover{background:#962b14}
+  .sp button:focus-visible,.sp a:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}
+  @media (min-width:1800px){.sp-hd h2{font-size:24px}.sp-what b{font-size:17px}}
+  @media (min-width:2400px){.sp-hd h2{font-size:27px}.sp-hd p,.sp-hd2 p{font-size:16px}.sp-what b{font-size:18.5px}.sp-m,.sp-sq{font-size:14.5px}.sp-tag{font-size:12px}
+    .sp-row{grid-template-columns:60px minmax(0,1fr) 150px 146px 104px}.sp-pic{width:60px;height:60px}.sp-box{height:46px}.sp-box input{font-size:16.5px}.sp-btn,.sp-add{font-size:15.5px;min-height:46px}
+    .sp-f label{font-size:15.5px}.sp-f input,.sp-f select,.sp-f textarea{font-size:16.5px;min-height:48px}.sp-f small,.sp-foot{font-size:14px}.sp-hd2 h3{font-size:21px}}
+  @media (max-width:720px){
+    .sp-hd{flex-wrap:wrap;padding:16px 16px 12px}.sp-hd h2{font-size:20px}
+    .sp-row{grid-template-columns:48px minmax(0,1fr) auto auto;grid-template-areas:"pic what what what" "price price tag act";gap:10px 12px;padding:12px 16px}
+    .sp-pic{width:48px;height:48px;align-self:start}.sp-what{align-self:center}.sp-price{align-self:start}.sp-box{width:128px;max-width:100%}.sp-tag,.sp-btn{align-self:start}.sp-tag{margin-top:8px}.sp-btn{margin-top:1px}
+    .sp-cat,.sp-none,.sp-foot{padding-left:16px;padding-right:16px}
+    .sp-form{padding:16px}.sp-fields{grid-template-columns:minmax(0,1fr)}
+    .sp-ft .rq-go{flex:1 1 100%;min-height:48px;order:3}
+  }
+
+  /* ---------- tappable cards ---------- */
+  .box{position:relative;background:var(--card);border-radius:16px;padding:16px 16px 16px 18px;cursor:pointer;
+       box-shadow:0 0 0 1px var(--line),0 1px 0 rgba(36,34,31,.03);transition:box-shadow .18s,transform .18s}
+  /* photos dragged from the computer onto a box (site-notes.js) */
+  .box.swn-drop{box-shadow:0 0 0 3px var(--accent),0 16px 34px -16px rgba(194,84,27,.5);background:var(--accent-soft)}
+  .box.swn-drop::after{content:"Drop photos here";position:absolute;inset:0;display:grid;place-items:center;border-radius:inherit;background:rgba(251,238,230,.88);color:var(--accent);font:700 20px/1.2 var(--slab);pointer-events:none}
+  .box:hover{box-shadow:0 0 0 2px var(--accent),0 12px 26px -16px rgba(194,84,27,.45);transform:translateY(-1px)}
+  .bh{display:flex;align-items:center;gap:12px}
+  .bh .ic{flex:none;width:38px;height:38px;border-radius:11px;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent)}
+  .bh .ic svg{width:20px;height:20px}
+  .bh .grow{flex:1;min-width:0}
+  .box b{display:block;font-size:16.5px;line-height:1.3;font-weight:650}
+  .bh span{display:block;color:var(--muted);font-size:14px;line-height:1.4;margin-top:1px}
+  .box .tap{flex:none;display:inline-flex;align-items:center;gap:5px;background:var(--accent-soft);color:var(--accent);font-weight:650;font-size:13.5px;padding:7px 12px;border-radius:999px;font-style:normal;white-space:nowrap;transition:background .15s,color .15s}
+  .box .tap svg{width:14px;height:14px}
+  .box:hover .tap{background:var(--accent);color:#fff}
+  .meet{margin:0 0 40px;padding:14px 14px 14px 18px}
+  .meet .ic{background:var(--sage-soft);color:var(--sage)}
+  .meet .tap{background:var(--sage-soft);color:var(--sage)}
+  .meet:hover{box-shadow:0 0 0 2px var(--sage),0 12px 26px -16px rgba(95,113,82,.5)}
+  .meet:hover .tap{background:var(--sage);color:#fff}
+
+  .sec-h{font:700 24px/1.2 var(--slab);margin:0 0 4px}
+  .sub{margin:0 0 16px;color:var(--muted);font-size:15.5px;max-width:640px}
+  .boxes{display:grid;gap:12px;margin:0 0 40px;padding:0;list-style:none}
+  @media (min-width:700px){.boxes{grid-template-columns:1fr 1fr}.box.wide{grid-column:1/-1}}
+
+  /* ---------- what's on the site now ---------- */
+  .now{margin:14px 0 0;padding:12px 0 0;border-top:1px dashed var(--line)}
+  .now-k{display:flex;align-items:center;gap:6px;font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage);margin:0 0 10px}
+  .now-k svg{width:12px;height:12px}
+  .now.empty .now-k{color:var(--soft)}
+  .now .none{margin:0;color:var(--soft);font-size:14px}
+  .logo-now{display:grid;place-items:center;height:96px;border-radius:12px;padding:12px;
+            background:repeating-conic-gradient(#f3efe9 0 25%,#fff 0 50%) 0 0/14px 14px;box-shadow:inset 0 0 0 1px var(--line)}
+  .logo-now img{max-width:100%;max-height:72px;width:auto;height:auto;object-fit:contain}
+  .pics{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
+  .pics > img,.pics .more{display:block;width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:var(--stone)}
+  .pics > img{cursor:zoom-in;transition:transform .15s,box-shadow .15s}
+  .pics > img:hover{transform:scale(1.04);box-shadow:0 6px 16px -8px rgba(36,34,31,.5)}
+  .pics .more{position:relative;overflow:hidden}
+  .pics .more img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35;filter:grayscale(.3)}
+  .pics .more span{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-size:11.5px;line-height:1.2;font-weight:600;color:var(--ink);background:rgba(255,255,255,.55);padding:4px}
+  .pics .more b{display:block;font:700 22px/1 var(--slab);margin-bottom:2px}
+  .facts{margin:0;display:grid;gap:7px}
+  .facts div{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:baseline}
+  .facts dt{color:var(--soft);font-size:13px}
+  .facts dd{margin:0;font-size:14.5px;line-height:1.45;overflow-wrap:anywhere}
+  .facts dd.miss{color:var(--soft);font-style:italic}
+  .facts .q{font-family:var(--slab);font-weight:600;font-size:16px}
+  .soc{list-style:none;margin:0;padding:0;display:grid;gap:7px}
+  .soc li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center;font-size:14.5px}
+  .soc li > span:first-child{color:var(--soft);font-size:13px}
+  .soc .on{display:inline-flex;align-items:center;gap:6px;min-width:0;overflow-wrap:anywhere}
+  .soc .on svg{flex:none;width:15px;height:15px;color:var(--sage)}
+  .soc .url{min-width:0;overflow-wrap:anywhere}
+  .soc .off{display:inline-flex;align-items:center;gap:8px;min-width:0;color:var(--soft);padding-left:21px}
+  .soc .off em{flex:none;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;font-style:normal;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px 7px}
+
+  /* ---------- private ---------- */
+  /* "private" reassurance: one quiet row */
+  .kept{list-style:none;margin:0 0 40px;padding:12px 18px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;border:1px solid var(--line);border-radius:14px;font-size:13.5px;color:var(--muted)}
+  .kept li{display:flex;align-items:center;gap:7px}
+  .kept svg{flex:none;width:16px;height:16px;color:var(--sage)}
+
+  /* ---------- footer ---------- */
+  [data-site-notes-spacer]{background:var(--char)}
+  .sw-foot{background:var(--char);color:#d8d2c8}
+  .sw-foot .wrap{max-width:1180px;padding-top:32px;padding-bottom:26px}
+  .sw-foot .row{display:flex;flex-wrap:wrap;align-items:center;gap:16px 28px}
+  .sw-foot .row img{height:34px;width:auto;display:block}
+  .sw-foot .row .gap{flex:1}
+  .sw-foot .contact{font-size:14.5px;margin:0}
+  .sw-foot .contact a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(238,106,53,.7)}
+  .sw-foot .contact a:hover{border-color:#ee6a35}
+  .sw-foot .rule{height:1px;background:rgba(216,210,200,.16);margin:20px 0 14px}
+  .sw-foot .fine{display:flex;flex-wrap:wrap;gap:6px 20px;font:500 11.5px/1.6 var(--mono);letter-spacing:.06em;color:#a59d91}
+  .sw-foot .fine a{color:#d8d2c8;text-decoration:none}.sw-foot .fine a:hover{color:#fff;text-decoration:underline}
+  .sw-foot .fine .lock{display:inline-flex;align-items:center;gap:6px}
+  .sw-foot .fine svg{width:12px;height:12px}
+
+  @media (min-width:1800px){body{font-size:17px}.wrap{max-width:1000px}.hero{padding-top:52px}.plate{width:170px;height:170px}h1{font-size:42px}
+    .edit b{font-size:22px}.box b{font-size:17.5px}.sw-brand img{height:34px}.sec-h{font-size:27px}.facts dd,.soc li{font-size:15.5px}.logo-now{height:110px}.logo-now img{max-height:84px}}
+  @media (min-width:2400px){body{font-size:18.5px}.wrap{max-width:1120px}.sw-head .wrap,.sw-foot .wrap{max-width:1400px}.plate{width:190px;height:190px}h1{font-size:48px}.lead{font-size:18px}
+    .trust{font-size:14.5px}.edit b{font-size:25px}.edit .t{font-size:16px}.edit .go{font-size:17px;min-height:52px}.box b{font-size:19px}.bh span{font-size:15.5px}.box .tap{font-size:15px}
+    .bh .ic{width:44px;height:44px}.sec-h{font-size:30px}.sub{font-size:17px;max-width:720px}.now-k{font-size:11.5px}.facts dt,.soc li > span:first-child{font-size:14.5px}.facts dd,.soc li{font-size:17px}
+    .facts div,.soc li{grid-template-columns:110px 1fr}.logo-now{height:124px}.logo-now img{max-height:94px}.kept{font-size:15px}.sw-brand img{height:38px}}
+  @media (min-width:561px) and (max-width:899px){.stats{grid-template-columns:1fr}}
+  @media (max-width:699px){
+    .pics{grid-template-columns:repeat(3,1fr)}
+  }
+  @media (max-width:560px){
+    .sw-head .wrap{min-height:54px}.sw-brand img{height:26px}.secure{padding:6px 9px 6px 8px;font-size:10px;letter-spacing:.08em}
+    .hero{flex-direction:column;text-align:center;gap:16px;padding:26px 0 22px}.stats{grid-template-columns:1fr;padding:16px 16px 10px}.stats-nums{grid-template-columns:1fr}.stats-nums li{display:grid;grid-template-columns:72px minmax(0,1fr);column-gap:12px;align-items:baseline;border-left:0;border-top:1px solid var(--line);padding:10px 0}.stats-nums b{grid-row:span 2;font-size:26px}.stats-nums span{margin-top:0}.stats-nums small{margin-top:2px}.stats-nums i{display:none}.plate{width:116px;height:116px;padding:14px;border-radius:18px}.plate.wide{width:min(280px,100%);height:110px;padding:12px 16px}
+    .kicker{justify-content:center}.kicker::before{content:"";width:28px;height:1px;background:currentColor;opacity:.5}
+    h1{font-size:27px}.lead{font-size:15.5px}.trust{justify-content:center;font-size:12.5px;gap:4px 12px}
+    .edit{grid-template-columns:auto 1fr;padding:16px;gap:12px 14px}.edit .ic{width:40px;height:40px;border-radius:11px}.edit .ic svg{width:20px;height:20px}
+    .edit b{font-size:18px}.edit .go{grid-column:1/-1;min-height:50px;font-size:16px}
+    .meet{flex-wrap:wrap}
+    .sec-h{font-size:22px}.box{padding:14px}.bh{gap:10px}.box .tap{font-size:12.5px;padding:6px 10px}
+    .facts div,.soc li{grid-template-columns:84px 1fr}
+    .soc{gap:10px}.soc li{grid-template-columns:1fr;gap:1px}.soc .off{flex-wrap:wrap;row-gap:4px}
+    .kept{padding:12px 14px;justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:8px}
+  }
+  @media (max-width:560px){.secure:has(~ .head-acts:not(:empty)){display:none}.head-acts button{padding:0 11px}}
+  @media (max-width:360px){.secure .w{display:none}}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+  .flat{line-height:0}.nojs{padding:24px}
+</style>
+</head>
+<body>
+<header class="sw-head" data-keep>
+  <div class="wrap">
+    <a class="sw-brand" href="https://straywolftech.com" rel="noopener"><img src="brand/stray-wolf-logo-color.svg" alt="Stray Wolf Technology" width="128" height="30"></a>
+    <span class="gap"></span>
+    <span class="secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Private <span class="w">and secure</span></span>
+    <!-- Help and Log out go here once they're logged in (site-notes.js fills it in) -->
+    <span class="head-acts" data-portal-actions></span>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="hero" data-area="Welcome">
+    <div class="plate"><img src="../favicon.svg" alt="Snip &amp; Sprout Co. mark" width="114" height="114"></div>
+    <div>
+      <p class="kicker">Client Portal</p>
+      <h1>Welcome, Snip &amp; Sprout Co.</h1>
+      <p class="lead">Send what's needed, ask for changes to your website, and set up a time to talk, all in one place.</p>
+    </div>
+  </section>
+
+  <!-- A few numbers from Google Analytics, in one wide strip under the welcome. Hidden until the notes
+       service sends real ones (site-notes.js asks /api/stats after login); the demo shows sample numbers. -->
+  <aside class="stats" data-stats hidden aria-label="Your website, last 28 days">
+    <div class="stats-head">
+      <p class="stats-k">Your website</p>
+      <p class="stats-when" data-stat="range">Last 28 days</p>
+      <p class="stats-sum" data-stat="summary"></p>
+    </div>
+    <ul class="stats-nums">
+      <li><b data-stat="visitors">–</b><span>Visitors</span><i>Different people who opened your website</i><small data-chg="visitors"></small></li>
+      <li><b data-stat="calls">–</b><span>Phone calls</span><i>Tapped your number on the website</i><small data-chg="calls"></small></li>
+      <li><b data-stat="leads">–</b><span>Form requests</span><i>Filled in and sent your form</i><small data-chg="leads"></small></li>
+    </ul>
+    <p class="stats-f"><span class="ga"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="16" y="2" width="6" height="20" rx="3" fill="#F9AB00"/><rect x="9" y="9" width="6" height="13" rx="3" fill="#E37400"/><circle cx="4.5" cy="18.5" r="3.5" fill="#E37400"/></svg><span data-stat="note">From Google Analytics</span></span></p>
+  </aside>
+
+  <a class="edit has-shot" href="{{home}}" data-edit-mode="{{home}}">
+    <div class="shot" aria-hidden="true"><div class="bar"><i></i><i></i><i></i><span>snipandsproutco.com</span></div><img src="brand/site-preview.jpg" alt="" width="960" height="600"></div>
+    <div class="side">
+      <span class="live">Your new website</span>
+      <div>
+        <p class="k">Edit mode</p>
+        <b>Want something changed?</b>
+        <p class="t">Open your website, tap the part you mean, and say what you'd like. Nothing changes until the update is made.</p>
+      </div>
+      <div class="go">Open Edit mode<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+  </a>
+
+  <!-- Your requests: what they've asked for and where each one stands, under the Edit mode card. Hidden until
+       the notes service sends at least one (site-notes.js asks /api/my-requests after login and builds the rows).
+       The status is the one Stray Wolf picks in the admin; a question gets an Answer button. -->
+  <section class="rq" data-requests hidden aria-labelledby="rq-h">
+    <div class="rq-hd"><div><h2 id="rq-h">Your requests</h2><p>What you've asked for, and where each one stands.</p></div><button class="rq-all" type="button" data-requests-all hidden></button></div>
+    <ul class="rq-list" data-requests-list></ul>
+  </section>
+
+  <!-- Your shop: for a client whose website sells through Square (kit/shop on their site). Hidden until Stray Wolf
+       starts their shop in the admin (site-notes.js asks /api/my-shop after login and builds the rows). They add,
+       change and delete items, type the shown price in each row, and set each item's photo and Square checkout link. -->
+  <section class="sp" data-shop-portal hidden aria-labelledby="sp-h">
+    <div class="sp-hd"><div><h2 id="sp-h">Your shop</h2><p data-shop-count>What your website sells.</p></div>
+      <button class="sp-add" type="button" data-shop-add><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add an item</button></div>
+    <div data-shop-form></div>
+    <div data-shop-list></div>
+    <p class="sp-foot">Every Buy button on your website opens your Square checkout, so payments never come through here. Changes show on your website within a minute.</p>
+  </section>
+
+  <h2 class="sec-h">What's on your site now</h2>
+  <p class="sub">Here's what your website shows today. Tap a box to add something new or fix anything that's wrong, then tap <b>Send to Stray Wolf</b> at the bottom.</p>
+  <ul class="boxes">
+    <li class="box" data-note-box data-note-photos data-area="Logo" data-note-ask="Add your logo below. Anything I should know about it?" data-note-hint="For example: This is the newest one. Use the round version.">
+      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></div><div class="grow"><b>Your logo</b><span>Have a newer one?</span></div><em class="tap">Add or change</em></div>
+      <div class="now">
+        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+        <div class="logo-now"><img src="../favicon.svg" alt="The Snip &amp; Sprout Co. mark on the website" width="64" height="64"></div>
+      </div>
+    </li>
+    <li class="box" data-note-box data-area="Contact info" data-note-fields="Email|Find us|Phone" data-note-now="Email=snipandsproutco@gmail.com|Find us=413 E. Emma Ave., Springdale, AR 72764" data-note-ask="Here&#x27;s what&#x27;s on your site. Tap Change on anything that&#x27;s new or wrong.">
+      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div class="grow"><b>Contact info</b><span>How people reach you.</span></div><em class="tap">Add or change</em></div>
+      <div class="now">
+        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+        <dl class="facts"><div><dt>Email</dt><dd>snipandsproutco@gmail.com</dd></div><div><dt>Find us</dt><dd>413 E. Emma Ave., Springdale, AR 72764</dd></div></dl>
+      </div>
+    </li>
+    <li class="box" data-note-box data-area="Shop hours" data-note-fields="Mon – Tue|Wed – Fri|Sat – Sun|A holiday or a day off" data-note-now="Mon – Tue=10 AM – 3 PM|Wed – Fri=9 AM – 6 PM|Sat – Sun=9 AM – 2 PM" data-note-ask="Here are the hours on your site. Tap Change on any that are different now.">
+      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="grow"><b>Shop hours</b><span>When you&#x27;re open.</span></div><em class="tap">Add or change</em></div>
+      <div class="now">
+        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+        <dl class="facts"><div><dt>Mon – Tue</dt><dd>10 AM – 3 PM</dd></div><div><dt>Wed – Fri</dt><dd>9 AM – 6 PM</dd></div><div><dt>Sat – Sun</dt><dd>9 AM – 2 PM</dd></div></dl>
+      </div>
+    </li>
+    <li class="box" data-note-box data-area="Your social pages" data-note-fields="Instagram|Etsy|Facebook|Google" data-note-now="Instagram=instagram.com/snipandsprout.co|Etsy=etsy.com/shop/SnipAndSproutCo" data-note-ask="Tap Change if a link is wrong, or paste a link for a page you have.">
+      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg></div><div class="grow"><b>Your social pages</b><span>Just the ones you have.</span></div><em class="tap">Add or change</em></div>
+      <div class="now">
+        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+        <ul class="soc"><li><span>Instagram</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">instagram.com/snipandsprout.co</span></span></li><li><span>Etsy</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">etsy.com/shop/SnipAndSproutCo</span></span></li><li><span>Facebook</span><span class="off"><span class="url">facebook.com/yourpage</span><em>Example</em></span></li><li><span>Google</span><span class="off"><span class="url">maps.app.goo.gl/yourplace</span><em>Example</em></span></li></ul>
+      </div>
+    </li>
+    <li class="box wide" data-note-box data-photos-page data-note-photos data-area="Photos" data-note-ask="Add new photos below. Want a photo on your site swapped out? Tell me which one." data-note-hint="For example: Swap the pumpkin photo for this one.">
+      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></div><div class="grow"><b>Photos</b><span>Your shop, your workshops, what people made.</span></div><em class="tap">Open</em></div>
+      <div class="now">
+        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+        <div class="pics"><img src="../img/ig-dani.webp" data-big="../img/ig-dani.webp" alt="Dani beside a big alocasia in the shop" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/kit-flatlay.webp" data-big="../img/kit-flatlay.webp" alt="A DIY terrarium kit laid out in labelled bags" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/ig-tbar.webp" data-big="../img/ig-tbar.webp" alt="Dani layering soil into a glass terrarium" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/stakes-tall.webp" data-big="../img/stakes-tall.webp" alt="Wooden plant markers and pastel pots" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/ig-globe.webp" data-big="../img/ig-globe.webp" alt="A glass terrarium with succulents and tiny pumpkins" title="Tap to see it bigger" loading="lazy" decoding="async"><span class="more"><img src="../img/bar-wide.webp" alt="" loading="lazy" decoding="async"><span><b>See all</b>your photos</span></span></div>
+      </div>
+    </li>
+  </ul>
+
+  <!-- Let's talk opens Stray Wolf's Google Calendar booking page (data-booking-url) in a new tab.
+       Empty data-booking-url = it goes back to a note with times that work. -->
+  <div class="meet box" data-note-box data-booking-url="https://calendar.app.google/XseK2nweRYW1hea37" data-area="Meeting request" data-note-fields="Days that work for you=For example: Tuesday or Thursday|Best time of day=For example: mornings, or after 3|Phone, video or in person?=For example: a phone call is easiest" data-note-ask="When can we talk? I'll set it up and confirm with you.">
+    <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8.5 15l2.2 2.2 4.8-4.8"/></svg></div><div class="grow"><b>Let's talk</b><span>Pick a time that works for you, for a call or a meeting.</span></div><em class="tap">Pick a time</em></div>
+  </div>
+
+  <ul class="kept" aria-label="Your portal is private">
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Only with your password</li>
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Sent only to Stray Wolf</li>
+    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Your visitors never see it</li>
+  </ul>
+  <!-- Every photo on the site's pages, for the Photos page ("On your site now"). build.mjs writes this
+       list from the pages themselves, so it always matches the site. data-on = the pages a photo is on. -->
+  <template data-site-photos>
+{{photos}}
+  </template>
+</main>
+
+<footer class="sw-foot" data-keep>
+  <div class="wrap">
+    <div class="row">
+      <a class="flat" href="https://straywolftech.com" rel="noopener"><img src="brand/stray-wolf-logo-reverse.svg" alt="Stray Wolf Technology" width="146" height="34"></a>
+      <span class="gap"></span>
+      <p class="contact">Questions? Email <a href="mailto:info@straywolftech.com">info@straywolftech.com</a></p>
+    </div>
+    <div class="rule"></div>
+    <div class="fine">
+      <span class="lock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Private page for Snip &amp; Sprout Co.</span>
+      <a href="https://straywolftech.com/privacy.html" rel="noopener">Privacy</a>
+      <a href="https://straywolftech.com/terms.html" rel="noopener">Terms</a>
+      <span>© 2026 Stray Wolf Technology</span>
+    </div>
+  </div>
+</footer>
+<noscript><p class="nojs">Please turn on JavaScript to log in.</p></noscript>
+<script src="../site-notes.js" data-site="{{site}}" data-api="{{api}}" data-hub data-caption-example="the new terrariums" data-name="Snip &amp; Sprout Co." data-logo="../favicon.svg"></script>
+</body>
+</html>
