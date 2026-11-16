@@ -52,7 +52,6 @@ const I = {
   bag: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h12l-1 10H5Z"/><path d="M7.5 7V6a2.5 2.5 0 0 1 5 0v1"/></svg>',
   cal: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3.5 5.5h13v11h-13ZM3.5 9h13M7 3.5v3M13 3.5v3"/></svg>',
   leaf: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M10 17V8"/><path d="M10 11c-3.4 0-5.5-2-5.5-5 3 0 5.5 1.8 5.5 5ZM10 9c0-3 2-5 5.5-5 0 3-2.2 5-5.5 5Z"/></svg>',
-  mark: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#585f53"/><g fill="none" stroke="#f5f1ea" stroke-width="1.7" stroke-linecap="round"><path d="M16 25V12"/><path d="M16 17c-4 0-6.5-2.4-6.5-6 3.4 0 6.5 2.2 6.5 6ZM16 14c0-3.6 2.5-6 6.5-6 0 3.6-2.6 6-6.5 6Z" fill="#f5f1ea" fill-opacity=".2"/></g></svg>',
 };
 
 const HOURS3 = `<table class="hours3" data-hours3>
@@ -67,7 +66,7 @@ const HOURS3 = `<table class="hours3" data-hours3>
 const NEIGHBORS = `<div class="neighbors"><span>In Bloom Floral Company</span><span>Two Friends Community Books</span><span>KaGie's</span></div>`;
 
 const nav = (file) => `<header class="nav"><div class="nav__in">
-  <a class="brand" href="index.html" aria-label="Snip &amp; Sprout Co. home">${I.mark}<span>Snip &amp; Sprout Co.</span></a>
+  <a class="brand" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo.svg" alt="" width="149" height="113"></a>
   <nav class="nav__links" aria-label="Main">
     ${[['workshops.html', 'Workshops'], ['visit.html', 'Visit Us'], ['about.html', 'About']].map(([h, t]) => `<a href="${h}"${h === file ? ' aria-current="page"' : ''}>${t}</a>`).join('\n    ')}
   </nav>
@@ -135,7 +134,7 @@ const shopList = `<script src="shop.js" data-site="${C.site}" data-api="${C.api}
 const foot = (p) => `<footer class="foot">
 <div class="wrap foot__grid">
   <div class="foot__brand">
-    <a class="foot__logo" href="index.html">${I.mark.replace('fill="#585f53"', 'fill="#f7f4ee"').replace(/#f5f1ea/g, '#2f342b')}<span>Snip &amp; Sprout Co.</span></a>
+    <a class="foot__logo" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo-reverse.svg" alt="" width="149" height="113"></a>
     <p>Snip &amp; Sprout Co. is an indoor plant boutique in Northwest Arkansas—offering thoughtfully curated houseplants, artisan pottery, plant care essentials, and hands-on workshops for anyone who wants to grow something.</p>
   </div>
   <div class="foot__col">
@@ -548,6 +547,6 @@ writeFileSync(dist + 'workshop.ics', ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:
   'UID:nov-2026-terrarium-workshop@snipandsproutco.com', 'DTSTAMP:20261115T000000Z', 'DTSTART:20261122T190000Z', 'DTEND:20261122T200000Z',
   'SUMMARY:November Terrarium Workshop at Snip & Sprout Co.', 'LOCATION:413 E. Emma Ave.\\, Springdale\\, AR 72764',
   'DESCRIPTION:Starts at 1 PM. Seating is limited.', 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n'));
-for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'robots.txt', '_headers']) cpSync(here + 'src/' + f, dist + f);
+for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-reverse.svg', 'robots.txt', '_headers']) cpSync(here + 'src/' + f, dist + f);
 cpSync(here + 'version.json', dist + 'version.json');   // the Stray Wolf admin reads the site's version from here
 console.log(`built 6 pages, the 404 page and the Client Portal${PREVIEW ? ' (preview)' : ''}`);

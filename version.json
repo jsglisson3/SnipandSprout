@@ -1,6 +1,7 @@
 {
-  "version": "V5.3",
+  "version": "V6",
   "changes": [
+    { "version": "V6", "date": "2026-11-16", "note": "Her own logo (Snip &, SPROUT, PLANT CO.) in the header, the footer and the Client Portal, redrawn in its typeface so it stays sharp at every size. On the portal, \"Find us\" is now \"Address\"." },
     { "version": "V5.3", "date": "2026-11-16", "note": "Every page now in Dani's own words, taken from her text about the Shop, her Instagram posts, her current site and her Plant Bar sign. The scrolling band shows six of her plant-marker sayings on her dusty rose." },
     { "version": "V5.2", "date": "2026-11-16", "note": "Smaller and tighter: the layout stops growing at a normal desktop width and sits centred, type, photos and spacing a notch smaller on every page, the olive bands and the Shop cards and kit photo tightened. The header is now her sage green, with the open-now line as a pill." },
     { "version": "V5.1", "date": "2026-11-16", "note": "Tidy-up: old photos removed, and the Client Portal's shop card now works with any checkout, not only Square." },

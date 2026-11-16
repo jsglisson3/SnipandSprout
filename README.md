@@ -54,6 +54,7 @@ Cloudflare Workers and Pages app on GitHub still has this repository under Repos
 | `src/shop-section.html`, `src/shop-section.css` | The Shop page's three tabs (DIY Terrarium Kits, Terrarium Bar, Plant Bar) in Dani's own words. No script: radio buttons and CSS. Prices and Square links are typed in here. |
 | `src/stray-badge.html` | The Stray Wolf footer badge, the dark logo version, copied unchanged from Stray Wolf's badge kit. Its styles are the kit's, in `site.css` under "Stray Wolf Technology footer badge". Holding it opens the Client Portal. |
 | `src/portal.html` | Her Client Portal page: Stray Wolf's standard page with her details. The build fills in her short name, the service address and the list of photos on her site. |
+| `src/logo.svg`, `src/logo-reverse.svg` | Her logo (Snip &, SPROUT, PLANT CO.), redrawn as outlines of Instrument Serif, its typeface: one for light grounds (header, Client Portal), one for dark grounds (footer). |
 | `src/_headers`, `src/robots.txt`, `src/favicon.svg` | Cloudflare's response headers, the search-engine file, the tab icon. |
 | `img/`, `img/shop/` | Every photo the site uses, already cropped and sized (WebP). |
 | `fonts/` | Instrument Serif and Newsreader, served from the site itself (SIL Open Font License). |
@@ -87,7 +88,7 @@ no MIME sniffing, no framing by other sites, and keeps the `.pages.dev` copy out
 5. The storefront photo (`ig-storefront`) came from a friend's post.
 6. The supplier's photos (Teardrop, the vessel thumbnails) are fine to use.
 7. The November 22 workshop's length (the calendar entry assumes one hour).
-8. Her logo file. The header uses a drawn stand-in for her mark.
+8. Her logo says "Snip & Sprout Plant Co."; the site's text says "Snip & Sprout Co." Which name she wants used.
 9. About says the shop has been in downtown Springdale since August 2026 (from her grand opening post).
 10. The DIY kit's price and styles: her Squarespace store says from $28 with six types (Closed, Open, Teardrop,
     Skull, Dino, Mini Witchy); her Square kit link and this site say $55 with four.
