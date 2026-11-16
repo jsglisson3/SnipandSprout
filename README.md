@@ -89,11 +89,14 @@ no MIME sniffing, no framing by other sites, and keeps the `.pages.dev` copy out
 7. The November 22 workshop's length (the calendar entry assumes one hour).
 8. Her logo file. The header uses a drawn stand-in for her mark.
 9. About says the shop has been in downtown Springdale since August 2026 (from her grand opening post).
+10. The DIY kit's price and styles: her Squarespace store says from $28 with six types (Closed, Open, Teardrop,
+    Skull, Dino, Mini Witchy); her Square kit link and this site say $55 with four.
 
 ## Launch (only after Dani says yes)
 
-1. Stray Wolf Admin: add her as a client with the short name `snip-and-sprout`, start her shop, import her
-   Square item library, and paste each item's Square checkout link.
+1. Stray Wolf Admin (set up Nov 16 with the short name `snip-and-sprout` and a Generic shop): her three
+   Square items are Hidden because the Shop section shows them; her store's other items are On the site.
+   Move the Squarespace store links to Square links when the Squarespace site retires.
 2. Cloudflare Pages, in Dani's account: connect the repository, build command `npm run build`, output `dist`.
 3. Set `DRAFT` to `false` in `build.mjs`, add the canonical address and a sitemap, set up Google Analytics.
 4. Point her domain at Cloudflare Pages, then retire the Squarespace site.

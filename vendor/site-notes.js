@@ -62,9 +62,10 @@
  *   (POST /api/my-request/answer {batch, n, text}). Nothing sent yet = the card stays hidden.
  * Your shop (their own page only): <section data-shop-portal hidden> holding <p data-shop-count>,
  *   <button data-shop-add>, <div data-shop-form> and <div data-shop-list>. For a client whose website sells
- *   through Square (kit/shop): they add, change and delete items, type the shown price right in each row, and
- *   set each item's photo and Square checkout link (POST /api/my-shop, /api/my-shop/item, /item/delete,
- *   /prices, /pic?id=). Only Square links are taken. No shop (Stray Wolf starts one) = the card stays hidden.
+ *   things (kit/shop): they add, change and delete items, type the shown price right in each row, and set
+ *   each item's photo and checkout link (POST /api/my-shop, /api/my-shop/item, /item/delete, /prices,
+ *   /pic?id=). Stray Wolf sets the shop's kind of checkout: Square (only Square links) or Generic (any https
+ *   checkout link); the card's words follow it. No shop (Stray Wolf starts one) = the card stays hidden.
  * The Photos page (their own page only): a box with data-photos-page opens a full page instead of
  *   a small note (also at <portal>#photos). Adding photos (drag and drop, a few words each), then
  *   "Photos you sent", each marked Received, Approved, On your site or Not used (Stray Wolf picks
@@ -1704,10 +1705,26 @@
 
   // "Your shop" on their page ([data-shop-portal]): what their website sells (kit/shop draws it there). They keep
   // it themselves, the same as Stray Wolf in the admin: add, change and delete items, the shown price right in
-  // each row, a photo, and each item's Square checkout link. Only Square links are taken: every Buy opens
-  // Square, so no payment ever comes through here. Stray Wolf starts the shop in the admin (and imports from
-  // Square there); with no shop, or an older service, the card stays hidden.
+  // each row, a photo, and each item's checkout link. Every Buy opens that link, so no payment ever comes
+  // through here. Stray Wolf starts the shop in the admin, imports into it there, and picks its kind of checkout
+  // (shop.checkout): "square" takes only Square links and keeps Square's own price beside the shown one;
+  // "generic" takes any https checkout link. With no shop, or an older service, the card stays hidden.
   var SHOP_WORDS = { live: "On your site", hidden: "Hidden", sold: "Sold out" };
+  // The card's words for each kind of checkout. A shop from a service that doesn't say its kind is a Square shop.
+  var SHOP_KINDS = {
+    square: { link: "Square checkout link", ph: "square.link/u/…", add: "Add the Square link", buys: "your Square checkout",
+      says: "Only Square checkout links work here, so every payment goes through Square.",
+      help: "In Square: Payment links, then copy the link. The Buy button opens it.",
+      need: "Add its Square checkout link before putting it on your site, or choose Hidden for now.",
+      seats: "Shown beside the date. Square keeps the real count.", priced: "Price saved. Change it in Square too, so checkout matches." },
+    generic: { link: "Checkout link", ph: "https://buy.stripe.com/…", add: "Add the checkout link", buys: "the checkout link you set for it",
+      says: "Paste the link to the page where people pay you, at Stripe, PayPal, Etsy or anywhere else. No payment comes through here.",
+      help: "The page where people pay for this. The Buy button opens it.",
+      need: "Add its checkout link before putting it on your site, or choose Hidden for now.",
+      seats: "Shown beside the date. Your checkout keeps the real count.", priced: "Price saved. Change it at your checkout too, so the two match." }
+  };
+  function shopSquare() { return !spShop || spShop.checkout !== "generic"; }
+  function shopKind() { return SHOP_KINDS[shopSquare() ? "square" : "generic"]; }
   var spShop = null, spEdit = null, spDel = false;   // their shop; the item being added or changed (a copy, no id = new); Delete asked once
   function loadShop() {
     if (!document.querySelector("[data-shop-portal]")) return;
@@ -1749,6 +1766,8 @@
     var items = spShop.items, shown = items.filter(function (x) { return x.show !== "hidden"; }).length;
     var count = box.querySelector("[data-shop-count]");
     if (count) count.textContent = "What your website sells. " + (items.length ? plural(items.length, "item") + ", " + shown + " on your website." : "Nothing in it yet.");
+    var foot = box.querySelector(".sp-foot");
+    if (foot) foot.textContent = "Every Buy button on your website opens " + shopKind().buys + ", so payments never come through here. Changes show on your website within a minute.";
     var add = box.querySelector("[data-shop-add]");
     if (add) { add.hidden = !!(spEdit && !spEdit.id); add.onclick = function () { editShopItem(null); }; }
     var top = box.querySelector("[data-shop-form]");
@@ -1774,16 +1793,17 @@
     spEdit = x ? JSON.parse(JSON.stringify(x)) : { kind: "item", show: "hidden" }; spDel = false; drawShop();
     var f = document.getElementById("sp-name"); if (f) { f.scrollIntoView({ block: "center" }); f.focus({ preventScroll: true }); }
   }
-  // One row: the photo, the name, the shown price (typed right here), where it stands, its Square checkout, Change.
+  // One row: the photo, the name, the shown price (typed right here), where it stands, its checkout, Change.
+  // x.via is whose checkout the link opens, as the service names it ("Square", "Stripe", or the link's own address).
   function shopRow(x) {
-    var off = x.sqPrice != null && x.price !== x.sqPrice;
+    var words = shopKind(), via = x.via || "Square", off = shopSquare() && x.sqPrice != null && x.price !== x.sqPrice;
     var price = h("input", { class: "sp-in", inputmode: "decimal", autocomplete: "off", placeholder: "none", "aria-label": "Shown price for " + x.name });
     price.value = dollars(x.price);
-    var save = function (v, words) {
+    var save = function (v, said) {
       shopCall("/prices", { prices: [{ id: x.id, price: v }] }).then(function (d) {
         if (!d.ok) { toast(shopTrouble(d, "save")); drawShop(); return; }
         var now = d.shop.items.filter(function (y) { return y.id === x.id; })[0] || x;
-        shopSaved(d, words || (now.sqPrice != null && now.price === now.sqPrice ? "Price saved. It matches Square." : "Price saved. Change it in Square too, so checkout matches."));
+        shopSaved(d, said || (shopSquare() && now.sqPrice != null && now.price === now.sqPrice ? "Price saved. It matches Square." : words.priced));
       });
     };
     // after Tab has moved on, so the next price box keeps the cursor
@@ -1793,8 +1813,8 @@
     var open = spEdit && spEdit.id === x.id;
     return h("li", { class: "sp-row" + (x.show === "hidden" ? " off" : "") + (open ? " open" : "") }, [shopThumb(x),
       h("div", { class: "sp-what" }, [h("b", { text: x.name }), sub ? h("span", { class: "sp-m", text: sub }) : null,
-        x.link ? h("a", { class: "sp-sq", href: x.link, target: "_blank", rel: "noopener", "aria-label": "Open the Square checkout for " + x.name + " (new tab)" }, ["Square checkout", icon("ext")])
-          : h("button", { class: "sp-link", type: "button", text: "Add the Square link", onclick: function () { editShopItem(x); } })]),
+        x.link ? h("a", { class: "sp-sq", href: x.link, target: "_blank", rel: "noopener", "aria-label": "Open the " + via + " checkout for " + x.name + " (new tab)" }, [via + " checkout", icon("ext")])
+          : h("button", { class: "sp-link", type: "button", text: words.add, onclick: function () { editShopItem(x); } })]),
       h("div", { class: "sp-price" }, [h("label", { class: "sp-box" + (off ? " diff" : "") }, [h("span", { "aria-hidden": "true", text: "$" }), price]),
         x.was != null ? h("span", { class: "sp-m", text: "Was " + money(x.was) }) : null,
         off ? h("span", { class: "sp-diff" }, ["Square charges " + money(x.sqPrice) + " · ",
@@ -1804,7 +1824,7 @@
   }
   // Add or change one item: the same details Stray Wolf has in the admin.
   function shopForm() {
-    var s = spEdit, isNew = !s.id;
+    var s = spEdit, isNew = !s.id, words = shopKind();
     var input = function (id, value, props) { props.id = id; props.autocomplete = "off"; var i = h("input", props); i.value = value || ""; return i; };
     var choose = function (id, list, now) { var b = h("select", { id: id }); list.forEach(function (o) { b.appendChild(h("option", { value: o[0], text: o[1], selected: o[0] === now })); }); return b; };
     var field = function (label, el, help, wide) { return h("div", { class: "sp-f" + (wide ? " wide" : "") }, [h("label", { for: el.id, text: label }), el, help ? h("small", { text: help }) : null]); };
@@ -1812,7 +1832,7 @@
         kind = choose("sp-kind", [["item", "Something to buy"], ["class", "A class or workshop"]], s.kind),
         price = input("sp-price", "_price" in s ? s._price : dollars(s.price), { inputmode: "decimal", placeholder: "18.00" }),
         was = input("sp-was", "_was" in s ? s._was : dollars(s.was), { inputmode: "decimal", placeholder: "Leave empty" }),
-        link = input("sp-link", s.link, { placeholder: "square.link/u/…", autocapitalize: "off", spellcheck: "false" }),
+        link = input("sp-link", s.link, { placeholder: words.ph, autocapitalize: "off", spellcheck: "false" }),
         cat = input("sp-cat", s.cat, { maxlength: "60" }),
         when = input("sp-when", s.when, { type: "datetime-local" }),
         seats = input("sp-seats", s.seats, { maxlength: "40", placeholder: "8 seats" }),
@@ -1826,7 +1846,7 @@
     var keep = function () { s.name = name.value; s._price = price.value; s._was = was.value; s.link = link.value; s.cat = cat.value; s.when = when.value; s.seats = seats.value; s.show = show.value; s.desc = desc.value; };
     kind.onchange = function () { keep(); s.kind = kind.value; drawShop(); var k = document.getElementById("sp-kind"); if (k) k.focus(); };
     var problem = function (text, at) { err.textContent = text; err.hidden = false; go.disabled = false; if (at) at.focus(); };
-    var done = function (d, words) { spEdit = null; spDel = false; shopSaved(d, words); };
+    var done = function (d, said) { spEdit = null; spDel = false; shopSaved(d, said); };
     var close = function () { var id = s.id; spEdit = null; spDel = false; drawShop(); var back = document.querySelector(id ? '[data-shop-portal] [aria-label="Change ' + (s.name || "").replace(/["\\]/g, "\\$&") + '"]' : "[data-shop-add]"); if (back) back.focus(); };
     var del = isNew ? null : spDel
       ? h("span", { class: "sp-sure" }, [h("span", { text: "Take it off your shop and your website?" }),
@@ -1838,31 +1858,31 @@
     return h("form", { class: "sp-form", "aria-label": isNew ? "Add an item" : "Change " + s.name, onsubmit: function (e) {
       e.preventDefault(); err.hidden = true;
       if (!name.value.trim()) return problem("Give it a name first.", name);
-      if (show.value !== "hidden" && !link.value.trim()) return problem("Add its Square checkout link before putting it on your site, or choose Hidden for now.", link);
+      if (show.value !== "hidden" && !link.value.trim()) return problem(words.need, link);
       var file = photo.files && photo.files[0];
       if (file && file.size > 3 * 1024 * 1024) return problem("That photo is too big (3 MB at most).", photo);
       go.disabled = true;
       shopCall("/item", { item: { id: s.id, name: name.value, kind: kind.value, price: price.value, was: was.value, link: link.value, cat: cat.value,
         when: kind.value === "class" ? when.value : "", seats: kind.value === "class" ? seats.value : "", show: show.value, desc: desc.value } }).then(function (d) {
         if (!d.ok) return problem(shopTrouble(d, "save"));
-        var words = show.value === "hidden" ? (isNew ? "Added. It stays hidden until you put it on your site." : "Saved.") : (isNew ? "Added. " : "Saved. ") + "Your website shows it within a minute.";
-        if (!file) return done(d, words);
+        var said = show.value === "hidden" ? (isNew ? "Added. It stays hidden until you put it on your site." : "Saved.") : (isNew ? "Added. " : "Saved. ") + "Your website shows it within a minute.";
+        if (!file) return done(d, said);
         spShop = d.shop; s.id = d.item.id;   // saved; if the photo fails the form stays open on the saved item
         shopPhoto(d.item.id, file).then(function (p) {
           if (!p.ok) { spEdit = JSON.parse(JSON.stringify(d.item)); drawShop(); toast("Saved, but the photo didn't upload. " + shopTrouble(p, "upload")); return; }
-          done(p, words);
+          done(p, said);
         });
       });
     } }, [
-      h("div", { class: "sp-hd2" }, [h("h3", { text: isNew ? "Add an item" : "Change " + s.name }), h("p", { text: "Only Square checkout links work here, so every payment goes through Square." })]),
+      h("div", { class: "sp-hd2" }, [h("h3", { text: isNew ? "Add an item" : "Change " + s.name }), h("p", { text: words.says })]),
       h("div", { class: "sp-fields" }, [
         field("Name", name, "What your website calls it."),
         field("Kind", kind, "A class or workshop gets a date and seats."),
-        field("Shown price", price, s.sqPrice != null ? "Square charges " + money(s.sqPrice) + "." : "What your website shows. Leave empty to show no price."),
+        field("Shown price", price, shopSquare() && s.sqPrice != null ? "Square charges " + money(s.sqPrice) + "." : "What your website shows. Leave empty to show no price."),
         field("Was (optional)", was, "Shown crossed out, for a sale."),
-        field("Square checkout link", link, "In Square: Payment links, then copy the link. The Buy button opens it.", true),
+        field(words.link, link, words.help, true),
         s.kind === "class" ? field("Date and time", when, "When it starts.") : null,
-        s.kind === "class" ? field("Seats", seats, "Shown beside the date. Square keeps the real count.") : null,
+        s.kind === "class" ? field("Seats", seats, words.seats) : null,
         field("Category", cat, "Groups things on your website, like Bread or Classes."),
         field("On your site", show, "Hidden keeps it here, off your website."),
         h("div", { class: "sp-f" }, [h("label", { for: "sp-photo", text: "Photo" }), h("div", { class: "sp-file" }, [s.photo ? shopThumb(s) : null, photo]),
@@ -1880,7 +1900,7 @@
     });
     return api("/api/my-shop/pic?id=" + encodeURIComponent(id), { token: getToken(), raw: file, type: file.type });
   }
-  // Demo only: a made-up bakery, kept in this page, with the service's own checks.
+  // Demo only: a made-up bakery with a Square shop, kept in this page, with the service's own checks.
   function demoShopCall(path, b) {
     if (!spShop) {
       var two = function (n) { return (n < 10 ? "0" : "") + n; };

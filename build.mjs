@@ -114,7 +114,7 @@ const head = (p) => `<!doctype html>
 <meta property="og:description" content="${p.desc}">
 <meta property="og:image" content="img/hero-dani.webp">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#f7f4ee">
+<meta name="theme-color" content="#dde2d3">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>

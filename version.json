@@ -1,6 +1,8 @@
 {
-  "version": "V5",
+  "version": "V5.2",
   "changes": [
+    { "version": "V5.2", "date": "2026-11-16", "note": "Smaller and tighter: the layout stops growing at a normal desktop width and sits centred, type, photos and spacing a notch smaller on every page, the olive bands and the Shop cards and kit photo tightened. The header is now her sage green, with the open-now line as a pill." },
+    { "version": "V5.1", "date": "2026-11-16", "note": "Tidy-up: old photos removed, and the Client Portal's shop card now works with any checkout, not only Square." },
     { "version": "V5", "date": "2026-11-16", "note": "Plant Bar menu look: every page opens on a short list set big, like the sign at her Plant Bar (Home: her four steps; Shop: the three ways with prices; Workshops: Gather. Create. Grow.; Visit: the hours, with today marked), beside one photo with a ticket on it. Home adds a slow strip of her plant-marker sayings, the three ways as photo cards and the Plant Bar questions; inner pages read as numbered sections. Photos: her photographer's shots wherever there is one, with the window glare taken off the Plant Bar sign; one gentle, matching finish on her Instagram photos; the Shop's photos at full size so they stay sharp on big screens." },
     { "version": "V4", "date": "2026-11-16", "note": "New look: a full-width header with the open-now status, larger type, rounded photos with soft shadows, card layouts, pill buttons, section labels on Home, a full footer with hours and links, and the Stray Wolf badge. The Shop tiles and buy button match." },
     { "version": "V3", "date": "2026-11-16", "note": "Simpler pages: the visit planner, the plant quiz, the marker picker, the countdown and the hours chart are gone. Home is now the top, three ways to make something, the next workshop, reviews, the gallery and the visit card." },

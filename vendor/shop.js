@@ -1,10 +1,10 @@
 /*
  * Stray Wolf shop list, for a client's website.
- * Shows the items kept in Stray Wolf Admin (Shop tab). Every Buy button opens that item's Square checkout:
- * no payment is ever taken by this page or by Stray Wolf.
+ * Shows the items kept in Stray Wolf Admin (Shop page). Every Buy button opens that item's own checkout link, at
+ * Square or whichever service the client is paid through: no payment is ever taken by this page or by Stray Wolf.
  *
  * On the page:
- *   <div data-shop>  …what shows if the list can't load, for example a link to the Square store…  </div>
+ *   <div data-shop>  …what shows if the list can't load, for example a link to their store…  </div>
  *   <link rel="stylesheet" href="/shop.css">
  *   <script src="/shop.js" defer data-site="their-short-name"></script>
  *
@@ -48,7 +48,8 @@
     if (x.soldOut) foot.appendChild(el("span", "sw-shop-soldout", x.kind === "class" ? "Full" : "Sold out"));
     else if (/^https:\/\//.test(x.buy || "")) {
       var a = el("a", "sw-shop-buy", x.kind === "class" ? BOOK : BUY); a.href = x.buy; a.rel = "noopener";
-      a.setAttribute("aria-label", (x.kind === "class" ? BOOK : BUY) + ": " + x.name + (x.price != null ? ", " + money(x.price) : "") + " (opens Square checkout)");
+      // x.via is whose checkout the link opens, as the notes service names it: "Square", "Stripe", or the link's own address.
+      a.setAttribute("aria-label", (x.kind === "class" ? BOOK : BUY) + ": " + x.name + (x.price != null ? ", " + money(x.price) : "") + " (opens " + (x.via ? x.via + " checkout" : "the checkout") + ")");
       foot.appendChild(a);
     }
     body.appendChild(foot); li.appendChild(body);
