@@ -1,6 +1,7 @@
 {
-  "version": "V5.2",
+  "version": "V5.3",
   "changes": [
+    { "version": "V5.3", "date": "2026-11-16", "note": "Every page now in Dani's own words, taken from her text about the Shop, her Instagram posts, her current site and her Plant Bar sign. The scrolling band shows six of her plant-marker sayings on her dusty rose." },
     { "version": "V5.2", "date": "2026-11-16", "note": "Smaller and tighter: the layout stops growing at a normal desktop width and sits centred, type, photos and spacing a notch smaller on every page, the olive bands and the Shop cards and kit photo tightened. The header is now her sage green, with the open-now line as a pill." },
     { "version": "V5.1", "date": "2026-11-16", "note": "Tidy-up: old photos removed, and the Client Portal's shop card now works with any checkout, not only Square." },
     { "version": "V5", "date": "2026-11-16", "note": "Plant Bar menu look: every page opens on a short list set big, like the sign at her Plant Bar (Home: her four steps; Shop: the three ways with prices; Workshops: Gather. Create. Grow.; Visit: the hours, with today marked), beside one photo with a ticket on it. Home adds a slow strip of her plant-marker sayings, the three ways as photo cards and the Plant Bar questions; inner pages read as numbered sections. Photos: her photographer's shots wherever there is one, with the window glare taken off the Plant Bar sign; one gentle, matching finish on her Instagram photos; the Shop's photos at full size so they stay sharp on big screens." },

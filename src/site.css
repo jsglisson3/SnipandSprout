@@ -27,7 +27,6 @@
   --rose: #d4bfb9;           /* her dusty rose */
   --rose-soft: #efe4e0;
   --clay: #b98c74;           /* her terracotta, for small accents */
-  --clay-light: #c9a68c;     /* the ribbon of plant-marker sayings */
   --clay-ink: #87593f;       /* terracotta dark enough for text on paper */
   --sage: #e4e7dc;
   --sage-deep: #dde2d3;      /* the header */
@@ -170,7 +169,7 @@ a.menu__item:hover{ background-size:100% 2px; }
 .ticket .open{ white-space:nowrap; font-size:var(--t-small); }
 
 /* ---------- the ribbon: the sayings on her wooden plant markers, drifting past ---------- */
-.ribbon{ overflow:hidden; background:var(--clay-light); color:var(--olive-ink); }
+.ribbon{ overflow:hidden; background:var(--rose); color:var(--olive-ink); }
 .ribbon__track{ display:flex; width:max-content; padding:14px 0; animation:ribbon 80s linear infinite; }
 .ribbon span{ display:inline-flex; align-items:center; gap:56px; padding-right:56px; font-family:var(--head); font-size:clamp(1.5rem,1.9vw,2rem); line-height:1.2; white-space:nowrap; }
 .ribbon span::after{ content:""; width:7px; height:7px; border-radius:50%; background:currentColor; opacity:.45; }
