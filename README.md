@@ -42,7 +42,7 @@ Node 20 or newer. Nothing to install. `dist/` is generated: don't edit or commit
 | Path | What it is |
 |---|---|
 | `build.mjs` | The whole build. One function per page (Home, Shop, Workshops, Visit, About, 404), the shared header, footer and photo stage, the security policy, and the copy step. Facts that repeat (email, links, hours) are at the top. |
-| `src/site.css`, `src/site.js` | All styling and behaviour: open-now status in Central time, the visit planner, the workshop countdown, the marker picker, Plant Match, the gallery. Every page reads fine without the script. |
+| `src/site.css`, `src/site.js` | All styling and behaviour: open-now status in Central time, the photo that follows what you read, the calendar menu, the gallery, the private event form. Every page reads fine without the script. |
 | `src/shop-section.html`, `src/shop-section.css` | The Shop page's three tabs (DIY Terrarium Kits, Terrarium Bar, Plant Bar) in Dani's own words. No script: radio buttons and CSS. Prices and Square links are typed in here. |
 | `src/portal.html` | Her Client Portal page: Stray Wolf's standard page with her details. The build fills in her short name, the service address and the list of photos on her site. |
 | `src/_headers`, `src/robots.txt`, `src/favicon.svg` | Cloudflare's response headers, the search-engine file, the tab icon. |
@@ -62,8 +62,8 @@ no MIME sniffing, no framing by other sites, and keeps the `.pages.dev` copy out
 
 - **Hours:** `HOURS3` and `week()` in `build.mjs`, `H` in `src/site.js`, the hours in `src/shop-section.html`
   and in `src/portal.html`.
-- **The next workshop:** `slip`, `countdown`, `C.gcal` and the calendar file at the bottom of `build.mjs`, and
-  the "Sunday, Nov 22" option in the planner (`build.mjs` and `src/site.js`).
+- **The next workshop:** `slip`, `C.gcal`, the hero line on Workshops and the calendar file at the bottom of
+  `build.mjs`.
 - **A Shop price or Square link:** `src/shop-section.html`. Square charges what is set in Square, so change
   both.
 - **Items and workshop seats:** nothing to edit here. They come from Stray Wolf Admin, Shop.

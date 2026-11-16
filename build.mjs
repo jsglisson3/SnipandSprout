@@ -52,8 +52,6 @@ const I = {
   bag: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h12l-1 10H5Z"/><path d="M7.5 7V6a2.5 2.5 0 0 1 5 0v1"/></svg>',
   cal: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3.5 5.5h13v11h-13ZM3.5 9h13M7 3.5v3M13 3.5v3"/></svg>',
   leaf: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M10 17V8"/><path d="M10 11c-3.4 0-5.5-2-5.5-5 3 0 5.5 1.8 5.5 5ZM10 9c0-3 2-5 5.5-5 0 3-2.2 5-5.5 5Z"/></svg>',
-  cam: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3 6.5h3l1.2-2h5.6l1.2 2h3v9H3Z"/><circle cx="10" cy="11" r="2.8"/></svg>',
-  send: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M17 3 9 11M17 3l-5 14-3-6-6-3Z"/></svg>',
   mark: '<svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="16" fill="#4b5446"/><g fill="none" stroke="#f5f1ea" stroke-width="1.7" stroke-linecap="round"><path d="M16 25V12"/><path d="M16 17c-4 0-6.5-2.4-6.5-6 3.4 0 6.5 2.2 6.5 6ZM16 14c0-3.6 2.5-6 6.5-6 0 3.6-2.6 6-6.5 6Z" fill="#f5f1ea" fill-opacity=".2"/></g></svg>',
 };
 
@@ -65,18 +63,6 @@ const HOURS3 = `<table class="hours3" data-hours3>
     <tr data-days="6,0"><th scope="row">Sat – Sun</th><td>9 AM – 2 PM</td></tr>
   </tbody>
 </table>`;
-
-const week = () => {
-  const days = [[1, 'Monday', 'Mon', 10, 15], [2, 'Tuesday', 'Tue', 10, 15], [3, 'Wednesday', 'Wed', 9, 18], [4, 'Thursday', 'Thu', 9, 18], [5, 'Friday', 'Fri', 9, 18], [6, 'Saturday', 'Sat', 9, 14], [0, 'Sunday', 'Sun', 9, 14]];
-  const f = (h) => (h > 12 ? h - 12 : h) + (h >= 12 ? ' PM' : ' AM');
-  return `<table class="week" data-week data-in>
-  <caption class="sr">Shop hours for each day of the week</caption>
-  <tbody>
-${days.map(([d, long, short, o, c]) => `    <tr data-day="${d}"><th scope="row"><span class="dlong">${long}</span><span class="dshort">${short}</span></th><td><div class="week__track" aria-hidden="true"><span class="week__bar" style="left:${((o - 9) / 9 * 100).toFixed(2)}%;width:${((c - o) / 9 * 100).toFixed(2)}%"></span><span class="week__now"></span></div></td><td>${f(o)} – ${f(c)}</td></tr>`).join('\n')}
-  </tbody>
-</table>
-<div class="week__scale" aria-hidden="true"><span>9 AM</span><span>noon</span><span>3 PM</span><span>6 PM</span></div>`;
-};
 
 const NEIGHBORS = `<div class="neighbors"><span>In Bloom Floral Company</span><span>Two Friends Community Books</span><span>KaGie's</span></div>`;
 
@@ -209,12 +195,6 @@ const slip = `<div class="slip" data-in>
       <div class="slip__total"><span>A seat at the table</span><span>from $40</span></div>
     </div>`;
 
-const countdown = `<div class="count" data-count="2026-11-22T13:00:00-06:00" role="timer" aria-label="Time until the workshop">
-        <div><b data-d>6</b><span>days</span></div>
-        <div><b data-h>19</b><span>hours</span></div>
-        <div><b data-m>0</b><span>minutes</span></div>
-      </div>`;
-
 const calendar = `<div class="cal" data-cal>
           <button class="textbtn" type="button" aria-expanded="false" aria-controls="cal-menu">Add to my calendar</button>
           <div class="cal__menu" id="cal-menu">
@@ -239,7 +219,6 @@ const workshopActs = `<div class="band__acts">
 /* ---------------- Home ---------------- */
 const P = {
   dani: { key: 'hero', src: 'ig-dani.webp', w: 818, h: 1448, alt: 'Dani, the owner, smiling beside a big alocasia inside Snip &amp; Sprout', pos: '50% 28%' },
-  plan: { key: 'plan', src: 'hero-dani.webp', w: 1400, h: 1750, alt: 'Dani potting a plant at the Plant Bar', pos: '60% 50%' },
   kits: { key: 'kits', src: 'kit-flatlay.webp', w: 1200, h: 1500, alt: 'A DIY terrarium kit laid out in labelled bags: drainage layer, soil, moss and the how-to card' },
   tbar: { key: 'tbar', src: 'ig-tbar.webp', w: 1100, h: 1954, alt: 'Dani layering soil into a glass terrarium at the bar', pos: '50% 48%' },
   pbar: { key: 'pbar', src: 'stakes-tall.webp', w: 1086, h: 1357, alt: 'Wooden plant markers with sayings like Little sprout and Way to grow, beside stacks of pastel pots', pos: '50% 100%' },
@@ -247,62 +226,21 @@ const P = {
 
 splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plants, pottery and workshops in Springdale, AR',
   desc: 'An indoor plant boutique at 413 E. Emma Ave. in downtown Springdale. Plants, pottery, a walk-in Plant Bar, a Terrarium Bar, take-home kits and workshops.',
-  pics: [P.dani, P.plan, P.kits, P.tbar, P.pbar], stake: 'Hi, I’m Dani!' }, `
+  pics: [P.dani, P.kits, P.tbar, P.pbar], stake: 'Hi, I’m Dani!' }, `
       <section class="hero" data-stage-for="hero" data-stake="Hi, I’m Dani!">
         <h1 class="h1" data-in>Plants that make a house feel like home</h1>
         <p class="hero__lede" data-in>Come in, take your time, and let us help you find something that will be happy in your window — and easy for you to keep.</p>
         <div class="hero__acts" data-in>
-          <a class="btn" href="#plan">Plan your visit ${I.arrow}</a>
+          <a class="btn" href="#visit">Plan your visit ${I.arrow}</a>
           <a class="link" href="shop.html">Go to the Shop</a>
         </div>
         <p class="hero__now" data-in><b data-open-long>Open every day in downtown Springdale.</b><span>413 E. Emma Ave. The Plant Bar is walk-in whenever we're open.</span></p>
       </section>
 
-      <section class="plan" id="plan" data-stage-for="plan" data-stake="At the Plant Bar" aria-labelledby="plan-title">
-        <div class="plan__head">
-          <h2 class="h1" id="plan-title" data-in>What sounds good?</h2>
-          <p data-in>Three quick taps and we'll point you to the right thing to make.</p>
-        </div>
-        <form data-plan>
-          <fieldset data-in>
-            <legend>Who's it for?</legend>
-            <div class="chips">
-              <label class="chip"><input type="radio" name="who" value="me" checked><span>Just me</span></label>
-              <label class="chip"><input type="radio" name="who" value="date"><span>A date</span></label>
-              <label class="chip"><input type="radio" name="who" value="friends"><span>Friends</span></label>
-              <label class="chip"><input type="radio" name="who" value="group"><span>A group</span></label>
-              <label class="chip"><input type="radio" name="who" value="gift"><span>It's a gift</span></label>
-            </div>
-          </fieldset>
-          <fieldset data-in>
-            <legend>Where?</legend>
-            <div class="chips">
-              <label class="chip"><input type="radio" name="where" value="shop" checked><span>At the shop</span></label>
-              <label class="chip"><input type="radio" name="where" value="home"><span>At my kitchen table</span></label>
-            </div>
-          </fieldset>
-          <fieldset data-in>
-            <legend>When?</legend>
-            <div class="chips">
-              <label class="chip"><input type="radio" name="when" value="now" checked><span>Today</span></label>
-              <label class="chip"><input type="radio" name="when" value="later"><span>Another day</span></label>
-              <label class="chip"><input type="radio" name="when" value="nov22"><span>Sunday, Nov 22</span></label>
-            </div>
-          </fieldset>
-        </form>
-        <div class="plan__out" data-plan-out aria-live="polite">
-          <h3>The Plant Bar</h3>
-          <p>Stop by and get your hands a little dirty. Pick out a plant and a pot, then put it together at our planting station.</p>
-          <div class="plan__facts"><span>$22</span><span>In the shop</span><span>No notice needed</span></div>
-          <p class="plan__live" data-plan-live>Walk in any time we're open.</p>
-          <div class="plan__acts"><a class="btn btn--paper" href="shop.html#pbar">See the Plant Bar ${I.arrow}</a><a class="link" href="visit.html">Hours and directions</a></div>
-        </div>
-      </section>
-
       <section class="ways" id="ways" aria-labelledby="ways-title">
         <div class="ways__head">
           <h2 class="h1" id="ways-title" data-in>Three ways to make something green</h2>
-          <p data-in>One goes home with you in a bag. Two happen right here at the bar. Checkout for all three is through Square.</p>
+          <p data-in>One goes home with you in a bag. Two happen right here at the bar.</p>
         </div>
 
         <article class="row" data-stage-for="kits" data-stake="Made at your kitchen table">
@@ -329,9 +267,9 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
           <a class="btn btn--tone" href="shop.html#tbar" data-in>Book the Terrarium Bar ${I.arrow}</a>
         </article>
 
-        <article class="row" data-stage-for="pbar" data-stake="Little sprout" data-stake-live>
+        <article class="row" data-stage-for="pbar" data-stake="Little sprout">
           <img class="inpic" src="img/${P.pbar.src}" width="1086" height="1357" alt="${P.pbar.alt}" loading="lazy" style="object-position:50% 78%">
-          <span class="stake stake--inline" data-stake-inline><span class="stake__label">Little sprout</span></span>
+          <span class="stake stake--inline"><span class="stake__label">Little sprout</span></span>
           <div class="row__head" data-in><h3 class="h3">Plant Bar</h3><span class="row__price">$22</span></div>
           <p class="row__where" data-in>${I.pin} In the shop, no notice needed. Just walk in.</p>
           <ul class="row__list" data-in>
@@ -340,10 +278,6 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
             <li><b>Pot it up.</b> Add soil and settle your new plant in.</li>
             <li><b>Make it yours.</b> Add in moss, a fun plant marker, or mini decor.</li>
           </ul>
-          <p data-in>Which marker is yours? Tap one to plant it.</p>
-          <div class="stakes" data-stakes role="group" aria-label="Plant markers from the Plant Bar" data-in>
-            ${['Little sprout', 'Way to grow!', 'You grow girl!', 'Emotional support plant', 'Happy new home!', 'Crazy plant lady', 'Stayin’ alive', 'Pretty fly for a cacti', 'Happy birthday!', 'Congratulations!'].map((s, i) => `<button type="button" aria-pressed="${i === 0}">${s}</button>`).join('')}
-          </div>
           <div class="faq" data-in>
             <h4 class="h3">Questions we get all the time</h4>
             <details><summary>Do I need a reservation?</summary><p>Nope. Just stop by any time we're open.</p></details>
@@ -359,64 +293,9 @@ splitPage({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plant
   <div class="band__text">
     <h2 class="display" id="ws-title" data-in>November Terrarium Workshop</h2>
     <p data-in>Gather. Create. Grow. Pull up a chair at the table in the back on Sunday, November 22 at 1 PM. Seating is limited.</p>
-    <div data-in>${countdown}</div>
     <div data-in>${workshopActsHome}</div>
   </div>
   ${slip}
-</div></section>
-
-<section class="match" id="match" aria-labelledby="match-title"><div class="match__grid">
-  <div class="match__plate">
-    <figure data-in>
-      <img src="img/ig-pothos.webp" width="1200" height="1200" alt="A golden pothos glowing in the afternoon sun" loading="lazy" data-match-img>
-      <span class="stake" data-match-stake hidden><span class="stake__label">Your spot</span></span>
-    </figure>
-  </div>
-  <div class="match__body">
-    <div class="match__top">
-      <h2 class="display" id="match-title" data-in>Tell us about the spot</h2>
-      <p class="statement" data-in>Show us a photo of the spot you have in mind and we'll find the plant that will be happy there.</p>
-    </div>
-    <form data-match action="mailto:${C.email}">
-      <div class="tabs" role="tablist" aria-label="Three questions">
-        <button type="button" role="tab" id="mt-light" aria-controls="mp-light" aria-selected="true">Light</button>
-        <button type="button" role="tab" id="mt-water" aria-controls="mp-water" aria-selected="false" tabindex="-1">Water</button>
-        <button type="button" role="tab" id="mt-home" aria-controls="mp-home" aria-selected="false" tabindex="-1">Home</button>
-      </div>
-      <div class="tabpanel" role="tabpanel" id="mp-light" aria-labelledby="mt-light" style="margin-top:22px">
-        <h3 class="h3">How much light does it get?</h3>
-        <div class="chips">
-          <label class="chip"><input type="radio" name="light" value="Direct sun for a few hours"><span>Direct sun</span></label>
-          <label class="chip"><input type="radio" name="light" value="Bright, but no direct sun"><span>Bright, no direct sun</span></label>
-          <label class="chip"><input type="radio" name="light" value="A few feet from a window"><span>A few feet from a window</span></label>
-          <label class="chip"><input type="radio" name="light" value="Low light"><span>Low light</span></label>
-        </div>
-      </div>
-      <div class="tabpanel" role="tabpanel" id="mp-water" aria-labelledby="mt-water" style="margin-top:22px" hidden>
-        <h3 class="h3">How often will you water?</h3>
-        <div class="chips">
-          <label class="chip"><input type="radio" name="water" value="I'll forget, so it needs to be forgiving"><span>I'll forget</span></label>
-          <label class="chip"><input type="radio" name="water" value="About once a week"><span>About once a week</span></label>
-          <label class="chip"><input type="radio" name="water" value="I love to fuss over my plants"><span>I love to fuss</span></label>
-        </div>
-      </div>
-      <div class="tabpanel" role="tabpanel" id="mp-home" aria-labelledby="mt-home" style="margin-top:22px" hidden>
-        <h3 class="h3">Anyone curious at home?</h3>
-        <div class="chips">
-          <label class="chip"><input type="radio" name="pets" value="Pets who nibble"><span>Pets who nibble</span></label>
-          <label class="chip"><input type="radio" name="pets" value="Little kids"><span>Little kids</span></label>
-          <label class="chip"><input type="radio" name="pets" value="Nobody, just me"><span>Just me</span></label>
-        </div>
-      </div>
-    </form>
-    <div>
-      <p class="match__sum" data-match-sum style="margin-bottom:16px">Dani will tell you honestly how much attention it'll ask of you.</p>
-      <div class="match__cells">
-        <label class="cell cell--tone">${I.cam}<span data-match-photo-label>Add a photo of the spot</span><input type="file" accept="image/*" data-match-file aria-label="Add a photo of the spot"></label>
-        <a class="cell cell--ink" href="mailto:${C.email}?subject=Plant%20match" data-match-send>${I.send}<span>Send it to Dani</span></a>
-      </div>
-    </div>
-  </div>
 </div></section>
 
 <section class="slips" aria-labelledby="rev-title"><div class="wrap">
@@ -496,7 +375,6 @@ splitPage({ file: 'workshops.html', shop: true, css: ['shop.css'], title: 'Works
       <section id="next" data-stage-for="next" data-stake="Sunday, Nov 22" aria-labelledby="next-title">
         <div class="stack stack--l">
           <h2 class="h1" id="next-title" data-in>November Terrarium Workshop</h2>
-          <div data-in>${countdown}</div>
           ${slip}
           <div data-in>${workshopActs}</div>
         </div>
@@ -573,8 +451,8 @@ splitPage({ file: 'visit.html', title: 'Visit · 413 E. Emma Ave., Springdale ·
 
       <section id="hours" data-stage-for="hours" data-stake="Walk-ins welcome" aria-labelledby="hours-title">
         <div class="stack">
-          <h2 class="h1" id="hours-title" data-in>This week's hours</h2>
-          ${week()}
+          <h2 class="h1" id="hours-title" data-in>Hours</h2>
+          <div data-in>${HOURS3}</div>
           <p class="small muted" data-in>Terrarium Bar visits need at least one day's notice so your vessel is ready.</p>
         </div>
       </section>
@@ -621,7 +499,7 @@ splitPage({ file: 'about.html', title: 'About Dani · Snip & Sprout Co.',
         <h1 class="h1" data-in>Rooted in a love of plants and community</h1>
         <p class="hero__lede" data-in>An indoor plant boutique in Northwest Arkansas, for first pothos and big collections alike.</p>
         <div class="hero__acts" data-in>
-          <a class="btn" href="index.html#plan">Plan your visit ${I.arrow}</a>
+          <a class="btn" href="visit.html">Plan your visit ${I.arrow}</a>
           <a class="link" href="workshops.html">See workshops</a>
         </div>
         <p class="hero__now" data-in><b>In downtown Springdale since August 2026.</b><span>413 E. Emma Ave., under one roof with three neighbors.</span></p>
@@ -657,7 +535,7 @@ splitPage({ file: 'about.html', title: 'About Dani · Snip & Sprout Co.',
         <div class="panel panel--forest" data-in>
           <h2 class="h1" id="go-title">Come make something</h2>
           <p>Walk in for the Plant Bar, book the Terrarium Bar, or join us at the next workshop.</p>
-          <p class="hero__acts"><a class="btn btn--paper" href="index.html#plan">Plan your visit ${I.arrow}</a><a class="link" href="workshops.html" style="color:inherit">See workshops</a></p>
+          <p class="hero__acts"><a class="btn btn--paper" href="visit.html">Plan your visit ${I.arrow}</a><a class="link" href="workshops.html" style="color:inherit">See workshops</a></p>
         </div>
       </section>`);
 
