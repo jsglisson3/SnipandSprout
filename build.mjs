@@ -52,6 +52,17 @@ const I = {
   bag: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M4 7h12l-1 10H5Z"/><path d="M7.5 7V6a2.5 2.5 0 0 1 5 0v1"/></svg>',
   cal: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M3.5 5.5h13v11h-13ZM3.5 9h13M7 3.5v3M13 3.5v3"/></svg>',
   leaf: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><path d="M10 17V8"/><path d="M10 11c-3.4 0-5.5-2-5.5-5 3 0 5.5 1.8 5.5 5ZM10 9c0-3 2-5 5.5-5 0 3-2.2 5-5.5 5Z"/></svg>',
+  pics: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><rect x="3" y="4" width="14" height="12" rx="2"/><circle cx="7.5" cy="8.5" r="1.4"/><path d="m3.5 14.5 4.2-4 3 2.8 2.2-2 3.6 3.2"/></svg>',
+  // the photo viewer's buttons
+  prev: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M12.5 4.5 7 10l5.5 5.5"/></svg>',
+  next: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="M7.5 4.5 13 10l-5.5 5.5"/></svg>',
+  close: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15"/></svg>',
+  // the footer links: email and the portal in the same 20 px line style
+  // Instagram's and Etsy's own marks (from Simple Icons, CC0), shown white on each brand's colour tile (.ic-ig, .ic-etsy)
+  ig: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>',
+  etsy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.559 2.445c0-.325.033-.52.59-.52h7.465c1.3 0 2.02 1.11 2.54 3.193l.42 1.666h1.27c.23-4.728.43-6.784.43-6.784s-3.196.36-5.09.36H6.635L1.521.196v1.37l1.725.326c1.21.24 1.5.496 1.6 1.606 0 0 .11 3.27.11 8.64 0 5.385-.09 8.61-.09 8.61 0 .973-.39 1.333-1.59 1.573l-1.722.33V24l5.13-.165h8.55c1.935 0 6.39.165 6.39.165.105-1.17.75-6.48.855-7.064h-1.2l-1.284 2.91c-1.005 2.28-2.476 2.445-4.11 2.445h-4.906c-1.63 0-2.415-.64-2.415-2.05V12.8s3.62 0 4.79.096c.912.064 1.463.325 1.76 1.598l.39 1.695h1.41l-.09-4.278.192-4.305h-1.391l-.45 1.89c-.283 1.244-.48 1.47-1.754 1.6-1.666.17-4.815.14-4.815.14V2.45h-.05z"/></svg>',
+  mail: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2.8" y="4.8" width="14.4" height="10.4" rx="2.2"/><path d="m3.6 6.2 6.4 4.8 6.4-4.8"/></svg>',
+  lock: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4.2" y="8.8" width="11.6" height="8" rx="2"/><path d="M7 8.8V6.6a3 3 0 0 1 6 0v2.2"/></svg>',
 };
 
 const HOURS3 = `<table class="hours3" data-hours3>
@@ -66,9 +77,9 @@ const HOURS3 = `<table class="hours3" data-hours3>
 const NEIGHBORS = `<div class="neighbors"><span>In Bloom Floral Company</span><span>Two Friends Community Books</span><span>KaGie's</span></div>`;
 
 const nav = (file) => `<header class="nav"><div class="nav__in">
-  <a class="brand" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo.svg" alt="" width="149" height="113"></a>
+  <a class="brand" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo-tag.svg" alt="" width="177" height="144"></a>
   <nav class="nav__links" aria-label="Main">
-    ${[['workshops.html', 'Workshops'], ['visit.html', 'Visit Us'], ['about.html', 'About']].map(([h, t]) => `<a href="${h}"${h === file ? ' aria-current="page"' : ''}>${t}</a>`).join('\n    ')}
+    ${[['workshops.html', 'Workshops'], ['gallery.html', 'Gallery'], ['visit.html', 'Visit Us'], ['about.html', 'About']].map(([h, t]) => `<a href="${h}"${h === file ? ' aria-current="page"' : ''}>${t}</a>`).join('\n    ')}
   </nav>
   <div class="nav__end">
     <span class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></span>
@@ -132,6 +143,7 @@ const siteNotes = `<script src="site-notes.js" data-site="${C.site}" data-api="$
 const shopList = `<script src="shop.js" data-site="${C.site}" data-api="${C.api}" data-book="Reserve your spot" defer></script>`;
 
 const foot = (p) => `<footer class="foot">
+<div class="shop-scene" data-shop-scene><img src="shop-scene.svg" alt="" width="2400" height="214" loading="lazy" decoding="async"></div>
 <div class="wrap foot__grid">
   <div class="foot__brand">
     <a class="foot__logo" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo-reverse.svg" alt="" width="149" height="113"></a>
@@ -149,10 +161,10 @@ const foot = (p) => `<footer class="foot">
   <div class="foot__col">
     <p class="kicker">Elsewhere</p>
     <ul class="foot__list">
-      <li><a href="${C.ig}" target="_blank" rel="noopener">Instagram</a></li>
-      <li><a href="${C.etsy}" target="_blank" rel="noopener">Etsy</a></li>
-      <li><a href="mailto:${C.email}">Email Dani</a></li>
-      <li><a href="${PORTAL}">Owner portal</a></li>
+      <li><a href="${C.ig}" target="_blank" rel="noopener"><span class="foot__ic ic-ig">${I.ig}</span>Instagram<span class="sr"> (opens in a new tab)</span></a></li>
+      <li><a href="${C.etsy}" target="_blank" rel="noopener"><span class="foot__ic ic-etsy">${I.etsy}</span>Etsy shop<span class="sr"> (opens in a new tab)</span></a></li>
+      <li><a href="mailto:${C.email}"><span class="foot__ic">${I.mail}</span>Email Dani</a></li>
+      <li><a href="${PORTAL}"><span class="foot__ic">${I.lock}</span>Owner portal</a></li>
     </ul>
   </div>
 </div>
@@ -162,7 +174,7 @@ const foot = (p) => `<footer class="foot">
 </div>
 </footer>
 <nav class="tabbar" aria-label="Quick links">
-  ${[['index.html', 'Home', I.home], ['shop.html', 'Shop', I.bag], ['workshops.html', 'Workshops', I.cal], ['visit.html', 'Visit', I.pin], ['about.html', 'About', I.leaf]].map(([h, t, ic]) => `<a href="${h}"${h === p.file ? ' aria-current="page"' : ''}>${ic}<span>${t}</span></a>`).join('\n  ')}
+  ${[['index.html', 'Home', I.home], ['shop.html', 'Shop', I.bag], ['workshops.html', 'Workshops', I.cal], ['gallery.html', 'Gallery', I.pics], ['visit.html', 'Visit', I.pin], ['about.html', 'About', I.leaf]].map(([h, t, ic]) => `<a href="${h}"${h === p.file ? ' aria-current="page"' : ''}>${ic}<span>${t}</span></a>`).join('\n  ')}
 </nav>
 <script src="site.js" defer></script>
 ${siteNotes}${p.shop ? '\n' + shopList : ''}
@@ -230,9 +242,10 @@ const top = (t) => `<section class="top" aria-labelledby="top-title">
 </section>`;
 
 // A course: one numbered section of an inner page, its heading (and photo) beside the text.
-const course = (c, body) => `<section class="course"${c.id ? ` id="${c.id}"` : ''} aria-labelledby="${c.key}-title"><div class="course__in">
+const course = (c, body) => `<section class="course${c.cls ? ' ' + c.cls : ''}"${c.id ? ` id="${c.id}"` : ''} aria-labelledby="${c.key}-title"><div class="course__in">
   <div class="course__head">
-    ${c.n ? `<span class="course__n" aria-hidden="true">${c.n}</span>\n    ` : ''}<h2 class="h1" id="${c.key}-title" data-in>${c.title}</h2>${c.pic ? `\n    <img class="course__pic${c.pic.wide ? ' course__pic--wide' : ''}" src="img/${c.pic.src}" width="${c.pic.w}" height="${c.pic.h}" alt="${c.pic.alt}" loading="lazy"${c.pic.pos ? ` style="object-position:${c.pic.pos}"` : ''}>` : ''}
+    ${c.n ? `<span class="course__n" aria-hidden="true">${c.n}</span>\n    ` : ''}<h2 class="h1" id="${c.key}-title" data-in>${c.title}</h2>${c.head ? `
+    ${c.head}` : ''}${c.pic ? `\n    <img class="course__pic${c.pic.wide ? ' course__pic--wide' : ''}" src="img/${c.pic.src}" width="${c.pic.w}" height="${c.pic.h}" alt="${c.pic.alt}" loading="lazy"${c.pic.pos ? ` style="object-position:${c.pic.pos}"` : ''}>` : ''}
   </div>
   <div class="course__body">
 ${body}
@@ -361,7 +374,8 @@ ${course({ key: 'faq', title: 'A few questions we get all the time…',
     <h2 class="display" id="reel-title" data-in>A few of our favorites</h2>
     <p data-in>Each one tells its own little story. Tap the picture to see the next.</p>
     <p data-in>Not everyone has time to build their own terrarium… and that’s okay! I’d be happy (literally overjoyed) to make you a custom one. <a class="link" href="mailto:${C.email}?subject=Custom%20terrarium">Ask about a custom terrarium</a></p>
-    <a class="btn" href="${C.ig}" target="_blank" rel="noopener" data-in>Follow @snipandsprout.co ${I.out}</a>
+    <div class="acts" data-in><a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a>
+      <a class="link" href="gallery.html">See the gallery</a></div>
   </div>
 </div></section>
 
@@ -509,6 +523,78 @@ ${invite({ key: 'go', title: 'Let’s grow something together',
 </main>
 `);
 
+/* ---------------- Gallery ---------------- */
+// Her photos in four groups. Each tile is a 4:5 crop (img/gal/, made by photo-tools/gallery-photos.py) that links
+// to the whole photo; site.js opens it in the photo viewer below, with her caption. Without script the link opens
+// the photo itself. Every caption is a line from her own posts, her Plant Bar sign or her Shop text.
+const GALLERY = [
+  { key: 'terrariums', title: 'Terrariums', line: 'Each one tells its own little story: plants, moss, crystals &amp; all!',
+    link: ['shop.html#kits', 'Shop terrarium kits'], photos: [
+    ['spooky', 'ig-globe.webp', 'A round glass terrarium with succulents, moss, white stones and tiny pumpkins', 'Just a few of our favorite spooky terrariums from this season'],
+    ['winter', 'ig-teardrop.webp', 'A glass teardrop terrarium with an air plant and tiny holiday decor, hanging among Christmas decorations', 'A tiny winter wonderland you make with your own hands'],
+    ['christmas', 'gal/christmas-full.webp', 'Christmas terrariums with ferns, white stones, a tiny red house and a little Santa', 'Fresh ferns, wintery decor, tiny houses, snow-kissed trees'],
+    ['made-to-order', 'gal/made-to-order-full.webp', 'Dani building a custom terrarium in a geometric glass vessel at the shop counter', 'A tiny forest, made to order'],
+    ['dino-kit', 'gal/dino-kit-full.webp', 'A mini terrarium kit: a glass jar, bags of soil and stones, a little plant and a toy dinosaur', 'Our newest mini terrarium kit! Dino lovers… get ready.'],
+    ['kit', 'kit-flatlay.webp', 'A DIY terrarium kit laid out in labelled bags: drainage layer, soil, moss and the how-to card', 'Make it at your kitchen table with a DIY kit'],
+  ] },
+  { key: 'plant-bar', title: 'The Plant Bar', line: 'Stop by anytime we’re open, pick out a plant and pot, and make it your own.',
+    link: ['shop.html#pbar', 'See the Plant Bar'], photos: [
+    ['plant-bar', 'plant-bar-dani.webp', 'Dani potting a plant at the Plant Bar, her Plant Bar sign behind her', 'Our Plant Bar is one of my favorite things ever!'],
+    ['ivy', 'pbar-ivy.webp', 'A little ivy potted at the Plant Bar, with moss and a tiny mushroom, in front of the Plant Bar sign', 'Add soil and settle your new plant in'],
+    ['pumpkin', 'ig-pumpkin.webp', 'An alocasia potted in a pumpkin-shaped pot', 'Fall looks better at the plant bar'],
+    ['spooky-succulents', 'gal/spooky-succulents-full.webp', 'Stacks of little terracotta pots beside a Spooky Succulents sign and a painted jack-o’-lantern pot', 'Paint a mini pot and plant your own spooky succulent'],
+    ['markers', 'stakes-tall.webp', 'Wooden plant markers with sayings like Little sprout and Way to grow, beside stacks of pastel pots', 'Choose the one that speaks to you'],
+    ['markers-gold', 'markers-gold.webp', 'Plant markers in a gold pot: I will survive, You grow girl, I am rooting for you', 'Add in moss, a fun plant marker, or mini decor'],
+  ] },
+  { key: 'workshops', title: 'Workshops', line: 'A fun night out with the girls, a date night activity, or just an excuse to make something green and happy!',
+    link: ['workshops.html', 'Book a workshop'], photos: [
+    ['group', 'ig-group.webp', 'A group around a workshop table in the shop, smiling, with their finished terrariums', 'Gather your favorite people and make something that grows'],
+    ['trio', 'ig-trio.webp', 'Three friends holding up the terrariums they made at the Merry Terrarium Workshop', 'A season full of creativity, community, and growing together'],
+    ['workshop-table', 'gal/workshop-table-full.webp', 'A long workshop table set with glass vessels, trays of soil and stones, and plants, as guests build', 'Consider this your invitation to get a little creative'],
+    ['workshop-one', 'gal/workshop-one-full.webp', 'Dani helping guests build their terrariums at the first Terrarium Workshop', 'Terrarium Workshop #1 was such a success!'],
+    ['apron', 'apron-dodeca.webp', 'Dani in her Snip &amp; Sprout Co. apron holding a geometric glass terrarium', 'We’ll guide you every step of the way'],
+    ['lantern', 'tbar-lantern.webp', 'Dani holding an empty glass lantern terrarium, ready to fill', 'Choose your terrarium style, then come build it with us'],
+  ] },
+  { key: 'plants', title: 'Plants', line: 'Here’s to the roots that keep us all growing together.',
+    link: ['visit.html', 'Plan your visit'], photos: [
+    ['mama-pothos', 'gal/mama-pothos-full.webp', 'A full golden pothos glowing in the afternoon sun', 'One of our sweet mama plants, glowing in the afternoon sun'],
+    ['monstera-leaf', 'gal/monstera-leaf-full.webp', 'A new monstera leaf unfurling by a sunny window', 'This baby Monstera leaf is just starting to unfurl'],
+    ['echeveria', 'gal/echeveria-full.webp', 'A lipstick echeveria held up in its nursery pot', 'Our new lipstick echeverias just landed'],
+    ['cuttings', 'ig-props.webp', 'Plant cuttings rooting in glass jars of water', 'Rooting for these little beauties, literally!'],
+    ['propagation', 'ig-spider.webp', 'A spider plant cutting with new roots, in a glass bulb on a gold stand', 'Our latest propagation is finally ready for its new home!'],
+    ['skull', 'ig-skull.webp', 'A stone skull planter holding an alocasia, among pumpkins and autumn leaves', 'Skull planters for spooky season'],
+  ] },
+];
+let galCount = 0;
+const galTotal = GALLERY.reduce((n, g) => n + g.photos.length, 0);
+page({ file: 'gallery.html', title: 'Gallery · Terrariums, the Plant Bar and workshops · Snip & Sprout Co.',
+  desc: 'Photos from Snip & Sprout Co. in downtown Springdale: terrariums, the Plant Bar, workshops and plants.' }, `<main id="main">
+${top({ title: 'Gallery',
+  items: GALLERY.map((g) => ({ t: g.title + '.', href: '#' + g.key })),
+  lede: 'Watching this space fill with laughter and new faces has been the best part.',
+  acts: `<a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a>`,
+  pic: { src: 'dani-tee.webp', w: 1280, h: 1920, alt: 'Dani in her Snip &amp; Sprout Co. tee, tending a plant', pos: '50% 35%' },
+  ticket: `<span><b>For the ones who grow wild</b><small>Our Snip &amp; Sprout Co. tee</small></span>` })}
+<div class="courses">
+${GALLERY.map((g, n) => course({ key: g.key, id: g.key, n: String(n + 1).padStart(2, '0'), title: g.title, cls: 'course--gal',
+  head: `<p class="course__line" data-in>${g.line}</p>\n    <a class="link" href="${g.link[0]}" data-in>${g.link[1]}</a>` },
+`    <ul class="gal" role="list">
+${g.photos.map(([tile, full, alt, cap]) => `      <li data-in><a class="gal__item" href="img/${full}" data-cap="${cap}" data-n="${++galCount}"><img src="img/gal/${tile}.webp" width="720" height="900" alt="${alt}" loading="lazy" decoding="async"></a></li>`).join('\n')}
+    </ul>`)).join('\n')}
+</div>
+<dialog class="lb" data-lb aria-label="Photo viewer">
+  <figure class="lb__fig">
+    <img class="lb__img" src="data:," alt="" data-lb-img>
+    <figcaption class="lb__cap"><span data-lb-cap></span><span class="lb__n" data-lb-n></span></figcaption>
+  </figure>
+  <button class="lb__btn lb__btn--prev" type="button" data-lb-step="-1" aria-label="Previous photo">${I.prev}</button>
+  <button class="lb__btn lb__btn--next" type="button" data-lb-step="1" aria-label="Next photo">${I.next}</button>
+  <button class="lb__btn lb__btn--close" type="button" data-lb-close aria-label="Close the photo" autofocus>${I.close}</button>
+</dialog>
+</main>
+`);
+if (galCount !== galTotal) throw new Error('gallery numbering');
+
 /* ---------------- Not found ---------------- */
 // Cloudflare Pages serves 404.html for any address that doesn't exist, at any depth, hence the base tag.
 page({ file: '404.html', base: '/', title: 'Page not found · Snip & Sprout Co.', desc: 'That page isn’t here. Find the shop, the workshops and our hours from the home page.' }, `<main id="main">
@@ -524,7 +610,7 @@ ${top({ title: 'Oops! This page didn’t take root',
 // Dani's private page for sending Stray Wolf changes and photos (src/portal.html, served at /portal/).
 // It is Stray Wolf's standard portal page with her details filled in.
 // "On your site now" on its Photos page is read from the pages just written, so it can't fall behind.
-const PAGE_NAMES = { 'index.html': 'Homepage', 'shop.html': 'Shop page', 'workshops.html': 'Workshops page', 'visit.html': 'Visit page', 'about.html': 'About page' };
+const PAGE_NAMES = { 'index.html': 'Homepage', 'shop.html': 'Shop page', 'workshops.html': 'Workshops page', 'visit.html': 'Visit page', 'about.html': 'About page', 'gallery.html': 'Gallery page' };
 const sitePhotos = new Map();   // photo -> { alt, pages }
 for (const [file, name] of Object.entries(PAGE_NAMES)) {
   for (const [tag] of written.get(file).matchAll(/<img\b[^>]*>/g)) {
@@ -547,6 +633,6 @@ writeFileSync(dist + 'workshop.ics', ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:
   'UID:nov-2026-terrarium-workshop@snipandsproutco.com', 'DTSTAMP:20261115T000000Z', 'DTSTART:20261122T190000Z', 'DTEND:20261122T200000Z',
   'SUMMARY:November Terrarium Workshop at Snip & Sprout Co.', 'LOCATION:413 E. Emma Ave.\\, Springdale\\, AR 72764',
   'DESCRIPTION:Starts at 1 PM. Seating is limited.', 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n'));
-for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-reverse.svg', 'robots.txt', '_headers']) cpSync(here + 'src/' + f, dist + f);
+for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-reverse.svg', 'logo-tag.svg', 'shop-scene.svg', 'robots.txt', '_headers']) cpSync(here + 'src/' + f, dist + f);
 cpSync(here + 'version.json', dist + 'version.json');   // the Stray Wolf admin reads the site's version from here
-console.log(`built 6 pages, the 404 page and the Client Portal${PREVIEW ? ' (preview)' : ''}`);
+console.log(`built ${written.size} pages (the 404 page among them) and the Client Portal${PREVIEW ? ' (preview)' : ''}`);

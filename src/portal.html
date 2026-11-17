@@ -40,6 +40,7 @@
   .sw-brand{display:block;line-height:0}
   .sw-brand img{height:30px;width:auto}
   .sw-head .gap{flex:1}
+  .sw-who{font-size:14.5px;font-weight:600;line-height:1.2;color:var(--ink);white-space:nowrap}.sw-who small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
   .secure{display:inline-flex;align-items:center;gap:7px;font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sage);background:var(--sage-soft);border:1px solid #d6dfcd;border-radius:999px;padding:7px 12px 7px 9px;white-space:nowrap}
   .secure svg{width:13px;height:13px;flex:none}
   .head-acts{display:flex;align-items:center;gap:6px}.head-acts:empty{display:none}
@@ -149,84 +150,7 @@
   @media (min-width:2400px){.rq-hd h2{font-size:27px}.rq-hd p,.rq-said,.rq-q{font-size:16px}.rq-row > b{font-size:18.5px}.rq-m{font-size:14.5px}.rq-tag{font-size:12px}.rq-go{font-size:15.5px;min-height:46px}}
   @media (max-width:560px){.rq-hd{padding:16px 16px 10px}.rq-hd h2{font-size:20px}.rq-row{grid-template-columns:minmax(0,1fr);padding:14px 16px}.rq-row .rq-tag{grid-row:1;justify-self:start}.rq-q .rq-go{flex:1 1 100%;min-height:46px}.rq-q.open .rq-no{flex:1 1 100%}}
 
-  /* ---------- Your shop: what their website sells, kept by them (filled in by site-notes.js; hidden with no shop) ---------- */
-  .rq:not([hidden]):has(+ .sp:not([hidden])),.edit:has(+ .rq[hidden] + .sp:not([hidden])){margin-bottom:16px}
-  .sp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:hidden}
-  .sp-hd{display:flex;gap:12px 16px;align-items:center;justify-content:space-between;padding:18px 22px 14px}
-  .sp-hd h2{font:700 22px/1.2 var(--slab);margin:0}
-  .sp-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}
-  .sp-add{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px 0 13px;font:650 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #f1d3c0;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}
-  .sp-add:hover{background:var(--accent);border-color:var(--accent);color:#fff}
-  .sp-add[hidden]{display:none}
-  .sp svg{flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .sp-add svg{width:16px;height:16px;stroke-width:2.4}
-  .sp-cat{margin:0;padding:16px 22px 4px;border-top:1px solid var(--line);font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage)}
-  .sp-items{list-style:none;margin:0;padding:0}
-  .sp-cat + .sp-items > .sp-row:first-child{border-top:0}
-  .sp-row{display:grid;grid-template-columns:52px minmax(0,1fr) 136px 132px 92px;grid-template-areas:"pic what price tag act";gap:6px 16px;align-items:center;padding:12px 22px;border-top:1px solid var(--line)}
-  .sp-row.open{background:#faf8f4}
-  .sp-pic{grid-area:pic;display:grid;place-items:center;width:52px;height:52px;border-radius:10px;background:var(--stone) center/cover no-repeat;color:var(--soft)}
-  .sp-pic svg{width:20px;height:20px;stroke-width:1.8}
-  .sp-row.off .sp-pic{opacity:.55}.sp-row.off .sp-what b{color:var(--muted)}
-  .sp-what{grid-area:what;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}
-  .sp-what b{font-size:16px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}
-  .sp-m{max-width:100%;color:var(--muted);font-size:13.5px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .sp-sq{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:600;color:var(--sage);text-decoration:none;white-space:nowrap}
-  .sp-sq:hover{text-decoration:underline;text-underline-offset:3px}
-  .sp-sq svg{width:13px;height:13px;stroke-width:2.2}
-  .sp-link,.sp-diff button{font:650 13.5px/1.35 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-  .sp-price{grid-area:price;display:flex;flex-direction:column;gap:3px;min-width:0}
-  .sp-box{display:flex;align-items:center;gap:3px;height:40px;padding:0 10px;background:#fff;border:1px solid #d8d1c6;border-radius:10px;cursor:text}
-  .sp-box span{color:var(--soft);font-weight:600}
-  .sp-box input{flex:1;width:100%;min-width:0;border:0;padding:0;background:none;outline:none;font:600 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink)}
-  .sp-box input::placeholder{color:var(--soft);font-weight:400}
-  .sp-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}
-  .sp-box.diff{border-color:#e39a6c;background:var(--accent-soft)}
-  .sp-diff{font-size:12.5px;line-height:1.35;color:#a94816}.sp-diff button{font-size:12.5px}
-  .sp-tag{grid-area:tag;justify-self:start}
-  .sp-tag.live{color:#4d5e42;background:var(--sage-soft);border-color:#d6dfcd}
-  .sp-tag.sold{color:#a94816;background:var(--accent-soft);border-color:#f1d3c0}
-  .sp-btn{grid-area:act;justify-self:end;min-height:38px;padding:0 15px;font:650 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;cursor:pointer}
-  .sp-btn:hover{border-color:var(--ink)}
-  .sp-none{margin:0;padding:16px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}
-  .sp-foot{margin:0;padding:12px 22px 14px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.45;color:var(--soft)}
-  /* adding or changing one item: under its row, or at the top for a new one */
-  .sp-open{list-style:none}
-  .sp-form{padding:18px 22px 20px;background:#faf8f4;border-top:1px solid var(--line)}
-  .sp-row.open + .sp-open .sp-form{border-top:1px dashed var(--line)}
-  .sp-hd2 h3{font:700 18px/1.25 var(--slab);margin:0}
-  .sp-hd2 p{margin:2px 0 14px;color:var(--muted);font-size:14px}
-  .sp-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}
-  .sp-f{display:flex;flex-direction:column;gap:5px;min-width:0}
-  .sp-f.wide{grid-column:1/-1}
-  .sp-f label{font-size:14px;font-weight:650}
-  .sp-f input,.sp-f select,.sp-f textarea{width:100%;min-height:44px;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid #d8d1c6;border-radius:10px;padding:9px 12px}
-  .sp-f textarea{min-height:68px;resize:vertical}
-  .sp-f input[type=file]{min-height:0;padding:6px 8px;font-size:14px;color:var(--muted)}
-  .sp-f input[type=file]::file-selector-button{margin-right:10px;padding:7px 13px;font:650 13.5px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--stone);border:1px solid var(--line);border-radius:8px;cursor:pointer}
-  .sp-f input:focus,.sp-f select:focus,.sp-f textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}
-  .sp-f small{color:var(--soft);font-size:12.5px;line-height:1.35}
-  .sp-file{display:flex;align-items:center;gap:10px}.sp-file .sp-pic{flex:none;width:44px;height:44px}
-  .sp-ft{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:16px}
-  .sp-ft .gap{flex:1}
-  .sp-form > .rq-err{margin-top:12px}
-  .sp-del{font:650 14px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#b4361c;background:none;border:0;padding:8px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
-  .sp-sure{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:14px}
-  .sp-sure .sp-del{min-height:40px;padding:0 14px;color:#fff;background:#b4361c;border-radius:10px;text-decoration:none}
-  .sp-sure .sp-del:hover{background:#962b14}
-  .sp button:focus-visible,.sp a:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}
-  @media (min-width:1800px){.sp-hd h2{font-size:24px}.sp-what b{font-size:17px}}
-  @media (min-width:2400px){.sp-hd h2{font-size:27px}.sp-hd p,.sp-hd2 p{font-size:16px}.sp-what b{font-size:18.5px}.sp-m,.sp-sq{font-size:14.5px}.sp-tag{font-size:12px}
-    .sp-row{grid-template-columns:60px minmax(0,1fr) 150px 146px 104px}.sp-pic{width:60px;height:60px}.sp-box{height:46px}.sp-box input{font-size:16.5px}.sp-btn,.sp-add{font-size:15.5px;min-height:46px}
-    .sp-f label{font-size:15.5px}.sp-f input,.sp-f select,.sp-f textarea{font-size:16.5px;min-height:48px}.sp-f small,.sp-foot{font-size:14px}.sp-hd2 h3{font-size:21px}}
-  @media (max-width:720px){
-    .sp-hd{flex-wrap:wrap;padding:16px 16px 12px}.sp-hd h2{font-size:20px}
-    .sp-row{grid-template-columns:48px minmax(0,1fr) auto auto;grid-template-areas:"pic what what what" "price price tag act";gap:10px 12px;padding:12px 16px}
-    .sp-pic{width:48px;height:48px;align-self:start}.sp-what{align-self:center}.sp-price{align-self:start}.sp-box{width:128px;max-width:100%}.sp-tag,.sp-btn{align-self:start}.sp-tag{margin-top:8px}.sp-btn{margin-top:1px}
-    .sp-cat,.sp-none,.sp-foot{padding-left:16px;padding-right:16px}
-    .sp-form{padding:16px}.sp-fields{grid-template-columns:minmax(0,1fr)}
-    .sp-ft .rq-go{flex:1 1 100%;min-height:48px;order:3}
-  }
+  /* ---------- Your shop: its styles come with site-notes.js (PAGE_CSS), in this page's colors ---------- */
 
   /* ---------- tappable cards ---------- */
   .box{position:relative;background:var(--card);border-radius:16px;padding:16px 16px 16px 18px;cursor:pointer;
@@ -258,6 +182,8 @@
   /* ---------- what's on the site now ---------- */
   .now{margin:14px 0 0;padding:12px 0 0;border-top:1px dashed var(--line)}
   .now-k{display:flex;align-items:center;gap:6px;font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage);margin:0 0 10px}
+  .now-dl{margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card);font:600 12.5px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:0;text-transform:none;color:var(--ink);text-decoration:none}
+  .now-dl:hover{border-color:var(--ink)}.now-k .now-dl svg{width:14px;height:14px}
   .now-k svg{width:12px;height:12px}
   .now.empty .now-k{color:var(--soft)}
   .now .none{margin:0;color:var(--soft);font-size:14px}
@@ -332,7 +258,8 @@
     .soc{gap:10px}.soc li{grid-template-columns:1fr;gap:1px}.soc .off{flex-wrap:wrap;row-gap:4px}
     .kept{padding:12px 14px;justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:8px}
   }
-  @media (max-width:560px){.secure:has(~ .head-acts:not(:empty)){display:none}.head-acts button{padding:0 11px}}
+  @media (max-width:760px){.secure:has(~ .head-acts:not(:empty)){display:none}}
+  @media (max-width:560px){.sw-who{display:none}.head-acts button{padding:0 11px}}
   @media (max-width:360px){.secure .w{display:none}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
   .flat{line-height:0}.nojs{padding:24px}
@@ -342,15 +269,18 @@
 <header class="sw-head" data-keep>
   <div class="wrap">
     <a class="sw-brand" href="https://straywolftech.com" rel="noopener"><img src="brand/stray-wolf-logo-color.svg" alt="Stray Wolf Technology" width="128" height="30"></a>
+    <span class="sw-who">Snip &amp; Sprout Co.<small>Client Portal</small></span>
     <span class="gap"></span>
     <span class="secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Private <span class="w">and secure</span></span>
     <!-- Help and Log out go here once they're logged in (site-notes.js fills it in) -->
     <span class="head-acts" data-portal-actions></span>
   </div>
+  <!-- A link to each part of the page below (each part has data-nav="its name"), filled in by site-notes.js after login -->
+  <nav class="sw-nav" data-portal-nav hidden aria-label="Parts of your portal"></nav>
 </header>
 
 <main class="wrap">
-  <section class="hero" data-area="Welcome">
+  <section class="hero" id="overview" data-nav="Overview" data-area="Welcome">
     <div class="plate"><img src="../logo.svg" alt="The Snip &amp; Sprout Plant Co. logo" width="149" height="113"></div>
     <div>
       <p class="kicker">Client Portal</p>
@@ -391,7 +321,7 @@
   <!-- Your requests: what they've asked for and where each one stands, under the Edit mode card. Hidden until
        the notes service sends at least one (site-notes.js asks /api/my-requests after login and builds the rows).
        The status is the one Stray Wolf picks in the admin; a question gets an Answer button. -->
-  <section class="rq" data-requests hidden aria-labelledby="rq-h">
+  <section class="rq" id="requests" data-nav="Requests" data-requests hidden aria-labelledby="rq-h">
     <div class="rq-hd"><div><h2 id="rq-h">Your requests</h2><p>What you've asked for, and where each one stands.</p></div><button class="rq-all" type="button" data-requests-all hidden></button></div>
     <ul class="rq-list" data-requests-list></ul>
   </section>
@@ -399,7 +329,7 @@
   <!-- Your shop: for a client whose website sells through Square (kit/shop on their site). Hidden until Stray Wolf
        starts their shop in the admin (site-notes.js asks /api/my-shop after login and builds the rows). They add,
        change and delete items, type the shown price in each row, and set each item's photo and Square checkout link. -->
-  <section class="sp" data-shop-portal hidden aria-labelledby="sp-h">
+  <section class="sp" id="shop" data-nav="Your shop" data-shop-portal hidden aria-labelledby="sp-h">
     <div class="sp-hd"><div><h2 id="sp-h">Your shop</h2><p data-shop-count>What your website sells.</p></div>
       <button class="sp-add" type="button" data-shop-add><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add an item</button></div>
     <div data-shop-form></div>
@@ -410,35 +340,35 @@
   <h2 class="sec-h">What's on your site now</h2>
   <p class="sub">Here's what your website shows today. Tap a box to add something new or fix anything that's wrong, then tap <b>Send to Stray Wolf</b> at the bottom.</p>
   <ul class="boxes">
-    <li class="box" data-note-box data-note-photos data-area="Logo" data-note-ask="Add your logo below. Anything I should know about it?" data-note-hint="For example: This is the newest one. Use the round version.">
+    <li class="box" id="logo" data-nav="Logo" data-note-box data-note-photos data-area="Logo" data-note-ask="Add your logo below. Anything I should know about it?" data-note-hint="For example: This is the newest one. Use the round version.">
       <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></div><div class="grow"><b>Your logo</b><span>Have a newer one?</span></div><em class="tap">Add or change</em></div>
       <div class="now">
-        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now<a class="now-dl" href="../logo.svg" download="Snip &amp; Sprout Co. logo.svg" title="Save the logo file on your website to this computer or phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>Download</a></p>
         <div class="logo-now"><img src="../logo.svg" alt="The Snip &amp; Sprout Plant Co. logo on the website" width="149" height="113"></div>
       </div>
     </li>
-    <li class="box" data-note-box data-area="Contact info" data-note-fields="Email|Address|Phone" data-note-now="Email=snipandsproutco@gmail.com|Address=413 E. Emma Ave., Springdale, AR 72764" data-note-ask="Here&#x27;s what&#x27;s on your site. Tap Change on anything that&#x27;s new or wrong.">
+    <li class="box" id="contact" data-nav="Contact info" data-note-box data-area="Contact info" data-note-fields="Email|Address|Phone" data-note-now="Email=snipandsproutco@gmail.com|Address=413 E. Emma Ave., Springdale, AR 72764" data-note-ask="Here&#x27;s what&#x27;s on your site. Tap Change on anything that&#x27;s new or wrong.">
       <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div class="grow"><b>Contact info</b><span>How people reach you.</span></div><em class="tap">Add or change</em></div>
       <div class="now">
         <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
         <dl class="facts"><div><dt>Email</dt><dd>snipandsproutco@gmail.com</dd></div><div><dt>Address</dt><dd>413 E. Emma Ave., Springdale, AR 72764</dd></div></dl>
       </div>
     </li>
-    <li class="box" data-note-box data-area="Shop hours" data-note-fields="Mon – Tue|Wed – Fri|Sat – Sun|A holiday or a day off" data-note-now="Mon – Tue=10 AM – 3 PM|Wed – Fri=9 AM – 6 PM|Sat – Sun=9 AM – 2 PM" data-note-ask="Here are the hours on your site. Tap Change on any that are different now.">
+    <li class="box" id="hours" data-nav="Shop hours" data-note-box data-area="Shop hours" data-note-fields="Mon – Tue|Wed – Fri|Sat – Sun|A holiday or a day off" data-note-now="Mon – Tue=10 AM – 3 PM|Wed – Fri=9 AM – 6 PM|Sat – Sun=9 AM – 2 PM" data-note-ask="Here are the hours on your site. Tap Change on any that are different now.">
       <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="grow"><b>Shop hours</b><span>When you&#x27;re open.</span></div><em class="tap">Add or change</em></div>
       <div class="now">
         <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
         <dl class="facts"><div><dt>Mon – Tue</dt><dd>10 AM – 3 PM</dd></div><div><dt>Wed – Fri</dt><dd>9 AM – 6 PM</dd></div><div><dt>Sat – Sun</dt><dd>9 AM – 2 PM</dd></div></dl>
       </div>
     </li>
-    <li class="box" data-note-box data-area="Your social pages" data-note-fields="Instagram|Etsy|Facebook|Google" data-note-now="Instagram=instagram.com/snipandsprout.co|Etsy=etsy.com/shop/SnipAndSproutCo" data-note-ask="Tap Change if a link is wrong, or paste a link for a page you have.">
+    <li class="box" id="social" data-nav="Social pages" data-note-box data-area="Your social pages" data-note-fields="Instagram|Etsy|Facebook|Google" data-note-now="Instagram=instagram.com/snipandsprout.co|Etsy=etsy.com/shop/SnipAndSproutCo" data-note-ask="Tap Change if a link is wrong, or paste a link for a page you have.">
       <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg></div><div class="grow"><b>Your social pages</b><span>Just the ones you have.</span></div><em class="tap">Add or change</em></div>
       <div class="now">
         <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
         <ul class="soc"><li><span>Instagram</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">instagram.com/snipandsprout.co</span></span></li><li><span>Etsy</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">etsy.com/shop/SnipAndSproutCo</span></span></li><li><span>Facebook</span><span class="off"><span class="url">facebook.com/yourpage</span><em>Example</em></span></li><li><span>Google</span><span class="off"><span class="url">maps.app.goo.gl/yourplace</span><em>Example</em></span></li></ul>
       </div>
     </li>
-    <li class="box wide" data-note-box data-photos-page data-note-photos data-area="Photos" data-note-ask="Add new photos below. Want a photo on your site swapped out? Tell me which one." data-note-hint="For example: Swap the pumpkin photo for this one.">
+    <li class="box wide" id="your-photos" data-nav="Photos" data-note-box data-photos-page data-note-photos data-area="Photos" data-note-ask="Add new photos below. Want a photo on your site swapped out? Tell me which one." data-note-hint="For example: Swap the pumpkin photo for this one.">
       <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></div><div class="grow"><b>Photos</b><span>Your shop, your workshops, what people made.</span></div><em class="tap">Open</em></div>
       <div class="now">
         <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
@@ -449,7 +379,7 @@
 
   <!-- Let's talk opens Stray Wolf's Google Calendar booking page (data-booking-url) in a new tab.
        Empty data-booking-url = it goes back to a note with times that work. -->
-  <div class="meet box" data-note-box data-booking-url="https://calendar.app.google/XseK2nweRYW1hea37" data-area="Meeting request" data-note-fields="Days that work for you=For example: Tuesday or Thursday|Best time of day=For example: mornings, or after 3|Phone, video or in person?=For example: a phone call is easiest" data-note-ask="When can we talk? I'll set it up and confirm with you.">
+  <div class="meet box" id="talk" data-nav="Let's talk" data-note-box data-booking-url="https://calendar.app.google/XseK2nweRYW1hea37" data-area="Meeting request" data-note-fields="Days that work for you=For example: Tuesday or Thursday|Best time of day=For example: mornings, or after 3|Phone, video or in person?=For example: a phone call is easiest" data-note-ask="When can we talk? I'll set it up and confirm with you.">
     <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8.5 15l2.2 2.2 4.8-4.8"/></svg></div><div class="grow"><b>Let's talk</b><span>Pick a time that works for you, for a call or a meeting.</span></div><em class="tap">Pick a time</em></div>
   </div>
 

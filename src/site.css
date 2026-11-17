@@ -102,6 +102,11 @@ ul,ol{ padding:0; list-style:none; }
 .btn:active{ transform:translateY(0) scale(.98); box-shadow:var(--sh-1); }
 .btn svg{ width:18px; height:18px; flex:none; transition:transform .2s var(--ease); }
 .btn:hover svg{ transform:translateX(3px); }
+/* the Follow button carries Instagram's own icon, white on its colour tile */
+.btn--ig{ padding-left:14px; }
+.btn--ig .ic-ig{ display:grid; place-items:center; width:28px; height:28px; border-radius:8px; }
+.btn--ig .ic-ig svg{ width:16px; height:16px; }
+.btn--ig:hover svg{ transform:none; }
 /* the second choice: an outline that fills on hover */
 .btn--tone{ background:transparent; color:var(--ink); border-color:var(--line-strong); box-shadow:none; }
 .btn--tone:hover{ background:var(--card); border-color:var(--olive); box-shadow:var(--sh-1); }
@@ -120,9 +125,10 @@ ul,ol{ padding:0; list-style:none; }
 /* ---------- the header: one bar across the top of every page, in her sage ---------- */
 .nav{ position:sticky; top:0; z-index:30; background:rgb(221 226 211 / .97); color:var(--olive-ink); -webkit-backdrop-filter:saturate(1.2) blur(14px); backdrop-filter:saturate(1.2) blur(14px); border-bottom:1px solid rgb(44 48 39 / .14); }
 .nav__in{ max-width:var(--max); margin:0 auto; min-height:var(--navh); padding:0 var(--pad); display:grid; grid-template-columns:1fr auto 1fr; align-items:center; gap:20px; }
-/* Her logo (src/logo.svg): "Snip &" / "SPROUT" / "PLANT CO." in Instrument Serif, drawn as outlines. */
-.brand{ display:inline-flex; align-items:center; justify-self:start; }
-.brand img{ display:block; height:52px; width:auto; }
+/* Her logo on its olive box (src/logo-tag.svg), hanging from the top of the bar like a shop tag: the link keeps
+   the bar's height and the picture hangs below it. */
+.brand{ display:block; justify-self:start; align-self:start; height:var(--navh); position:relative; z-index:1; }
+.brand img{ display:block; height:calc(var(--navh) + 28px); width:auto; border-radius:0 0 12px 12px; box-shadow:0 1px 2px rgb(30 34 28 / .18), 0 16px 28px -14px rgb(30 34 28 / .5); }
 .nav__links{ display:flex; align-items:center; gap:clamp(20px,2.4vw,36px); }
 .nav__links a{ position:relative; text-decoration:none; font-size:1rem; letter-spacing:.01em; padding:6px 0; }
 .nav__links a::after{ content:""; position:absolute; left:0; right:0; bottom:2px; height:1.5px; background:var(--clay); transform:scaleX(0); transform-origin:left; transition:transform .3s var(--ease); }
@@ -205,6 +211,36 @@ a.menu__item:hover{ background-size:100% 2px; }
 .course__body > p:not(.statement):not(.small){ color:var(--muted); }
 .courses{ padding-bottom:var(--section); }
 
+/* ---------- the Gallery: each group's heading beside a grid of her photos ---------- */
+.course--gal .course__head{ grid-column:1 / 4; }
+.course--gal .course__body{ grid-column:4 / 13; }
+.course__line{ color:var(--muted); max-width:22em; }
+.course--gal .course__head .link{ align-self:flex-start; }
+.gal{ list-style:none; margin:0; padding:0; display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(10px,1.2vw,18px); }
+.gal__item{ display:block; border-radius:14px; overflow:hidden; background:var(--cream); box-shadow:var(--sh-1); transition:box-shadow .3s var(--ease); }
+.gal__item img{ display:block; width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; transition:transform .6s var(--ease); }
+.gal__item:hover{ box-shadow:var(--sh-2); }
+.gal__item:hover img{ transform:scale(1.04); }
+
+/* the photo viewer (site.js): the whole photo on a dark screen, her caption under it */
+.lb{ position:fixed; inset:0; width:100%; height:100%; max-width:none; max-height:none; margin:0; padding:0; border:0; background:rgb(28 31 25 / .96); color:var(--on-dark); overflow:hidden; }
+.lb[open]{ display:grid; place-items:center; }
+.lb::backdrop{ background:transparent; -webkit-backdrop-filter:blur(8px); backdrop-filter:blur(8px); }
+html:has(.lb[open]){ overflow:hidden; }
+.lb__fig{ margin:0; min-width:0; display:flex; flex-direction:column; align-items:center; gap:14px; padding:clamp(64px,7vh,88px) clamp(16px,7vw,120px) clamp(24px,4vh,40px); }
+.lb__img{ display:block; max-width:min(100%, 1100px); max-height:calc(100svh - 170px); width:auto; height:auto; border-radius:12px; box-shadow:0 30px 60px -30px rgb(0 0 0 / .7); transition:opacity .25s var(--ease); }
+.lb__img.is-loading{ opacity:0; }
+.lb__cap{ display:flex; flex-wrap:wrap; justify-content:center; align-items:baseline; gap:6px 16px; max-width:40rem; text-align:center; font-size:1.0625rem; line-height:1.45; }
+.lb__n{ font-size:var(--t-small); color:var(--on-dark-soft); font-variant-numeric:tabular-nums; white-space:nowrap; }
+.lb__btn{ position:fixed; width:48px; height:48px; display:grid; place-items:center; padding:0; border-radius:50%; border:1px solid rgb(247 244 238 / .24); background:rgb(247 244 238 / .08); color:var(--on-dark); cursor:pointer; transition:background-color .2s var(--ease), border-color .2s var(--ease); }
+.lb__btn:hover{ background:rgb(247 244 238 / .18); border-color:rgb(247 244 238 / .45); }
+.lb__btn:focus-visible{ outline-color:var(--on-dark); }
+.lb__btn svg{ width:20px; height:20px; }
+.lb__btn--prev, .lb__btn--next{ top:50%; translate:0 -50%; }
+.lb__btn--prev{ left:clamp(12px,2vw,32px); }
+.lb__btn--next{ right:clamp(12px,2vw,32px); }
+.lb__btn--close{ top:clamp(12px,2vw,24px); right:clamp(12px,2vw,32px); }
+
 /* questions, in native details (no script needed) */
 .faq{ display:flex; flex-direction:column; border-top:1px solid var(--line-strong); }
 .faq details{ border-bottom:1px solid var(--line-strong); }
@@ -284,7 +320,7 @@ a.menu__item:hover{ background-size:100% 2px; }
 .hours3 tr.is-today th::after{ content:" · today"; color:var(--clay-ink); font-weight:600; }
 
 /* ---------- footer ---------- */
-.foot{ background:var(--olive-ink); color:var(--on-dark-soft); font-size:var(--t-small); padding:clamp(56px,6vw,88px) 0 0; }
+.foot{ background:var(--olive-ink); color:var(--on-dark-soft); font-size:var(--t-small); }
 .foot a{ text-decoration:none; }
 .foot a:hover{ color:var(--on-dark); text-decoration:underline; text-decoration-color:var(--rose); }
 .foot__grid{ display:grid; grid-template-columns:minmax(0,1.6fr) repeat(3,minmax(0,1fr)); gap:40px clamp(24px,4vw,64px); }
@@ -294,12 +330,44 @@ a.menu__item:hover{ background-size:100% 2px; }
 .foot__brand p{ font-size:1.0625rem; line-height:1.6; }
 .foot__col{ display:flex; flex-direction:column; gap:14px; }
 .foot__col address{ font-style:normal; }
-.foot__list{ display:flex; flex-direction:column; gap:8px; }
+.foot__list{ display:flex; flex-direction:column; gap:10px; }
+/* each link with its icon on a small rounded tile: Instagram and Etsy in their own colours, email and the portal
+   on a soft tile that fills with her rose on hover */
+.foot__list a{ display:inline-flex; align-items:center; gap:12px; }
+.foot__ic{ display:grid; place-items:center; width:34px; height:34px; flex:none; border-radius:10px; color:var(--rose); background:rgb(247 244 238 / .07); border:1px solid rgb(247 244 238 / .14); transition:background-color .2s var(--ease), color .2s var(--ease), border-color .2s var(--ease), transform .2s var(--ease), box-shadow .2s var(--ease); }
+.foot__ic svg{ width:17px; height:17px; }
+.foot__list a:hover .foot__ic:not(.ic-ig, .ic-etsy){ background:var(--rose); border-color:var(--rose); color:var(--olive-ink); }
+.foot__list a:hover .ic-ig, .foot__list a:hover .ic-etsy{ transform:translateY(-1px); box-shadow:0 6px 14px -6px rgb(0 0 0 / .55); }
+/* Instagram's and Etsy's brand colours */
+.ic-ig, .ic-etsy{ color:#fff; border-color:transparent; }
+.ic-ig{ background:radial-gradient(circle at 30% 107%, #fdf497 0%, #fdf497 5%, #fd5949 45%, #d6249f 60%, #285aeb 90%); }
+.ic-etsy{ background:#f1641e; }
 .foot .hours3 th, .foot .hours3 td{ padding:4px 0; }
 .foot .hours3 tr + tr th, .foot .hours3 tr + tr td{ border-top:0; }
 .foot .hours3 tr.is-today th, .foot .hours3 tr.is-today td{ color:var(--on-dark); }
 .foot .hours3 tr.is-today th::after{ color:var(--rose); }
 .foot__base{ margin-top:clamp(44px,5vw,72px); padding-top:22px; padding-bottom:22px; border-top:1px solid rgb(247 244 238 / .14); display:flex; justify-content:space-between; align-items:center; gap:14px 24px; flex-wrap:wrap; }
+
+/* ---------- her shop across the top of the footer ----------
+   shop-scene.svg: her counter and wall shelves with plants, pots and terrariums. It shows as a still picture,
+   cropped at the sides to fill the width; site.js swaps in the same drawing inline and plays it (see there). */
+.shop-scene{ position:relative; height:clamp(170px, 12vw + 60px, 270px); margin-bottom:clamp(40px,5vw,64px); overflow:hidden; }
+.shop-scene > img, .shop-scene > svg{ display:block; width:100%; height:100%; }
+.shop-scene > img{ object-fit:cover; object-position:50% 100%; }
+.shop-scene .sc-can, .shop-scene .sc-can__tilt, .shop-scene .sp__grow{ transform-box:view-box; }
+.shop-scene .sc-can__tilt{ transform-origin:0 -24px; }          /* the middle of the can */
+.shop-scene .sc-drop{ animation:sc-rain .72s linear infinite; }
+.shop-scene .sc-drop:nth-child(2n){ animation-duration:.66s; }
+.shop-scene .sc-drop:nth-child(2){ animation-delay:-.07s; } .shop-scene .sc-drop:nth-child(3){ animation-delay:-.14s; } .shop-scene .sc-drop:nth-child(4){ animation-delay:-.22s; }
+.shop-scene .sc-drop:nth-child(5){ animation-delay:-.29s; } .shop-scene .sc-drop:nth-child(6){ animation-delay:-.36s; } .shop-scene .sc-drop:nth-child(7){ animation-delay:-.43s; }
+.shop-scene .sc-drop:nth-child(8){ animation-delay:-.5s; } .shop-scene .sc-drop:nth-child(9){ animation-delay:-.58s; } .shop-scene .sc-drop:nth-child(10){ animation-delay:-.65s; }
+@keyframes sc-rain{ 0%{ transform:translateY(0) scaleY(.8); opacity:0; } 15%{ opacity:1; } 80%{ opacity:1; } 100%{ transform:translateY(56px) scaleY(1.3); opacity:0; } }
+/* the pause button (added by site.js, so only when the scene moves), lined up with the page's right edge */
+.shop-scene__toggle{ position:absolute; top:14px; right:max(var(--pad), calc((100% - var(--max)) / 2 + var(--pad))); width:38px; height:38px; display:grid; place-items:center; padding:0; border-radius:50%; border:1px solid rgb(247 244 238 / .22); background:rgb(47 52 43 / .7); color:var(--on-dark); cursor:pointer; transition:background-color .2s var(--ease), border-color .2s var(--ease); }
+.shop-scene__toggle:hover{ background:rgb(247 244 238 / .14); border-color:rgb(247 244 238 / .4); }
+.shop-scene__toggle svg{ width:14px; height:14px; }
+.shop-scene__toggle .i-play, .shop-scene__toggle.is-held .i-pause{ display:none; }
+.shop-scene__toggle.is-held .i-play{ display:block; }
 
 /* Stray Wolf footer badge: the kit's own rules, unchanged */
 /* Stray Wolf Technology footer badge · v1 · https://straywolftech.com
@@ -410,6 +478,7 @@ a.menu__item:hover{ background-size:100% 2px; }
   .course__head{ position:static; }
   .course__pic{ aspect-ratio:4/3; max-height:none; }
   .course__pic--wide{ aspect-ratio:auto; }
+  .course--gal .course__head, .course--gal .course__body{ grid-column:1 / -1; }
   .band__text, .band__pic{ grid-column:1 / -1; }
   .band__pic{ aspect-ratio:4/3; max-height:none; max-width:620px; }
   .slip{ grid-column:1 / -1; max-width:560px; }
@@ -424,15 +493,15 @@ a.menu__item:hover{ background-size:100% 2px; }
 }
 @media (max-width: 700px){
   :root{ --navh:64px; --t-menu:min(10vw, 2.75rem); }
-  .brand img{ height:46px; }
+  .brand img{ height:calc(var(--navh) + 14px); border-radius:0 0 10px 10px; }
   .menu li{ grid-template-columns:2rem minmax(0,1fr); }
   .menu__value{ grid-column:2; padding:4px 0 2px; font-size:1.5rem; }
   .ticket{ left:12px; right:12px; bottom:12px; padding:12px 16px; }
   .ticket b{ font-size:1.3125rem; }
   .ticket__price{ font-size:1.75rem; }
   .ribbon__track{ padding:14px 0; }
-  .tabbar{ display:grid; grid-template-columns:repeat(5,1fr); position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgb(247 244 238 / .9); -webkit-backdrop-filter:saturate(1.2) blur(14px); backdrop-filter:saturate(1.2) blur(14px); border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom)); }
-  .tabbar a{ display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 2px 5px; border-radius:12px; text-decoration:none; color:var(--muted); font-size:.8125rem; font-weight:600; }
+  .tabbar{ display:flex; position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgb(247 244 238 / .9); -webkit-backdrop-filter:saturate(1.2) blur(14px); backdrop-filter:saturate(1.2) blur(14px); border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom)); }
+  .tabbar a{ flex:1 1 auto; min-width:0; display:flex; flex-direction:column; align-items:center; gap:3px; padding:7px 4px 5px; border-radius:12px; text-decoration:none; color:var(--muted); font-size:.8125rem; font-weight:600; }
   .tabbar svg{ width:22px; height:22px; }
   .tabbar a[aria-current="page"]{ color:var(--on-dark); background:var(--olive); }
   .foot{ padding-bottom:84px; }
@@ -442,6 +511,10 @@ a.menu__item:hover{ background-size:100% 2px; }
   .statement{ font-size:1.5rem; }
   .slipq blockquote{ font-size:1.5rem; }
   .reel__text{ order:-1; }
+  .gal{ grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .lb__fig{ padding:64px 12px 92px; }
+  .lb__img{ max-height:calc(100svh - 210px); border-radius:10px; }
+  .lb__btn--prev, .lb__btn--next{ top:auto; bottom:max(20px, env(safe-area-inset-bottom)); translate:none; }
   .reel__grid{ grid-template-columns:1fr; }
   .frame{ max-width:none; }
   .visit{ padding-left:12px; padding-right:12px; }
