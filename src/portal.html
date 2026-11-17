@@ -77,6 +77,12 @@
   .kicker::after{content:"";width:28px;height:1px;background:currentColor;opacity:.5}
   h1{font:700 clamp(28px,3.6vw,38px)/1.1 var(--slab);letter-spacing:-.005em;margin:0 0 8px;text-wrap:balance}
   .lead{margin:0;color:var(--muted);max-width:540px;font-size:16px}
+  .hero-go{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
+  .hero-go button,.hero-go a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:11px;font:600 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
+  .hero-go svg{width:18px;height:18px;flex:none}
+  .go-talk{color:#fff;background:var(--sage);border:1px solid var(--sage)}.go-talk:hover{background:#4d5e42}
+  .go-edit{color:var(--ink);background:var(--card);border:1px solid var(--line)}.go-edit:hover{border-color:var(--accent)}
+  .hero-go :focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}
   .trust{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--soft);font-size:13px}
   .trust li{display:inline-flex;align-items:center;gap:6px}
   .trust svg{width:14px;height:14px;color:var(--sage)}
@@ -311,55 +317,11 @@
       <p class="kicker">Client Portal</p>
       <h1>Welcome, Snip &amp; Sprout Co.</h1>
       <p class="lead">Send what's needed, ask for changes to your website, and set up a time to talk, all in one place.</p>
+      <p class="hero-go">
+        <button class="go-talk" type="button" data-talk title="Pick a time to talk with Stray Wolf about your website"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Let's talk</button>
+        <a class="go-edit" href="{{home}}" data-edit-mode="{{home}}" title="Open your website to point at what you'd like changed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>Edit my website</a>
+      </p>
     </div>
-  </section>
-
-  <!-- A few numbers from Google Analytics, in one wide strip under the welcome. Hidden until the notes
-       service sends real ones (site-notes.js asks /api/stats after login); the demo shows sample numbers. -->
-  <aside class="stats" data-stats hidden aria-label="Your website, last 28 days">
-    <div class="stats-head">
-      <p class="stats-k">Your website</p>
-      <p class="stats-when" data-stat="range">Last 28 days</p>
-      <p class="stats-sum" data-stat="summary"></p>
-    </div>
-    <ul class="stats-nums">
-      <li><b data-stat="visitors">–</b><span>Visitors</span><i>Different people who opened your website</i><small data-chg="visitors"></small></li>
-      <li><b data-stat="calls">–</b><span>Phone calls</span><i>Tapped your number on the website</i><small data-chg="calls"></small></li>
-      <li><b data-stat="leads">–</b><span>Form requests</span><i>Filled in and sent your form</i><small data-chg="leads"></small></li>
-    </ul>
-    <p class="stats-f"><span class="ga"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="16" y="2" width="6" height="20" rx="3" fill="#F9AB00"/><rect x="9" y="9" width="6" height="13" rx="3" fill="#E37400"/><circle cx="4.5" cy="18.5" r="3.5" fill="#E37400"/></svg><span data-stat="note">From Google Analytics</span></span></p>
-  </aside>
-
-  <a class="edit has-shot" href="{{home}}" data-edit-mode="{{home}}">
-    <div class="shot" aria-hidden="true"><div class="bar"><i></i><i></i><i></i><span>snipandsproutco.com</span></div><img src="brand/site-preview.jpg" alt="" width="960" height="600"></div>
-    <div class="side">
-      <span class="live">Your new website</span>
-      <div>
-        <p class="k">Edit mode</p>
-        <b>Want something changed?</b>
-        <p class="t">Open your website, tap the part you mean, and say what you'd like. Nothing changes until the update is made.</p>
-      </div>
-      <div class="go">Open Edit mode<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
-    </div>
-  </a>
-
-  <!-- Your requests: what they've asked for and where each one stands, under the Edit mode card. Hidden until
-       the notes service sends at least one (site-notes.js asks /api/my-requests after login and builds the rows).
-       The status is the one Stray Wolf picks in the admin; a question gets an Answer button. -->
-  <section class="rq" id="requests" data-nav="Requests" data-requests hidden aria-labelledby="rq-h">
-    <div class="rq-hd"><div><h2 id="rq-h">Your requests</h2><p>What you've asked for, and where each one stands.</p></div><button class="rq-all" type="button" data-requests-all hidden></button></div>
-    <ul class="rq-list" data-requests-list></ul>
-  </section>
-
-  <!-- Your shop: for a client whose website sells through Square (kit/shop on their site). Hidden until Stray Wolf
-       starts their shop in the admin (site-notes.js asks /api/my-shop after login and builds the rows). They add,
-       change and delete items, type the shown price in each row, and set each item's photo and Square checkout link. -->
-  <section class="sp" id="shop" data-nav="Your shop" data-shop-portal hidden aria-labelledby="sp-h">
-    <div class="sp-hd"><div><h2 id="sp-h">Your shop</h2><p data-shop-count>What your website sells.</p></div>
-      <button class="sp-add" type="button" data-shop-add><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add an item</button></div>
-    <div data-shop-form></div>
-    <div data-shop-list></div>
-    <p class="sp-foot">Every Buy button on your website opens your Square checkout, so payments never come through here. Changes show on your website within a minute.</p>
   </section>
 
   <h2 class="sec-h">What's on your site now</h2>
@@ -401,6 +363,59 @@
       </div>
     </li>
   </ul>
+
+  <!-- Messages from your website: what people send with the form on the website, for a client whose form sends
+       to the notes service. Hidden while the form is off; site-notes.js asks /api/my-form after login and builds it. -->
+  <section class="fp" id="messages" data-nav="Messages" data-form-portal hidden aria-labelledby="fp-h"></section>
+
+  <!-- Your shop: for a client whose website sells things (kit/shop on their site), through Square or any other
+       checkout. Hidden until Stray Wolf starts their shop in the admin (site-notes.js asks /api/my-shop after login,
+       builds the rows, and words the last line for the shop's kind of checkout). They add, change and delete items,
+       type the shown price in each row, and set each item's photo and checkout link. -->
+  <section class="sp" id="shop" data-nav="Your shop" data-shop-portal hidden aria-labelledby="sp-h">
+    <div class="sp-hd"><div><h2 id="sp-h">Your shop</h2><p data-shop-count>What your website sells.</p></div>
+      <button class="sp-add" type="button" data-shop-add><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add an item</button></div>
+    <div data-shop-form></div>
+    <div data-shop-list></div>
+    <p class="sp-foot">Every Buy button on your website opens your Square checkout, so payments never come through here. Changes show on your website within a minute.</p>
+  </section>
+
+  <a class="edit has-shot" href="{{home}}" data-edit-mode="{{home}}">
+    <div class="shot" aria-hidden="true"><div class="bar"><i></i><i></i><i></i><span>snipandsproutco.com</span></div><img src="brand/site-preview.jpg" alt="" width="960" height="600"></div>
+    <div class="side">
+      <span class="live">Your new website</span>
+      <div>
+        <p class="k">Edit mode</p>
+        <b>Want something changed?</b>
+        <p class="t">Open your website, tap the part you mean, and say what you'd like. Nothing changes until the update is made.</p>
+      </div>
+      <div class="go">Open Edit mode<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+    </div>
+  </a>
+
+  <!-- Your requests: what they've asked for and where each one stands, under the Edit mode card. Hidden until
+       the notes service sends at least one (site-notes.js asks /api/my-requests after login and builds the rows).
+       The status is the one Stray Wolf picks in the admin; a question gets an Answer button. -->
+  <section class="rq" id="requests" data-nav="Requests" data-requests hidden aria-labelledby="rq-h">
+    <div class="rq-hd"><div><h2 id="rq-h">Your requests</h2><p>What you've asked for, and where each one stands.</p></div><button class="rq-all" type="button" data-requests-all hidden></button></div>
+    <ul class="rq-list" data-requests-list></ul>
+  </section>
+
+  <!-- A few numbers from Google Analytics, in one wide strip above Let's talk. Hidden until the notes
+       service sends real ones (site-notes.js asks /api/stats after login); the demo shows sample numbers. -->
+  <aside class="stats" data-stats hidden aria-label="Your website, last 28 days">
+    <div class="stats-head">
+      <p class="stats-k">Your website</p>
+      <p class="stats-when" data-stat="range">Last 28 days</p>
+      <p class="stats-sum" data-stat="summary"></p>
+    </div>
+    <ul class="stats-nums">
+      <li><b data-stat="visitors">–</b><span>Visitors</span><i>Different people who opened your website</i><small data-chg="visitors"></small></li>
+      <li><b data-stat="calls">–</b><span>Phone calls</span><i>Tapped your number on the website</i><small data-chg="calls"></small></li>
+      <li><b data-stat="leads">–</b><span>Form requests</span><i>Filled in and sent your form</i><small data-chg="leads"></small></li>
+    </ul>
+    <p class="stats-f"><span class="ga"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="16" y="2" width="6" height="20" rx="3" fill="#F9AB00"/><rect x="9" y="9" width="6" height="13" rx="3" fill="#E37400"/><circle cx="4.5" cy="18.5" r="3.5" fill="#E37400"/></svg><span data-stat="note">From Google Analytics</span></span></p>
+  </aside>
 
   <!-- Let's talk opens Stray Wolf's Google Calendar booking page (data-booking-url) in a new tab.
        Empty data-booking-url = it goes back to a note with times that work. -->

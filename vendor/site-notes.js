@@ -67,12 +67,15 @@
  *   /pic?id=). Stray Wolf sets the shop's kind of checkout: Square (only Square links) or Generic (any https
  *   checkout link); the card's words follow it. No shop (Stray Wolf starts one) = the card stays hidden.
  * Messages from your website (their own page only): for a client whose website form sends to the notes service.
- *   Built by this script (a <section data-form-portal> is added under Your requests, or under the shop when
- *   there is one; a page can place its own empty <section data-form-portal hidden> instead). Each message is
- *   listed with the visitor's answers, files and Reply, Call, Mark replied and Delete (POST /api/my-form,
- *   /api/my-form/lead {id, status}, /lead/delete {id}), and "Form emails go to" lets the client change where the
- *   emails go (POST /api/my-form/to {to}; a new address gets a short email at once; /api/my-form/test sends a
- *   test). Form off in the admin, or an older service: no card.
+ *   A page places its own empty <section data-form-portal hidden> where it wants it; otherwise this script adds
+ *   one under the boxes of what's on their site (or under the shop or Your requests on an older page). It's a
+ *   short inbox: one row per message (who, what they want, when, a dot while it's new) with Reply, Call, Mark
+ *   replied and Delete (one tap, with Undo); a row opens to every answer and file; ticked rows (or Select all)
+ *   are marked or deleted together (POST /api/my-form, /api/my-form/lead {id, status}, /lead/delete {id}).
+ *   "Emails go to" lets the client change where the emails go (POST /api/my-form/to {to}; a new address gets a
+ *   short email at once). Form off in the admin, or an older service: no card.
+ * Let's talk: any element with data-talk (a button in their page's top section) and a button this script adds
+ *   in the header beside Help open the booking page of the Let's talk box (data-booking-url), or go to that box.
  * The Photos page (their own page only): a box with data-photos-page opens a full page instead of
  *   a small note (also at <portal>#photos). Adding photos (drag and drop, a few words each), then
  *   "Photos you sent", each marked Received, Approved, On your site or Not used (Stray Wolf picks
@@ -202,7 +205,12 @@
     plus: ["M12 5v14", "M5 12h14"],
     download: ["M12 4v11", "M7 10.5l5 5 5-5", "M5 20h14"],
     ext: ["M14 4h6v6", "M10 14L20 4", "M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"],
-    tag: ["M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z", "M7.5 7.5h.01"]
+    tag: ["M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z", "M7.5 7.5h.01"],
+    phone: ["M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"],
+    reply: ["M9 14L4 9l5-5", "M4 9h10.5a5.5 5.5 0 0 1 0 11H11"],
+    mail: ["M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z", "M3 7l9 6 9-6"],
+    clip: ["M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"],
+    calendar: ["M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z", "M16 3v4", "M8 3v4", "M3 10h18"]
   };
   // Social sites the portal knows by name: their own colors, logo and an example of the address to paste.
   var BRANDS = {
@@ -529,50 +537,76 @@
   // What this script builds on their own page (the shop card) uses the page's own colors and type
   // (--card, --line, --accent, --sage, --slab, ...), so it fits every client's portal. It goes in once, after login.
   var PAGE_CSS = [
-    // Messages from your website
+    // Messages from your website: a short inbox
     ".fp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:hidden}",
-    ".rq:not([hidden]):has(+ .fp:not([hidden])),.sp:not([hidden]):has(+ .fp:not([hidden])){margin-bottom:16px}",
-    ".fp-hd{display:flex;gap:12px 16px;align-items:baseline;justify-content:space-between;padding:18px 22px 12px}",
+    ".fp .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}",
+    ".fp .ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}",
+    ".fp-hd{display:flex;flex-wrap:wrap;gap:2px 16px;align-items:baseline;justify-content:space-between;padding:18px 22px 14px}",
     ".fp-hd h2{font:700 22px/1.2 var(--slab);margin:0}",
-    ".fp-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}",
-    ".fp-test{margin:0 22px 12px;padding:10px 14px;border-radius:12px;background:var(--stone);font-size:14.5px;line-height:1.45}",
+    ".fp-hd p{margin:0;color:var(--muted);font-size:14px}",
+    ".fp-test{margin:0 22px 14px;padding:10px 14px;border-radius:12px;background:var(--stone);font-size:14.5px;line-height:1.45}",
+    // Select all, and what to do with the ticked rows
+    ".fp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-height:44px;padding:4px 22px 4px 18px;border-top:1px solid var(--line);background:#faf8f4}",
+    ".fp-bar.on{background:var(--accent-soft)}",
+    ".fp-sel{display:inline-flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted);cursor:pointer;margin-right:auto}.fp-bar.on .fp-sel{color:var(--ink);font-weight:600}",
+    ".fp input[type=checkbox]{width:17px;height:17px;margin:0;accent-color:var(--accent);cursor:pointer}",
     ".fp-list{list-style:none;margin:0;padding:0}",
-    ".fp-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:start;padding:14px 22px;border-top:1px solid var(--line)}",
-    ".fp-row > b{font-size:16px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}",
-    ".fp-m{grid-column:1;color:var(--muted);font-size:13.5px}",
-    ".fp-tag{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;border-radius:999px;padding:6px 10px;border:1px solid var(--line);color:var(--muted);background:var(--stone)}",
-    ".fp-tag::before{content:\"\";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.8}",
-    ".fp-tag.new{color:#a94816;background:var(--accent-soft);border-color:#f1d3c0}",
-    ".fp-tag.replied{color:#4d5e42;background:var(--sage-soft);border-color:#d6dfcd}",
-    ".fp-ans{grid-column:1/-1;margin:6px 0 0;display:grid;grid-template-columns:minmax(110px,max-content) minmax(0,1fr);gap:4px 14px;font-size:14.5px;line-height:1.45}",
+    // one row: tick, who and what (opens it), the actions
+    ".fp-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:12px;padding:0 22px 0 18px;border-top:1px solid var(--line);transition:background .12s}",
+    ".fp-row:hover{background:#fbfaf7}.fp-row.picked{background:#fdf6f1}.fp-row.open{background:#fbfaf7}",
+    ".fp-main{display:grid;gap:3px;min-width:0;padding:13px 0;background:none;border:0;text-align:left;font:inherit;color:inherit;cursor:pointer}",
+    ".fp-l1{display:flex;align-items:center;gap:10px;min-width:0}",
+    ".fp-dot{flex:none;width:8px;height:8px;border-radius:50%;background:transparent}.fp-row.fresh .fp-dot{background:var(--accent)}",
+    ".fp-l1 b{font-size:15.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fp-row.fresh .fp-l1 b{font-weight:650}",
+    ".fp-kind{font-size:12.5px;color:var(--muted);white-space:nowrap}",
+    ".fp-clip{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;color:var(--muted)}.fp-clip .ic{width:14px;height:14px}",
+    ".fp-bad{font-size:12px;font-weight:600;color:#b4361c;white-space:nowrap}",
+    ".fp-l1 time{margin-left:auto;padding-left:8px;font-size:13px;color:var(--muted);white-space:nowrap}.fp-row.fresh .fp-l1 time{color:var(--ink);font-weight:600}",
+    ".fp-l2{display:block;padding-left:18px;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+    ".fp-want{color:var(--ink);font-weight:500}",
+    ".fp-acts{display:flex;align-items:center;gap:4px;padding-left:6px}",
+    ".fp-b{min-height:36px;padding:0 13px;display:inline-flex;align-items:center;gap:7px;font:600 13.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;cursor:pointer;text-decoration:none;white-space:nowrap}",
+    ".fp-b:hover{border-color:var(--accent)}.fp-b.main{justify-content:center;min-width:6.6em;color:#fff;background:var(--accent);border-color:var(--accent);margin-right:4px}.fp-b.main:hover{background:#a94816}",
+    ".fp-b.del{color:#b4361c}.fp-b.del:hover{border-color:#b4361c}.fp-b[disabled]{opacity:.6;cursor:default}",
+    ".fp-i{width:36px;height:36px;display:inline-grid;place-items:center;border:0;border-radius:9px;background:none;color:var(--soft);cursor:pointer}",
+    "span.fp-i{cursor:default}a.fp-i:hover,button.fp-i:hover{background:var(--stone);color:var(--ink)}.fp-i.done{color:var(--sage)}.fp-i.done:hover{color:var(--sage)}.fp-i.del:hover{color:#b4361c;background:#fbeae5}",
+    ".fp-i .ic{width:18px;height:18px}",
+    ".fp-link{background:none;border:0;padding:6px 4px;font:600 13.5px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
+    // an opened row: how to reach them, every answer, the files
+    ".fp-body{grid-column:2/-1;display:grid;gap:12px;padding:0 0 18px 18px;max-width:760px}",
+    ".fp-reach{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0;font-size:14px}",
+    ".fp-reach a{display:inline-flex;align-items:center;gap:6px;color:var(--ink);text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:3px}.fp-reach a:hover{text-decoration-color:var(--accent)}.fp-reach .ic{color:var(--soft)}",
+    ".fp-ans{margin:0;display:grid;grid-template-columns:minmax(110px,max-content) minmax(0,1fr);gap:6px 16px;font-size:14.5px;line-height:1.5;padding:12px 14px;border-radius:12px;background:var(--card);box-shadow:0 0 0 1px var(--line)}",
     ".fp-ans dt{color:var(--muted)}.fp-ans dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}",
-    ".fp-files{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}",
-    ".fp-files a{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink);text-decoration:none;background:var(--card)}",
+    ".fp-files{display:flex;flex-wrap:wrap;gap:8px}",
+    ".fp-files a{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink);text-decoration:none;background:var(--card)}",
     ".fp-files a:hover{border-color:var(--accent)}",
-    ".fp-files img{width:44px;height:32px;object-fit:cover;border-radius:7px;background:var(--stone)}",
-    ".fp-files .doc{display:inline-grid;place-items:center;width:44px;height:32px;border-radius:7px;background:var(--stone);font:500 11px/1 var(--mono)}",
-    ".fp-acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:8px}",
-    ".fp-b{min-height:38px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font:650 14px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;text-decoration:none}",
-    ".fp-b:hover{border-color:var(--accent)}.fp-b.main{color:#fff;background:var(--accent);border-color:var(--accent)}.fp-b.main:hover{background:#a94816}",
-    ".fp-b[disabled]{opacity:.6;cursor:default}",
-    ".fp-x{background:none;border:0;padding:8px 4px;font:650 14px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:#b4361c;cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
-    ".fp-x.no{color:var(--muted)}",
-    ".fp-mail{grid-column:1/-1;margin:4px 0 0;color:#b4361c;font-size:13.5px}",
+    ".fp-files img{width:52px;height:38px;object-fit:cover;border-radius:7px;background:var(--stone)}",
+    ".fp-files .doc{display:inline-grid;place-items:center;width:52px;height:38px;border-radius:7px;background:var(--stone);font:500 11px/1 var(--mono)}",
+    ".fp-when{margin:0;font-size:12.5px;color:var(--soft)}",
     ".fp-none{margin:0;padding:14px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}",
-    ".fp-more{display:block;margin:0;padding:10px 22px 14px;border-top:1px solid var(--line)}",
-    ".fp-more button{font:650 14px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;background:none;border:0;padding:4px 0;cursor:pointer;color:var(--accent);text-decoration:underline;text-underline-offset:3px}",
-    ".fp-to{display:grid;gap:8px;padding:16px 22px 18px;border-top:1px dashed var(--line);background:#faf8f4}",
-    ".fp-to label{font-weight:600;font-size:15px}",
+    ".fp-more{margin:0;padding:8px 22px 10px;border-top:1px solid var(--line)}",
+    ".fp-more button{font:600 13.5px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;background:none;border:0;padding:4px 0;cursor:pointer;color:var(--accent);text-decoration:underline;text-underline-offset:3px}",
+    // where the emails go: one line, or the box to change it
+    ".fp-to{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:12px 22px;border-top:1px solid var(--line);background:#faf8f4;font-size:13.5px;color:var(--muted)}",
+    ".fp-to > .ic{color:var(--soft)}.fp-to b{font-weight:600;color:var(--ink);overflow-wrap:anywhere}",
+    ".fp-to.edit{display:grid;gap:8px;padding:14px 22px 16px}",
+    ".fp-to label{font-weight:600;font-size:14.5px;color:var(--ink)}",
     ".fp-to .row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}",
-    ".fp-to input{flex:1 1 280px;min-width:0;min-height:42px;font:inherit;font-size:15px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}",
+    ".fp-to input{flex:1 1 280px;min-width:0;min-height:40px;font:inherit;font-size:15px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 12px}",
     ".fp-to input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}",
-    ".fp-to small{color:var(--muted);font-size:13.5px;line-height:1.45}",
+    ".fp-to small{font-size:13px;line-height:1.45}",
     ".fp-to .err{margin:0;color:#b4361c;font-size:14px}",
-    ".fp button:focus-visible,.fp a:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}",
-    "@media (min-width:1800px){.fp-hd h2{font-size:24px}.fp-row > b{font-size:17px}}",
-    "@media (min-width:2400px){.fp-hd h2{font-size:27px}.fp-hd p,.fp-ans,.fp-test{font-size:16px}.fp-row > b{font-size:18.5px}.fp-m,.fp-to small{font-size:14.5px}.fp-tag{font-size:12px}.fp-b{font-size:15.5px;min-height:44px}}",
-    "@media (max-width:560px){.fp-hd{flex-wrap:wrap;padding:16px 16px 10px}.fp-hd h2{font-size:20px}.fp-test{margin-inline:16px}.fp-row{grid-template-columns:minmax(0,1fr);padding:14px 16px}",
-    "  .fp-row .fp-tag{grid-row:1;justify-self:start}.fp-ans{grid-template-columns:minmax(0,1fr);gap:0}.fp-ans dd{margin-bottom:6px}.fp-to,.fp-none,.fp-more{padding-left:16px;padding-right:16px}.fp-b{min-height:44px}}",
+    ".fp button:focus-visible,.fp a:focus-visible,.fp input:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}",
+    "@media (min-width:1800px){.fp-hd h2{font-size:24px}.fp-l1 b{font-size:16.5px}.fp-l2{font-size:15px}}",
+    "@media (min-width:2400px){.fp-hd h2{font-size:27px}.fp-hd p,.fp-ans,.fp-test,.fp-l2{font-size:16px}.fp-l1 b{font-size:18px}.fp-kind,.fp-l1 time,.fp-to,.fp-sel{font-size:14.5px}.fp-b{font-size:15px;min-height:42px}.fp-i{width:42px;height:42px}}",
+    "@media (max-width:560px){.fp-hd{padding:16px 16px 12px}.fp-hd h2{font-size:20px}.fp-test{margin-inline:16px}.fp-bar{padding-inline:14px 16px}",
+    "  .fp-row{grid-template-columns:auto minmax(0,1fr);padding:0 16px 0 14px}.fp-main{padding-bottom:4px}.fp-kind{display:none}",
+    "  .fp-acts{grid-column:2;padding:0 0 10px 12px;margin-left:-2px}span.fp-i{display:none}.fp-b{min-height:40px}.fp-i{width:40px;height:40px}",
+    "  .fp-body{grid-column:1/-1;padding-left:0}.fp-ans{grid-template-columns:minmax(0,1fr);gap:0}.fp-ans dd{margin-bottom:8px}.fp-to,.fp-none,.fp-more{padding-left:16px;padding-right:16px}}",
+    // Let's talk, in the header beside Help and Log out
+    ".head-acts .talk{background:var(--sage);color:#fff;margin-right:8px;padding:0 13px}.head-acts .talk:hover{background:#4d5e42}",
+    "@media (max-width:640px){.head-acts .talk{display:none}}",   // on a phone the welcome has its own Let's talk button
     // Your shop
     ".rq:not([hidden]):has(+ .sp:not([hidden])),.edit:has(+ .rq[hidden] + .sp:not([hidden])){margin-bottom:16px}",
     ".sp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:visible}",
@@ -1673,6 +1707,14 @@
   // photos they added stay saved on this device until they send them.
   var reviewFrom = null;
   function photosBox() { return MODE === "hub" ? document.querySelector("[data-photos-page]") : null; }
+  // Let's talk: the box on their page that books a time. Its booking page opens in a new tab; with none set,
+  // the page goes to the box, and a tap there starts a note with the times that work.
+  function talkBox() { return MODE === "hub" ? document.querySelector("[data-booking-url]") : null; }
+  function letsTalk() {
+    var box = talkBox(); if (!box) return;
+    var book = (box.getAttribute("data-booking-url") || "").trim();
+    if (book) window.open(book, "_blank", "noopener"); else goToPart(box);
+  }
   function sitePhotos() {
     var tpl = document.querySelector("template[data-site-photos]");
     var imgs = tpl && tpl.content ? tpl.content.querySelectorAll("img") : [];
@@ -2078,120 +2120,175 @@
   }
 
   // "Messages from your website" on their page ([data-form-portal]): everything people send with the form on their
-  // website, when its form sends to the notes service. Each message was also emailed to them, so this is the copy they
-  // can come back to (kept a year). They mark one replied, reply, call, or delete it, and they choose where the emails
-  // go. Stray Wolf switches the form on in the admin and never reads these. Form off, or an older service: no card.
-  var FP_SHOWN = 5;
-  var fpForm = null, fpLeads = [], fpAll = false, fpOpen = {}, fpDel = null, fpTyped = null;
-  function fpNew() { return fpForm && fpForm.state === "on" ? fpLeads.filter(function (l) { return l.status !== "replied"; }).length : 0; }
+  // website, when its form sends to the notes service, as a short inbox. Each row is one message: who, what they
+  // want and when, with a dot while it's new. Reply opens their email; the small buttons call, mark it replied, or
+  // delete it (one tap, with Undo). A tap on the row opens every answer and file. Tick rows (or Select all) to mark
+  // or delete several at once. Each message was also emailed to them, so this is the copy they can come back to
+  // (kept a year), and "Emails go to" is where those emails go, theirs to change. Stray Wolf switches the form on
+  // in the admin and never reads these. Form off, or an older service: no card.
+  var FP_SHOWN = 6;
+  // the form and its messages; all shown; rows opened; rows ticked; rows deleted but still undoable; "Emails go to" being changed (and what's typed)
+  var fpForm = null, fpLeads = [], fpAll = false, fpOpen = {}, fpPick = {}, fpGone = {}, fpEditTo = false, fpTyped = null;
+  function fpList() { return fpLeads.filter(function (l) { return !fpGone[l.id]; }); }
+  function fpNew() { return fpForm && fpForm.state === "on" ? fpList().filter(function (l) { return l.status !== "replied"; }).length : 0; }
   function formCall(path, body) { return DEMO ? Promise.resolve(demoFormCall(path, body || {})) : api("/api/my-form" + path, { token: getToken(), body: body || {} }); }
   function loadForm() {
     formCall("").then(function (d) { if (d && d.ok && d.form) { fpForm = d.form; fpLeads = Array.isArray(d.leads) ? d.leads : []; drawForm(); } });
   }
-  // The card goes under Your requests (or the shop), unless the page placed its own.
+  // The card goes under the boxes of what's on their site (under the shop or Your requests on an older page),
+  // unless the page placed its own.
   function formBox() {
     var box = document.querySelector("[data-form-portal]"); if (box) return box;
-    var after = document.querySelector("[data-shop-portal]") || document.querySelector("[data-requests]"); if (!after) return null;
+    var after = document.querySelector(".boxes") || document.querySelector("[data-shop-portal]") || document.querySelector("[data-requests]"); if (!after) return null;
     box = h("section", { class: "fp", id: "messages", "data-nav": "Messages", "data-form-portal": true, hidden: true, "aria-labelledby": "fp-h" });
     after.parentNode.insertBefore(box, after.nextSibling);
     return box;
   }
   function fpWho(l) { return l.name || l.email || l.phone || "Someone"; }
   function fpTrouble(d, what) { return d.status === 401 ? "Your login timed out. Log in again to " + what + "." : d.status === 0 ? d.error : d.error || "That didn't " + what + ". Try again in a minute."; }
+  // Their answers, less the name, email and phone (shown on their own). What they want is picked the same way
+  // as in the email's subject: a "type of project" or "service" answer.
+  function fpDetails(l) {
+    var used = [l.name, l.email, l.phone].filter(Boolean).map(function (v) { return String(v).toLowerCase(); });
+    return (Array.isArray(l.fields) ? l.fields : []).filter(function (f) { return used.indexOf(String(f[1]).toLowerCase()) < 0; });
+  }
+  function fpWant(details) { var w = details.filter(function (f) { return /type|service|interest|looking for|what/i.test(f[0]); })[0]; return w ? w[1] : ""; }
+
   function drawForm() {
     var box = formBox(); if (!box) return;
     if (!fpForm || fpForm.state === "off") { box.hidden = true; drawNav(); return; }
     box.className = "fp"; box.textContent = "";
-    var n = fpNew();
-    box.appendChild(h("div", { class: "fp-hd" }, [h("div", {}, [h("h2", { id: "fp-h", text: "Messages from your website" }),
-      h("p", { text: fpLeads.length ? plural(fpLeads.length, "message") + (n ? ", " + n + " not replied to yet" : ", all replied to") + ". Each one was also emailed to you." : "What people send with the form on your website. Each one is also emailed to you." })])]));
-    if (fpForm.state === "test") box.appendChild(h("p", { class: "fp-test", text: TO + " is testing your website's form, so messages aren't coming to you yet. Once it's switched on, they'll be emailed to the addresses below and listed here." }));
-    if (!fpLeads.length) box.appendChild(h("p", { class: "fp-none", text: fpForm.state === "on" ? "No messages yet. When someone fills in the form on your website, it shows up here." : "Nothing here yet." }));
+    var all = fpList(), n = fpNew();
+    Object.keys(fpPick).forEach(function (id) { if (!all.some(function (l) { return l.id === id; })) delete fpPick[id]; });
+    box.appendChild(h("div", { class: "fp-hd" }, [h("h2", { id: "fp-h", text: "Messages from your website" }),
+      h("p", { text: all.length ? (n ? n + " new · " : "") + plural(all.length, "message") + ". Each one was also emailed to you." : "What people send with the form on your website. Each one is also emailed to you." })]));
+    if (fpForm.state === "test") box.appendChild(h("p", { class: "fp-test", text: TO + " is testing your website's form, so messages aren't coming to you yet. Once it's switched on, they'll be emailed to you and listed here." }));
+    if (!all.length) box.appendChild(h("p", { class: "fp-none", text: fpForm.state === "on" ? "No messages yet. When someone fills in the form on your website, it shows up here and in your email." : "Nothing here yet." }));
     else {
-      var list = h("ul", { class: "fp-list" }), shown = fpAll ? fpLeads : fpLeads.slice(0, FP_SHOWN);
-      shown.forEach(function (l) { list.appendChild(fpRow(l)); });
+      box.appendChild(fpBar(all));
+      var list = h("ul", { class: "fp-list", "aria-label": "Messages, newest first" });
+      (fpAll ? all : all.slice(0, FP_SHOWN)).forEach(function (l) { list.appendChild(fpRow(l)); });
       box.appendChild(list);
-      if (fpLeads.length > FP_SHOWN) box.appendChild(h("p", { class: "fp-more" }, [h("button", { type: "button", text: fpAll ? "Show fewer" : "See all " + fpLeads.length, onclick: function () { fpAll = !fpAll; drawForm(); } })]));
+      if (all.length > FP_SHOWN) box.appendChild(h("p", { class: "fp-more" }, [h("button", { type: "button", text: fpAll ? "Show fewer" : "See all " + all.length + " messages", onclick: function () { fpAll = !fpAll; drawForm(); } })]));
     }
     box.appendChild(fpToBox());
     box.hidden = false;
     drawNav();
   }
+  // Above the list: Select all, and once rows are ticked, what to do with them.
+  function fpBar(all) {
+    var ids = Object.keys(fpPick), every = ids.length === all.length;
+    var tick = h("input", { type: "checkbox", id: "fp-all", onchange: function () { fpPick = {}; if (tick.checked) all.forEach(function (l) { fpPick[l.id] = true; }); drawForm(); } });
+    tick.checked = every; tick.indeterminate = ids.length > 0 && !every;
+    var bar = h("div", { class: "fp-bar" + (ids.length ? " on" : "") }, [h("label", { class: "fp-sel", for: "fp-all" }, [tick, h("span", { text: ids.length ? ids.length + " selected" : "Select all" })])]);
+    if (ids.length) {
+      var picked = all.filter(function (l) { return fpPick[l.id]; }), fresh = picked.some(function (l) { return l.status !== "replied"; });
+      bar.append(h("button", { class: "fp-b", type: "button", onclick: function () { fpMark(picked, fresh ? "replied" : "new"); } }, [icon(fresh ? "check" : "mail"), h("span", { text: fresh ? "Mark replied" : "Mark as new" })]),
+        h("button", { class: "fp-b del", type: "button", onclick: function () { fpDelete(ids); } }, [icon("trash"), h("span", { text: every && all.length > 1 ? "Delete all " + all.length : "Delete" })]),
+        h("button", { class: "fp-link", type: "button", text: "Cancel", onclick: function () { fpPick = {}; drawForm(); } }));
+    }
+    return bar;
+  }
   function fpRow(l) {
-    var open = !!fpOpen[l.id], replied = l.status === "replied";
-    var fields = Array.isArray(l.fields) ? l.fields : [], files = Array.isArray(l.files) ? l.files : [];
-    var about = fields.filter(function (f) { return !/name|e-?mail|phone|mobile|cell/i.test(f[0]); })[0];
-    var row = h("li", { class: "fp-row" }, [
-      h("b", { text: fpWho(l) + (about ? ": " + short(about[1], 90) : "") }),
-      h("span", { class: "fp-tag " + (replied ? "replied" : "new"), text: replied ? "Replied" : "New" }),
-      h("span", { class: "fp-m", text: [l.title ? l.title.charAt(0).toUpperCase() + l.title.slice(1) : "Message", l.at ? dayWord(l.at) : "", files.length ? plural(files.length, "file") : ""].filter(Boolean).join(" · ") })]);
+    var open = !!fpOpen[l.id], fresh = l.status !== "replied", files = Array.isArray(l.files) ? l.files : [];
+    var details = fpDetails(l), want = fpWant(details), rest = details.filter(function (f) { return f[1] !== want; }).map(function (f) { return f[1]; }).join(" · ");
+    var kind = l.title ? l.title.charAt(0).toUpperCase() + l.title.slice(1) : "Message", tel = l.phone ? String(l.phone).replace(/[^\d+]/g, "") : "";
+    var pick = h("input", { type: "checkbox", class: "fp-pick", "aria-label": "Select the message from " + fpWho(l), onchange: function () { if (pick.checked) fpPick[l.id] = true; else delete fpPick[l.id]; drawForm(); } });
+    pick.checked = !!fpPick[l.id];
+    var main = h("button", { class: "fp-main", type: "button", "aria-expanded": open ? "true" : "false", title: open ? "Close this message" : "Open this message to see every answer and file", onclick: function () { fpOpen[l.id] = !open; drawForm(); } }, [
+      h("span", { class: "fp-l1" }, [
+        h("span", { class: "fp-dot", title: fresh ? "New: not replied to yet" : null }, [fresh ? h("span", { class: "vh", text: "New: " }) : null]),
+        h("b", { text: fpWho(l) }),
+        h("span", { class: "fp-kind", text: kind }),
+        files.length ? h("span", { class: "fp-clip", title: plural(files.length, "file") + " attached" }, [icon("clip"), String(files.length)]) : null,
+        l.mail && l.mail.ok === false && l.mail.why !== "off" ? h("span", { class: "fp-bad", text: "Not emailed", title: "This one couldn't be emailed to you, so it's only here." }) : null,
+        h("time", { datetime: l.at || "", text: l.at ? dayWord(l.at) : "" })]),
+      h("span", { class: "fp-l2" }, [want ? h("span", { class: "fp-want", text: want }) : null, rest ? h("span", { text: (want ? " · " : "") + rest }) : null])]);
+    var acts = h("div", { class: "fp-acts" }, [
+      l.email ? h("a", { class: "fp-b main", href: "mailto:" + l.email + "?subject=" + encodeURIComponent("Re: your " + (l.title || "message")), title: "Write back to " + l.email }, [icon("reply"), h("span", { text: "Reply" })])
+        : tel ? h("a", { class: "fp-b main", href: "tel:" + tel, title: "Call " + l.phone }, [icon("phone"), h("span", { text: "Call" })]) : null,
+      l.email && tel ? h("a", { class: "fp-i", href: "tel:" + tel, title: "Call " + l.phone, "aria-label": "Call " + l.phone }, [icon("phone")]) : h("span", { class: "fp-i", "aria-hidden": "true" }),   // keeps the buttons lined up row to row
+      h("button", { class: "fp-i" + (fresh ? "" : " done"), type: "button", title: fresh ? "Mark as replied" : "Replied. Tap to mark it new again", "aria-label": fresh ? "Mark as replied" : "Mark as new again", onclick: function () { fpMark([l], fresh ? "replied" : "new"); } }, [icon("check")]),
+      h("button", { class: "fp-i del", type: "button", title: "Delete this message (you can undo)", "aria-label": "Delete the message from " + fpWho(l), onclick: function () { fpDelete([l.id]); } }, [icon("trash")])]);
+    var row = h("li", { class: "fp-row" + (fresh ? " fresh" : "") + (open ? " open" : "") + (fpPick[l.id] ? " picked" : "") }, [pick, main, acts]);
     if (open) {
+      var body = h("div", { class: "fp-body" });
+      var reach = [l.email ? h("a", { href: "mailto:" + l.email }, [icon("mail"), l.email]) : null, tel ? h("a", { href: "tel:" + tel }, [icon("phone"), l.phone]) : null].filter(Boolean);
+      if (reach.length) body.appendChild(h("p", { class: "fp-reach" }, reach));
       var dl = h("dl", { class: "fp-ans" });
-      fields.forEach(function (f) { dl.append(h("dt", { text: f[0] }), h("dd", { text: f[1] })); });
-      row.appendChild(dl);
-      if (files.length) row.appendChild(h("div", { class: "fp-files" }, files.map(function (f) {
+      details.forEach(function (f) { dl.append(h("dt", { text: f[0] }), h("dd", { text: f[1] })); });
+      if (details.length) body.appendChild(dl);
+      if (files.length) body.appendChild(h("div", { class: "fp-files" }, files.map(function (f) {
         var pic = /^image\/(jpeg|png|webp)$/.test(f.type || "");
         return h("a", { href: f.url, target: "_blank", rel: "noopener", title: "Open " + f.name }, [pic ? h("img", { src: f.url, alt: "", loading: "lazy" }) : h("span", { class: "doc", text: /pdf/.test(f.type || "") ? "PDF" : "FILE" }), short(f.name, 28)]);
       })));
+      body.appendChild(h("p", { class: "fp-when", text: "Sent " + (l.at ? new Date(l.at).toLocaleString(undefined, { month: "short", day: "numeric", hour: "numeric", minute: "2-digit" }) : "") + " from your website's " + (l.title || "form") + "." }));
+      row.appendChild(body);
     }
-    if (l.mail && l.mail.ok === false && l.mail.why !== "off") row.appendChild(h("p", { class: "fp-mail", text: "This one couldn't be emailed to you, so it's only here." }));
-    var acts = h("div", { class: "fp-acts" }, [
-      h("button", { class: "fp-b", type: "button", "aria-expanded": open ? "true" : "false", text: open ? "Hide answers" : "Show answers" + (files.length ? " and files" : ""), onclick: function () { fpOpen[l.id] = !open; drawForm(); } }),
-      l.email ? h("a", { class: "fp-b main", href: "mailto:" + l.email + "?subject=" + encodeURIComponent("Re: your " + (l.title || "message")), text: "Reply by email" }) : null,
-      l.phone ? h("a", { class: "fp-b", href: "tel:" + String(l.phone).replace(/[^\d+]/g, ""), text: "Call " + l.phone }) : null,
-      h("button", { class: "fp-b", type: "button", text: replied ? "Mark as new" : "Mark replied", onclick: function (e) {
-        var b = e.currentTarget; b.disabled = true;
-        formCall("/lead", { id: l.id, status: replied ? "new" : "replied" }).then(function (d) {
-          if (!d.ok) { b.disabled = false; toast(fpTrouble(d, "save")); return; }
-          l.status = replied ? "new" : "replied"; drawForm();
-        });
-      } })]);
-    if (fpDel === l.id) acts.append(h("span", { class: "fp-m", text: "Delete this message and its files for good?" }),
-      h("button", { class: "fp-x", type: "button", text: "Delete", onclick: function (e) {
-        e.currentTarget.disabled = true;
-        formCall("/lead/delete", { id: l.id }).then(function (d) {
-          if (!d.ok) { toast(fpTrouble(d, "delete")); drawForm(); return; }
-          fpDel = null; fpLeads = fpLeads.filter(function (x) { return x !== l; }); drawForm(); toast("Deleted.");
-        });
-      } }), h("button", { class: "fp-x no", type: "button", text: "Keep it", onclick: function () { fpDel = null; drawForm(); } }));
-    else acts.appendChild(h("button", { class: "fp-x", type: "button", text: "Delete", onclick: function () { fpDel = l.id; drawForm(); } }));
-    row.appendChild(acts);
     return row;
   }
-  // Where the emails go: the client's own choice. A new address gets a short email at once.
+  // Replied or new, for one row or every ticked one. It shows at once and goes back if the service says no.
+  function fpMark(leads, status) {
+    var change = leads.filter(function (l) { return l.status !== status; }), was = change.map(function (l) { return l.status; });
+    change.forEach(function (l) { l.status = status; }); fpPick = {}; drawForm();
+    Promise.all(change.map(function (l) { return formCall("/lead", { id: l.id, status: status }); })).then(function (rs) {
+      var bad = rs.filter(function (d) { return !d.ok; }); if (!bad.length) return;
+      rs.forEach(function (d, i) { if (!d.ok) change[i].status = was[i]; }); drawForm(); toast(fpTrouble(bad[0], "save"));
+    });
+  }
+  // Delete takes one tap: the rows go at once, and Undo in the message at the top brings them back. They're
+  // deleted for good (with their files) once that message is gone.
+  function fpDelete(ids) {
+    ids.forEach(function (id) { fpGone[id] = true; delete fpPick[id]; delete fpOpen[id]; });
+    drawForm();
+    toast(ids.length === 1 ? "Message deleted." : plural(ids.length, "message") + " deleted.", {
+      undo: function () { ids.forEach(function (id) { delete fpGone[id]; }); drawForm(); },
+      after: function () {
+        Promise.all(ids.map(function (id) { return formCall("/lead/delete", { id: id }); })).then(function (rs) {
+          var bad = rs.filter(function (d) { return !d.ok; });
+          ids.forEach(function (id, i) { delete fpGone[id]; if (rs[i].ok) fpLeads = fpLeads.filter(function (l) { return l.id !== id; }); });
+          drawForm(); if (bad.length) toast(fpTrouble(bad[0], "delete"));
+        });
+      } });
+  }
+  // Where the emails go: the client's own choice, one line until they change it. A new address gets a short email at once.
   function fpToBox() {
-    var input = h("input", { id: "fp-to", type: "text", autocomplete: "off", spellcheck: "false", "aria-describedby": "fp-to-help", placeholder: "name@business.com",
+    var to = (fpForm.to || []).join(", ");
+    if (!fpEditTo && to) return h("div", { class: "fp-to" }, [icon("mail"), h("span", { class: "fp-to-k", text: "Emails go to" }), h("b", { text: to }),
+      h("button", { class: "fp-link", type: "button", text: "Change", title: "Change where your website's form emails go", onclick: function () { fpEditTo = true; drawForm(); var i = document.getElementById("fp-to"); if (i) i.focus(); } })]);
+    var input = h("input", { id: "fp-to", type: "text", autocomplete: "off", spellcheck: "false", "aria-describedby": "fp-to-help", placeholder: "you@yourbusiness.com",
       oninput: function () { fpTyped = input.value; } });
-    input.value = fpTyped != null ? fpTyped : (fpForm.to || []).join(", ");
+    input.value = fpTyped != null ? fpTyped : to;
     var err = h("p", { class: "err", role: "alert", hidden: true });
     var save = h("button", { class: "fp-b main", type: "button", text: "Save", onclick: function () {
       save.disabled = true; err.hidden = true;
       formCall("/to", { to: input.value }).then(function (d) {
         save.disabled = false;
         if (!d.ok) { err.textContent = fpTrouble(d, "save"); err.hidden = false; return; }
-        fpForm = d.form; fpTyped = null; drawForm();
+        fpForm = d.form; fpTyped = null; fpEditTo = false; drawForm();
         toast(d.added && d.added.length ? (d.mail && d.mail.ok === false ? "Saved, but the hello email to " + d.added.join(", ") + " didn't go. Check the address." : "Saved. " + d.added.join(", ") + " just got a short email from your website.") : "Saved.");
       });
     } });
-    var test = h("button", { class: "fp-b", type: "button", text: "Send a test email", onclick: function () {
-      test.disabled = true;
-      formCall("/test").then(function (d) { test.disabled = false; toast(d.ok ? "A test email went to " + d.to.join(", ") + "." : fpTrouble(d, "send")); });
-    } });
-    return h("div", { class: "fp-to" }, [h("label", { for: "fp-to", text: "Form emails go to" }), h("div", { class: "row" }, [input, save, test]), err,
-      h("small", { id: "fp-to-help", text: "One or more email addresses, separated by commas, for example you@yourbusiness.com, office@yourbusiness.com. A newly added address gets a short email right away, so you'll know it works." })]);
+    input.addEventListener("keydown", function (e) { if (e.key === "Enter") save.click(); });
+    return h("div", { class: "fp-to edit" }, [h("label", { for: "fp-to", text: "Form emails go to" }),
+      h("div", { class: "row" }, [input, save, to ? h("button", { class: "fp-link", type: "button", text: "Cancel", onclick: function () { fpEditTo = false; fpTyped = null; drawForm(); } }) : null]), err,
+      h("small", { id: "fp-to-help", text: "One or more addresses, separated by commas, for example you@yourbusiness.com, office@yourbusiness.com. A newly added address gets a short email right away, so you'll know it works." })]);
   }
-  // Demo only: a form that is on, with two made-up messages.
+  // Demo only: a form that is on, with three made-up messages.
   function demoFormCall(path, b) {
+    var at = function (hours) { return new Date(Date.now() - hours * 36e5).toISOString(); };
     var D = demoFormCall.d || (demoFormCall.d = { form: { state: "on", to: ["owner@example.com"] }, leads: [
-      { id: "demo-2", at: new Date(Date.now() - 3 * 36e5).toISOString(), title: "estimate request", name: "Sarah Mills", email: "sarah@example.com", phone: "423-555-0101", status: "new",
-        fields: [["Name", "Sarah Mills"], ["Phone", "423-555-0101"], ["email", "sarah@example.com"], ["Project type", "Drainage"], ["Project details", "Water pools by the garage after every rain.\nAbout 30 feet of the yard slopes toward it."]], files: [] },
-      { id: "demo-1", at: new Date(Date.now() - 50 * 36e5).toISOString(), title: "estimate request", name: "Ray Fox", email: "", phone: "423-555-0177", status: "replied",
+      { id: "demo-3", at: at(3), title: "estimate request", name: "Sarah Mills", email: "sarah@example.com", phone: "423-555-0101", status: "new",
+        fields: [["Name", "Sarah Mills"], ["Phone", "423-555-0101"], ["Email", "sarah@example.com"], ["Project type", "Drainage"], ["Project details", "Water pools by the garage after every rain.\nAbout 30 feet of the yard slopes toward it."]],
+        files: [{ name: "garage-side.jpg", type: "image/jpeg", url: demoPic("demo-3a") }, { name: "back-yard.jpg", type: "image/jpeg", url: demoPic("demo-3b") }] },
+      { id: "demo-2", at: at(27), title: "estimate request", name: "Dale Turner", email: "dale@example.com", phone: "", status: "new",
+        fields: [["Name", "Dale Turner"], ["Email", "dale@example.com"], ["Project type", "Shed pad"], ["Project details", "12 by 16 shed going in next month. Yard is mostly flat."]], files: [] },
+      { id: "demo-1", at: at(50), title: "estimate request", name: "Ray Fox", email: "", phone: "423-555-0177", status: "replied",
         fields: [["Name", "Ray Fox"], ["Phone", "423-555-0177"], ["Project type", "Gravel driveway"], ["Project details", "About 120 feet, mostly washed out."]], files: [] }] });
     if (path === "") return { ok: true, form: D.form, leads: D.leads };
     if (path === "/to") { var to = String(b.to || "").toLowerCase().split(/[\s,;]+/).filter(Boolean), added = to.filter(function (x) { return D.form.to.indexOf(x) < 0; });
       if (!to.length) return { ok: false, status: 400, error: "The form is on, so it needs at least one address to send to." };
       D.form.to = to; return { ok: true, form: D.form, added: added, mail: { ok: true } }; }
-    if (path === "/test") return { ok: true, to: D.form.to };
     if (path === "/lead") return { ok: true };
     if (path === "/lead/delete") { D.leads = D.leads.filter(function (x) { return x.id !== b.id; }); return { ok: true }; }
     return { ok: false, status: 404, error: "Not found." };
@@ -2667,6 +2764,7 @@
     if (slot) {
       els.bare = true;
       slot.textContent = "";
+      if (talkBox()) slot.appendChild(h("button", { class: "talk", type: "button", "data-talk": "", title: "Pick a time to talk with " + TO + " about your website" }, [icon("calendar"), h("span", { text: "Let's talk" })]));
       slot.append(els.stripLbl = h("button", { type: "button", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]),
                   h("button", { type: "button", onclick: askLogOut }, [icon("power"), h("span", { text: "Log out" })]));
     }
@@ -2683,6 +2781,8 @@
     document.addEventListener("click", function (e) {
       if (inUs(e)) return;
       if (MODE === "hub" && e.target.closest && e.target.closest("[data-note-box] a[download]")) return;   // a box's Download link (their logo) just downloads
+      var talk = MODE === "hub" && !els.veil && e.target.closest && e.target.closest("[data-talk]");
+      if (talk) { e.preventDefault(); letsTalk(); return; }
       var em = MODE === "hub" && !els.veil && e.target.closest && e.target.closest("[data-edit-mode]");
       if (em) { e.preventDefault(); goEdit(em.getAttribute("data-edit-mode") || em.getAttribute("href") || "/"); return; }
       // A photo with data-big (the Photos box on their page) opens bigger instead of starting a note.
@@ -2691,8 +2791,7 @@
       // Boxes made for notes (like on the welcome page) open a note with one tap, no "Add a note" first.
       var box = !picking && !st.sent && !els.note && !els.veil && e.target.closest && e.target.closest("[data-note-box]");
       // A booking page set on the box (Let's talk, later a Google Calendar schedule) opens that instead of a note.
-      var book = box && (box.getAttribute("data-booking-url") || "").trim();
-      if (book) { e.preventDefault(); window.open(book, "_blank", "noopener"); return; }
+      if (box && box === talkBox() && (box.getAttribute("data-booking-url") || "").trim()) { e.preventDefault(); letsTalk(); return; }
       if (box && box === photosBox()) { e.preventDefault(); openPhotos(); return; }   // the Photos box opens the Photos page
       if (box) { e.preventDefault(); addNote(box, box.getAttribute("data-area") || null, e); return; }
       if (!picking) return;
