@@ -498,7 +498,7 @@ page({ file: 'visit.html', title: 'Visit · 413 E. Emma Ave., Springdale · Snip
       <button class="textbtn" type="button" data-copy="413 E. Emma Ave., Springdale, AR 72764">Copy the address</button></div>
   </div>
   <div class="hero--visit__side">
-    <img class="hero__pic" src="img/ig-window.webp" width="1080" height="1350" alt="Dani outside the shop window, lettered Snip &amp; Sprout Co." fetchpriority="high">
+    <img class="hero__pic" src="img/dani-market.webp" width="1440" height="1527" alt="Dani at the Snip &amp; Sprout Co. booth at the Fifth Market, smiling beside a table of plants and plant care jars" fetchpriority="high">
     <p class="hero__lede" data-in>Come wander the shelves, smell the soil, and ask us the things you’ve been googling at midnight. No appointment needed!</p>
     <p class="hero__note" data-in>Planning a Terrarium Bar visit? At least one day’s advance notice is required so we can prepare your vessel.</p>
   </div>

@@ -1,7 +1,8 @@
 /*
  * Stray Wolf shop list, for a client's website.
- * Shows the items kept in Stray Wolf Admin (Shop page). Every Buy button opens that item's own checkout link, at
- * Square or whichever service the client is paid through: no payment is ever taken by this page or by Stray Wolf.
+ * Shows the items kept in Stray Wolf Admin (Shop) and the client's Client Portal (Your shop). Every Buy button opens
+ * that item's own checkout link, at Square or whichever service the client is paid through: no payment is ever taken
+ * by this page or by Stray Wolf.
  *
  * On the page:
  *   <div data-shop>  …what shows if the list can't load, for example a link to their store…  </div>
@@ -10,20 +11,23 @@
  *
  * Settings on the script tag (all optional except data-site):
  *   data-site         the client's short name in the admin (required)
- *   data-api          the notes service, if it ever moves (default https://site-notes.jsglisson.workers.dev)
+ *   data-api          SW Core, if it ever moves (default https://site-notes.jsglisson.workers.dev)
  *   data-buy          the button's words for something to buy        (default "Buy")
  *   data-book         the button's words for a class or workshop     (default "Sign up")
  * Settings on a [data-shop] box:
  *   data-kind="class" only classes and workshops;  data-kind="item" only things to buy
  *   data-cat="Bread"  only that category
  *   data-group="off"  one list, without a heading per category
- * The page's policy must allow the service: connect-src and img-src https://site-notes.jsglisson.workers.dev
+ * Each item shows its photos (up to 5: swipe, or the arrows, to see the next), its price (a sale's price with the
+ * regular one crossed out, and the sale's last day), its options (Size: S, M, L), and a tag for a sale, New or Featured.
+ * The page's policy must allow SW Core: connect-src and img-src https://site-notes.jsglisson.workers.dev
  * This file must stay the same on every client site; per-site words go in the data- settings above.
  */
 (function () {
   var me = document.currentScript, set = me ? me.dataset : {};
   var API = String(set.api || "https://site-notes.jsglisson.workers.dev").replace(/\/+$/, ""), SITE = set.site || "";
-  var BUY = set.buy || "Buy", BOOK = set.book || "Sign up";
+  var BUY = set.buy || "Buy", BOOK = set.book || "Sign up", TAGS = { new: "New", featured: "Featured" };
+  var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var money = function (c) { return "$" + (c / 100).toLocaleString("en-US", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }); };
   // A class's date is kept as the client's own local time (2026-12-06T10:00), so it is read and shown as written.
   var when = function (s) {
@@ -31,25 +35,101 @@
     var d = new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]);
     return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + " · " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
   };
+  // A sale's last day (2026-11-26), shown as "Nov 26".
+  var day = function (s) {
+    var m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(s || ""); return m ? new Date(+m[1], m[2] - 1, +m[3]).toLocaleDateString("en-US", { month: "short", day: "numeric" }) : "";
+  };
   var el = function (tag, cls, text) { var e = document.createElement(tag); if (cls) e.className = cls; if (text != null) e.textContent = text; return e; };
+  var chevron = function (d) {
+    var svg = document.createElementNS("http://www.w3.org/2000/svg", "svg"), path = document.createElementNS(svg.namespaceURI, "path");
+    svg.setAttribute("viewBox", "0 0 24 24"); svg.setAttribute("aria-hidden", "true"); path.setAttribute("d", d); svg.appendChild(path); return svg;
+  };
+
+  // An item's photos, main one first. Before SW Core 2.2 an item had one photo, without a description.
+  function photosOf(x) {
+    var list = Array.isArray(x.photos) ? x.photos : x.photo ? [{ src: x.photo }] : [];
+    return list.filter(function (p) { return p && /^https:\/\//.test(p.src || ""); }).slice(0, 5);
+  }
+  // The photo frame: one photo, or a row of them to swipe through, with arrows for a mouse or keyboard and a dot for each.
+  function frame(x, pics) {
+    var box = el("div", "sw-shop-photo"), strip = el("div", "sw-shop-strip");
+    pics.forEach(function (p, i) {
+      var img = el("img"); img.src = p.src; img.alt = p.alt || (i ? "" : x.name); img.loading = "lazy"; img.decoding = "async"; strip.appendChild(img);
+    });
+    box.appendChild(strip);
+    if (pics.length < 2) return box;
+    box.setAttribute("role", "group"); box.setAttribute("aria-label", pics.length + " photos of " + x.name);
+    var dots = el("div", "sw-shop-dots"), at = 0, busy = 0;
+    dots.setAttribute("aria-hidden", "true");
+    strip.tabIndex = -1;   // the arrows are the keyboard's way through, so the row itself isn't one more stop
+    pics.forEach(function (p, i) { dots.appendChild(el("span", i ? "" : "is-on")); });
+    var show = function (i) { at = (i + pics.length) % pics.length; Array.prototype.forEach.call(dots.children, function (d, n) { d.className = n === at ? "is-on" : ""; }); };
+    var go = function (step) { show(at + step); strip.scrollTo({ left: at * strip.clientWidth, behavior: still ? "auto" : "smooth" }); };
+    strip.addEventListener("scroll", function () {   // swiped: the dots follow the photo that's showing
+      if (!busy) busy = requestAnimationFrame(function () { busy = 0; show(Math.round(strip.scrollLeft / Math.max(1, strip.clientWidth))); });
+    }, { passive: true });
+    [["sw-shop-go is-prev", "Previous photo of ", -1, "M15 5l-7 7 7 7"], ["sw-shop-go is-next", "Next photo of ", 1, "M9 5l7 7-7 7"]].forEach(function (b) {
+      var btn = el("button", b[0]); btn.type = "button"; btn.setAttribute("aria-label", b[1] + x.name); btn.appendChild(chevron(b[3]));
+      btn.addEventListener("click", function () { go(b[2]); }); box.appendChild(btn);
+    });
+    box.appendChild(dots);
+    return box;
+  }
+  // Tags over the photo (or above the name, with no photo): a sale, then New or Featured.
+  function tags(x) {
+    var list = [];
+    if (x.was != null) list.push(el("span", "sw-shop-tag is-sale", x.salePct ? x.salePct + "% off" : "Sale"));
+    if (TAGS[x.tag]) list.push(el("span", "sw-shop-tag", TAGS[x.tag]));
+    if (!list.length) return null;
+    var box = el("p", "sw-shop-tags"); list.forEach(function (t) { box.appendChild(t); }); return box;
+  }
+  // The price: one amount, or "From" the lowest when its choices cost different amounts. On a sale, the regular
+  // price is crossed out beside it.
+  function price(x) {
+    var now = [], was = [];
+    if (x.price != null) { now.push(x.price); was.push(x.was != null ? x.was : x.price); }
+    (x.options || []).forEach(function (o) {
+      (o.choices || []).forEach(function (c) { if (c.price != null) { now.push(c.price); was.push(c.was != null ? c.was : c.price); } });
+    });
+    if (!now.length) return null;
+    var low = Math.min.apply(null, now), from = Math.max.apply(null, now) > low, before = Math.min.apply(null, was);
+    var p = el("p", "sw-shop-price");
+    if (from) p.appendChild(document.createTextNode("From "));
+    if (x.was != null && before > low) {
+      p.appendChild(el("span", "sw-shop-sr", "Was ")); p.appendChild(el("s", "sw-shop-was", money(before)));
+      p.appendChild(document.createTextNode(" ")); p.appendChild(el("span", "sw-shop-sr", "now "));
+    }
+    p.appendChild(document.createTextNode(money(low)));
+    return { el: p, low: low, from: from };
+  }
+  // Each option as one line, "Size: S, M, L", with each choice's price when that option's choices have their own.
+  function options(x) {
+    return (x.options || []).filter(function (o) { return o && o.name && (o.choices || []).length; }).map(function (o) {
+      var priced = o.choices.some(function (c) { return c.price != null; });
+      var line = el("p", "sw-shop-opt"); line.appendChild(el("span", "sw-shop-opt-name", o.name + ": "));
+      line.appendChild(document.createTextNode(o.choices.map(function (c) {
+        var cost = c.price != null ? c.price : x.price; return c.name + (priced && cost != null ? " " + money(cost) : "");
+      }).join(", ")));
+      return line;
+    });
+  }
 
   function card(x) {
-    var li = el("li", "sw-shop-item" + (x.soldOut ? " is-sold" : "")), body = el("div", "sw-shop-body");
-    if (x.photo) { var img = el("img", "sw-shop-photo"); img.src = x.photo; img.alt = ""; img.loading = "lazy"; img.decoding = "async"; li.appendChild(img); }
+    var li = el("li", "sw-shop-item" + (x.soldOut ? " is-sold" : "")), body = el("div", "sw-shop-body"), pics = photosOf(x), tag = tags(x);
+    if (pics.length) { var pic = frame(x, pics); if (tag) pic.appendChild(tag); li.appendChild(pic); }
+    else if (tag) body.appendChild(tag);
     body.appendChild(el("h3", "sw-shop-name", x.name));
     if (x.kind === "class" && (x.when || x.seats)) body.appendChild(el("p", "sw-shop-when", [when(x.when), x.seats].filter(Boolean).join(" · ")));
     if (x.desc) body.appendChild(el("p", "sw-shop-desc", x.desc));
-    var foot = el("div", "sw-shop-foot");
-    if (x.price != null) {
-      var p = el("p", "sw-shop-price");
-      if (x.was != null) { var was = el("s", "sw-shop-was", money(x.was)); p.appendChild(el("span", "sw-shop-sr", "Was ")); p.appendChild(was); p.appendChild(document.createTextNode(" ")); p.appendChild(el("span", "sw-shop-sr", "now ")); }
-      p.appendChild(document.createTextNode(money(x.price))); foot.appendChild(p);
-    }
+    options(x).forEach(function (o) { body.appendChild(o); });
+    if (x.was != null && day(x.saleEnds)) body.appendChild(el("p", "sw-shop-ends", "Sale ends " + day(x.saleEnds)));
+    var foot = el("div", "sw-shop-foot"), cost = price(x);
+    if (cost) foot.appendChild(cost.el);
     if (x.soldOut) foot.appendChild(el("span", "sw-shop-soldout", x.kind === "class" ? "Full" : "Sold out"));
     else if (/^https:\/\//.test(x.buy || "")) {
-      var a = el("a", "sw-shop-buy", x.kind === "class" ? BOOK : BUY); a.href = x.buy; a.rel = "noopener";
-      // x.via is whose checkout the link opens, as the notes service names it: "Square", "Stripe", or the link's own address.
-      a.setAttribute("aria-label", (x.kind === "class" ? BOOK : BUY) + ": " + x.name + (x.price != null ? ", " + money(x.price) : "") + " (opens " + (x.via ? x.via + " checkout" : "the checkout") + ")");
+      var words = x.kind === "class" ? BOOK : BUY, a = el("a", "sw-shop-buy", words); a.href = x.buy; a.rel = "noopener";
+      // x.via is whose checkout the link opens, as SW Core names it: "Square", "Stripe", or the link's own address.
+      a.setAttribute("aria-label", words + ": " + x.name + (cost ? ", " + (cost.from ? "from " : "") + money(cost.low) : "") + " (opens " + (x.via ? x.via + " checkout" : "the checkout") + ")");
       foot.appendChild(a);
     }
     body.appendChild(foot); li.appendChild(body);

@@ -210,7 +210,7 @@ main{ background:radial-gradient(1100px 560px at 78% -80px, rgb(214 222 200 / .5
 .place address{ font-style:normal; font-size:1.1875rem; line-height:1.5; }
 .place #hours{ width:100%; max-width:26rem; }
 .hero--visit__side{ display:flex; flex-direction:column; gap:16px; }
-.hero--visit .hero__pic{ aspect-ratio:4/3; object-position:40% 48%; }   /* her face and the lettered window both in frame */
+.hero--visit .hero__pic{ aspect-ratio:4/3; object-position:50% 12%; }   /* Dani at her market booth: her face and the booth sign in frame */
 
 /* ---------- Home: how the Plant Bar works, in the four steps on her sign ---------- */
 .pbar{ background:var(--cream); padding:var(--section) 0; }

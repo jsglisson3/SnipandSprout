@@ -1,6 +1,8 @@
 {
-  "version": "V7.8",
+  "version": "V7.10",
   "changes": [
+    { "version": "V7.10", "date": "2026-11-17", "note": "Visit Us opens on the photographer's photo of Dani at her Fifth Market booth: her face, her sign and her plant care jars, in place of the shop-window photo that cut her off." },
+    { "version": "V7.9", "date": "2026-11-17", "note": "Shop and Workshops: each item from her shop can show up to 5 photos to swipe through (arrows and dots), a sale tag with the old price crossed out and the last day, From the lowest price when choices cost different amounts, each option on its own line, New and Featured tags, and Sold out fades the photo." },
     { "version": "V7.8", "date": "2026-11-17", "note": "Client Portal: Contact info, Shop hours and Your social pages are each one tidy list, every row the same height, and each social page has its own logo beside its name (Instagram, Etsy, Facebook, Google)." },
     { "version": "V7.7", "date": "2026-11-17", "note": "Home opens in her own words from her current site: Plants that make a house feel like home, her welcome, and Plan your visit and Book a workshop. Visit Us: the photo of Dani at the shop window shows her face." },
     { "version": "V7.6", "date": "2026-11-17", "note": "Client Portal: Your shop is the same shop manager Stray Wolf uses: every item in one list with its photo, price and whether it shows on the website; add, change, sale prices, photos, Undo and a list of changes, download the photos or a spreadsheet. Needs SW Core 2.2." },
