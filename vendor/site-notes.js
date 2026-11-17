@@ -66,6 +66,13 @@
  *   each item's photo and checkout link (POST /api/my-shop, /api/my-shop/item, /item/delete, /prices,
  *   /pic?id=). Stray Wolf sets the shop's kind of checkout: Square (only Square links) or Generic (any https
  *   checkout link); the card's words follow it. No shop (Stray Wolf starts one) = the card stays hidden.
+ * Messages from your website (their own page only): for a client whose website form sends to the notes service.
+ *   Built by this script (a <section data-form-portal> is added under Your requests, or under the shop when
+ *   there is one; a page can place its own empty <section data-form-portal hidden> instead). Each message is
+ *   listed with the visitor's answers, files and Reply, Call, Mark replied and Delete (POST /api/my-form,
+ *   /api/my-form/lead {id, status}, /lead/delete {id}), and "Form emails go to" lets the client change where the
+ *   emails go (POST /api/my-form/to {to}; a new address gets a short email at once; /api/my-form/test sends a
+ *   test). Form off in the admin, or an older service: no card.
  * The Photos page (their own page only): a box with data-photos-page opens a full page instead of
  *   a small note (also at <portal>#photos). Adding photos (drag and drop, a few words each), then
  *   "Photos you sent", each marked Received, Approved, On your site or Not used (Stray Wolf picks
@@ -522,6 +529,50 @@
   // What this script builds on their own page (the shop card) uses the page's own colors and type
   // (--card, --line, --accent, --sage, --slab, ...), so it fits every client's portal. It goes in once, after login.
   var PAGE_CSS = [
+    // Messages from your website
+    ".fp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:hidden}",
+    ".rq:not([hidden]):has(+ .fp:not([hidden])),.sp:not([hidden]):has(+ .fp:not([hidden])){margin-bottom:16px}",
+    ".fp-hd{display:flex;gap:12px 16px;align-items:baseline;justify-content:space-between;padding:18px 22px 12px}",
+    ".fp-hd h2{font:700 22px/1.2 var(--slab);margin:0}",
+    ".fp-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}",
+    ".fp-test{margin:0 22px 12px;padding:10px 14px;border-radius:12px;background:var(--stone);font-size:14.5px;line-height:1.45}",
+    ".fp-list{list-style:none;margin:0;padding:0}",
+    ".fp-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:start;padding:14px 22px;border-top:1px solid var(--line)}",
+    ".fp-row > b{font-size:16px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}",
+    ".fp-m{grid-column:1;color:var(--muted);font-size:13.5px}",
+    ".fp-tag{display:inline-flex;align-items:center;gap:6px;font:500 11px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap;border-radius:999px;padding:6px 10px;border:1px solid var(--line);color:var(--muted);background:var(--stone)}",
+    ".fp-tag::before{content:\"\";width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.8}",
+    ".fp-tag.new{color:#a94816;background:var(--accent-soft);border-color:#f1d3c0}",
+    ".fp-tag.replied{color:#4d5e42;background:var(--sage-soft);border-color:#d6dfcd}",
+    ".fp-ans{grid-column:1/-1;margin:6px 0 0;display:grid;grid-template-columns:minmax(110px,max-content) minmax(0,1fr);gap:4px 14px;font-size:14.5px;line-height:1.45}",
+    ".fp-ans dt{color:var(--muted)}.fp-ans dd{margin:0;white-space:pre-wrap;overflow-wrap:anywhere}",
+    ".fp-files{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;margin-top:6px}",
+    ".fp-files a{display:inline-flex;align-items:center;gap:6px;min-height:36px;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink);text-decoration:none;background:var(--card)}",
+    ".fp-files a:hover{border-color:var(--accent)}",
+    ".fp-files img{width:44px;height:32px;object-fit:cover;border-radius:7px;background:var(--stone)}",
+    ".fp-files .doc{display:inline-grid;place-items:center;width:44px;height:32px;border-radius:7px;background:var(--stone);font:500 11px/1 var(--mono)}",
+    ".fp-acts{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center;margin-top:8px}",
+    ".fp-b{min-height:38px;padding:0 14px;display:inline-flex;align-items:center;gap:6px;font:650 14px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;cursor:pointer;text-decoration:none}",
+    ".fp-b:hover{border-color:var(--accent)}.fp-b.main{color:#fff;background:var(--accent);border-color:var(--accent)}.fp-b.main:hover{background:#a94816}",
+    ".fp-b[disabled]{opacity:.6;cursor:default}",
+    ".fp-x{background:none;border:0;padding:8px 4px;font:650 14px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:#b4361c;cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
+    ".fp-x.no{color:var(--muted)}",
+    ".fp-mail{grid-column:1/-1;margin:4px 0 0;color:#b4361c;font-size:13.5px}",
+    ".fp-none{margin:0;padding:14px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}",
+    ".fp-more{display:block;margin:0;padding:10px 22px 14px;border-top:1px solid var(--line)}",
+    ".fp-more button{font:650 14px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;background:none;border:0;padding:4px 0;cursor:pointer;color:var(--accent);text-decoration:underline;text-underline-offset:3px}",
+    ".fp-to{display:grid;gap:8px;padding:16px 22px 18px;border-top:1px dashed var(--line);background:#faf8f4}",
+    ".fp-to label{font-weight:600;font-size:15px}",
+    ".fp-to .row{display:flex;flex-wrap:wrap;gap:8px 10px;align-items:center}",
+    ".fp-to input{flex:1 1 280px;min-width:0;min-height:42px;font:inherit;font-size:15px;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:10px;padding:8px 12px}",
+    ".fp-to input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}",
+    ".fp-to small{color:var(--muted);font-size:13.5px;line-height:1.45}",
+    ".fp-to .err{margin:0;color:#b4361c;font-size:14px}",
+    ".fp button:focus-visible,.fp a:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}",
+    "@media (min-width:1800px){.fp-hd h2{font-size:24px}.fp-row > b{font-size:17px}}",
+    "@media (min-width:2400px){.fp-hd h2{font-size:27px}.fp-hd p,.fp-ans,.fp-test{font-size:16px}.fp-row > b{font-size:18.5px}.fp-m,.fp-to small{font-size:14.5px}.fp-tag{font-size:12px}.fp-b{font-size:15.5px;min-height:44px}}",
+    "@media (max-width:560px){.fp-hd{flex-wrap:wrap;padding:16px 16px 10px}.fp-hd h2{font-size:20px}.fp-test{margin-inline:16px}.fp-row{grid-template-columns:minmax(0,1fr);padding:14px 16px}",
+    "  .fp-row .fp-tag{grid-row:1;justify-self:start}.fp-ans{grid-template-columns:minmax(0,1fr);gap:0}.fp-ans dd{margin-bottom:6px}.fp-to,.fp-none,.fp-more{padding-left:16px;padding-right:16px}.fp-b{min-height:44px}}",
     // Your shop
     ".rq:not([hidden]):has(+ .sp:not([hidden])),.edit:has(+ .rq[hidden] + .sp:not([hidden])){margin-bottom:16px}",
     ".sp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:visible}",
@@ -674,9 +725,9 @@
     ".sw-nav .nav-in.more{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}",
     ".sw-nav .nav-in.less{-webkit-mask-image:linear-gradient(90deg,transparent,#000 15%);mask-image:linear-gradient(90deg,transparent,#000 15%)}",
     ".sw-nav .nav-in.more.less{-webkit-mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent)}",
-    ".sw-nav a{position:relative;display:inline-flex;align-items:center;gap:7px;height:50px;padding:0 12px;font:600 14.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--muted);text-decoration:none;white-space:nowrap}",
+    ".sw-nav a{position:relative;display:inline-flex;align-items:center;gap:7px;height:50px;padding:0 11px;font:600 14.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--muted);text-decoration:none;white-space:nowrap}",
     ".sw-nav a:hover,.sw-nav a.on{color:var(--ink)}",
-    ".sw-nav a.on::after{content:\"\";position:absolute;left:12px;right:12px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}",
+    ".sw-nav a.on::after{content:\"\";position:absolute;left:11px;right:11px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}",
     ".sw-nav a:focus-visible{outline:3px solid var(--accent);outline-offset:-3px;border-radius:8px}",
     ".sw-nav .n{font-size:12px;font-weight:600;color:var(--muted);background:var(--stone);border-radius:999px;padding:4px 7px}",
     ".sw-nav .ask{font-size:12px;font-weight:600;color:#fff;background:var(--accent);border-radius:999px;padding:4px 8px}",
@@ -1896,6 +1947,7 @@
     var extra = function (el) {
       if (el.matches("[data-requests]")) return asks ? h("span", { class: "ask", text: asks === 1 ? "1 question" : asks + " questions", title: TO + " asked you something. Answer it under Your requests." })
         : open ? h("span", { class: "n", text: String(open), title: plural(open, "request") + " still open" }) : null;
+      if (el.matches("[data-form-portal]") && fpNew()) return h("span", { class: "n", text: String(fpNew()), title: plural(fpNew(), "new message") + " from your website" });
       if (el.matches("[data-shop-portal]") && spShop) return h("span", { class: "n", text: String(spShop.items.length), title: plural(spShop.items.length, "item") + " in your shop" });
       return null;
     };
@@ -2023,6 +2075,126 @@
         msgs: [{ by: "sw", text: "Updated. It shows on your Contact page now.", at: ago(5) }] },
       { batch: "demo1", n: 2, at: ago(6), title: "About", on: "", text: "Add a map of every job this year", photos: 0, status: "declined", statusAt: ago(5),
         msgs: [{ by: "sw", text: "That needs its own page. Pick a time under Let's talk to go over it.", at: ago(5) }] } ] };
+  }
+
+  // "Messages from your website" on their page ([data-form-portal]): everything people send with the form on their
+  // website, when its form sends to the notes service. Each message was also emailed to them, so this is the copy they
+  // can come back to (kept a year). They mark one replied, reply, call, or delete it, and they choose where the emails
+  // go. Stray Wolf switches the form on in the admin and never reads these. Form off, or an older service: no card.
+  var FP_SHOWN = 5;
+  var fpForm = null, fpLeads = [], fpAll = false, fpOpen = {}, fpDel = null, fpTyped = null;
+  function fpNew() { return fpForm && fpForm.state === "on" ? fpLeads.filter(function (l) { return l.status !== "replied"; }).length : 0; }
+  function formCall(path, body) { return DEMO ? Promise.resolve(demoFormCall(path, body || {})) : api("/api/my-form" + path, { token: getToken(), body: body || {} }); }
+  function loadForm() {
+    formCall("").then(function (d) { if (d && d.ok && d.form) { fpForm = d.form; fpLeads = Array.isArray(d.leads) ? d.leads : []; drawForm(); } });
+  }
+  // The card goes under Your requests (or the shop), unless the page placed its own.
+  function formBox() {
+    var box = document.querySelector("[data-form-portal]"); if (box) return box;
+    var after = document.querySelector("[data-shop-portal]") || document.querySelector("[data-requests]"); if (!after) return null;
+    box = h("section", { class: "fp", id: "messages", "data-nav": "Messages", "data-form-portal": true, hidden: true, "aria-labelledby": "fp-h" });
+    after.parentNode.insertBefore(box, after.nextSibling);
+    return box;
+  }
+  function fpWho(l) { return l.name || l.email || l.phone || "Someone"; }
+  function fpTrouble(d, what) { return d.status === 401 ? "Your login timed out. Log in again to " + what + "." : d.status === 0 ? d.error : d.error || "That didn't " + what + ". Try again in a minute."; }
+  function drawForm() {
+    var box = formBox(); if (!box) return;
+    if (!fpForm || fpForm.state === "off") { box.hidden = true; drawNav(); return; }
+    box.className = "fp"; box.textContent = "";
+    var n = fpNew();
+    box.appendChild(h("div", { class: "fp-hd" }, [h("div", {}, [h("h2", { id: "fp-h", text: "Messages from your website" }),
+      h("p", { text: fpLeads.length ? plural(fpLeads.length, "message") + (n ? ", " + n + " not replied to yet" : ", all replied to") + ". Each one was also emailed to you." : "What people send with the form on your website. Each one is also emailed to you." })])]));
+    if (fpForm.state === "test") box.appendChild(h("p", { class: "fp-test", text: TO + " is testing your website's form, so messages aren't coming to you yet. Once it's switched on, they'll be emailed to the addresses below and listed here." }));
+    if (!fpLeads.length) box.appendChild(h("p", { class: "fp-none", text: fpForm.state === "on" ? "No messages yet. When someone fills in the form on your website, it shows up here." : "Nothing here yet." }));
+    else {
+      var list = h("ul", { class: "fp-list" }), shown = fpAll ? fpLeads : fpLeads.slice(0, FP_SHOWN);
+      shown.forEach(function (l) { list.appendChild(fpRow(l)); });
+      box.appendChild(list);
+      if (fpLeads.length > FP_SHOWN) box.appendChild(h("p", { class: "fp-more" }, [h("button", { type: "button", text: fpAll ? "Show fewer" : "See all " + fpLeads.length, onclick: function () { fpAll = !fpAll; drawForm(); } })]));
+    }
+    box.appendChild(fpToBox());
+    box.hidden = false;
+    drawNav();
+  }
+  function fpRow(l) {
+    var open = !!fpOpen[l.id], replied = l.status === "replied";
+    var fields = Array.isArray(l.fields) ? l.fields : [], files = Array.isArray(l.files) ? l.files : [];
+    var about = fields.filter(function (f) { return !/name|e-?mail|phone|mobile|cell/i.test(f[0]); })[0];
+    var row = h("li", { class: "fp-row" }, [
+      h("b", { text: fpWho(l) + (about ? ": " + short(about[1], 90) : "") }),
+      h("span", { class: "fp-tag " + (replied ? "replied" : "new"), text: replied ? "Replied" : "New" }),
+      h("span", { class: "fp-m", text: [l.title ? l.title.charAt(0).toUpperCase() + l.title.slice(1) : "Message", l.at ? dayWord(l.at) : "", files.length ? plural(files.length, "file") : ""].filter(Boolean).join(" · ") })]);
+    if (open) {
+      var dl = h("dl", { class: "fp-ans" });
+      fields.forEach(function (f) { dl.append(h("dt", { text: f[0] }), h("dd", { text: f[1] })); });
+      row.appendChild(dl);
+      if (files.length) row.appendChild(h("div", { class: "fp-files" }, files.map(function (f) {
+        var pic = /^image\/(jpeg|png|webp)$/.test(f.type || "");
+        return h("a", { href: f.url, target: "_blank", rel: "noopener", title: "Open " + f.name }, [pic ? h("img", { src: f.url, alt: "", loading: "lazy" }) : h("span", { class: "doc", text: /pdf/.test(f.type || "") ? "PDF" : "FILE" }), short(f.name, 28)]);
+      })));
+    }
+    if (l.mail && l.mail.ok === false && l.mail.why !== "off") row.appendChild(h("p", { class: "fp-mail", text: "This one couldn't be emailed to you, so it's only here." }));
+    var acts = h("div", { class: "fp-acts" }, [
+      h("button", { class: "fp-b", type: "button", "aria-expanded": open ? "true" : "false", text: open ? "Hide answers" : "Show answers" + (files.length ? " and files" : ""), onclick: function () { fpOpen[l.id] = !open; drawForm(); } }),
+      l.email ? h("a", { class: "fp-b main", href: "mailto:" + l.email + "?subject=" + encodeURIComponent("Re: your " + (l.title || "message")), text: "Reply by email" }) : null,
+      l.phone ? h("a", { class: "fp-b", href: "tel:" + String(l.phone).replace(/[^\d+]/g, ""), text: "Call " + l.phone }) : null,
+      h("button", { class: "fp-b", type: "button", text: replied ? "Mark as new" : "Mark replied", onclick: function (e) {
+        var b = e.currentTarget; b.disabled = true;
+        formCall("/lead", { id: l.id, status: replied ? "new" : "replied" }).then(function (d) {
+          if (!d.ok) { b.disabled = false; toast(fpTrouble(d, "save")); return; }
+          l.status = replied ? "new" : "replied"; drawForm();
+        });
+      } })]);
+    if (fpDel === l.id) acts.append(h("span", { class: "fp-m", text: "Delete this message and its files for good?" }),
+      h("button", { class: "fp-x", type: "button", text: "Delete", onclick: function (e) {
+        e.currentTarget.disabled = true;
+        formCall("/lead/delete", { id: l.id }).then(function (d) {
+          if (!d.ok) { toast(fpTrouble(d, "delete")); drawForm(); return; }
+          fpDel = null; fpLeads = fpLeads.filter(function (x) { return x !== l; }); drawForm(); toast("Deleted.");
+        });
+      } }), h("button", { class: "fp-x no", type: "button", text: "Keep it", onclick: function () { fpDel = null; drawForm(); } }));
+    else acts.appendChild(h("button", { class: "fp-x", type: "button", text: "Delete", onclick: function () { fpDel = l.id; drawForm(); } }));
+    row.appendChild(acts);
+    return row;
+  }
+  // Where the emails go: the client's own choice. A new address gets a short email at once.
+  function fpToBox() {
+    var input = h("input", { id: "fp-to", type: "text", autocomplete: "off", spellcheck: "false", "aria-describedby": "fp-to-help", placeholder: "name@business.com",
+      oninput: function () { fpTyped = input.value; } });
+    input.value = fpTyped != null ? fpTyped : (fpForm.to || []).join(", ");
+    var err = h("p", { class: "err", role: "alert", hidden: true });
+    var save = h("button", { class: "fp-b main", type: "button", text: "Save", onclick: function () {
+      save.disabled = true; err.hidden = true;
+      formCall("/to", { to: input.value }).then(function (d) {
+        save.disabled = false;
+        if (!d.ok) { err.textContent = fpTrouble(d, "save"); err.hidden = false; return; }
+        fpForm = d.form; fpTyped = null; drawForm();
+        toast(d.added && d.added.length ? (d.mail && d.mail.ok === false ? "Saved, but the hello email to " + d.added.join(", ") + " didn't go. Check the address." : "Saved. " + d.added.join(", ") + " just got a short email from your website.") : "Saved.");
+      });
+    } });
+    var test = h("button", { class: "fp-b", type: "button", text: "Send a test email", onclick: function () {
+      test.disabled = true;
+      formCall("/test").then(function (d) { test.disabled = false; toast(d.ok ? "A test email went to " + d.to.join(", ") + "." : fpTrouble(d, "send")); });
+    } });
+    return h("div", { class: "fp-to" }, [h("label", { for: "fp-to", text: "Form emails go to" }), h("div", { class: "row" }, [input, save, test]), err,
+      h("small", { id: "fp-to-help", text: "One or more email addresses, separated by commas, for example you@yourbusiness.com, office@yourbusiness.com. A newly added address gets a short email right away, so you'll know it works." })]);
+  }
+  // Demo only: a form that is on, with two made-up messages.
+  function demoFormCall(path, b) {
+    var D = demoFormCall.d || (demoFormCall.d = { form: { state: "on", to: ["owner@example.com"] }, leads: [
+      { id: "demo-2", at: new Date(Date.now() - 3 * 36e5).toISOString(), title: "estimate request", name: "Sarah Mills", email: "sarah@example.com", phone: "423-555-0101", status: "new",
+        fields: [["Name", "Sarah Mills"], ["Phone", "423-555-0101"], ["email", "sarah@example.com"], ["Project type", "Drainage"], ["Project details", "Water pools by the garage after every rain.\nAbout 30 feet of the yard slopes toward it."]], files: [] },
+      { id: "demo-1", at: new Date(Date.now() - 50 * 36e5).toISOString(), title: "estimate request", name: "Ray Fox", email: "", phone: "423-555-0177", status: "replied",
+        fields: [["Name", "Ray Fox"], ["Phone", "423-555-0177"], ["Project type", "Gravel driveway"], ["Project details", "About 120 feet, mostly washed out."]], files: [] }] });
+    if (path === "") return { ok: true, form: D.form, leads: D.leads };
+    if (path === "/to") { var to = String(b.to || "").toLowerCase().split(/[\s,;]+/).filter(Boolean), added = to.filter(function (x) { return D.form.to.indexOf(x) < 0; });
+      if (!to.length) return { ok: false, status: 400, error: "The form is on, so it needs at least one address to send to." };
+      D.form.to = to; return { ok: true, form: D.form, added: added, mail: { ok: true } }; }
+    if (path === "/test") return { ok: true, to: D.form.to };
+    if (path === "/lead") return { ok: true };
+    if (path === "/lead/delete") { D.leads = D.leads.filter(function (x) { return x.id !== b.id; }); return { ok: true }; }
+    return { ok: false, status: 404, error: "Not found." };
   }
 
   // "Your shop" on their page ([data-shop-portal]): what their website sells (kit/shop draws it there). They keep
@@ -2551,7 +2723,7 @@
     if (MODE === "hub" && st.sent) newList(true);   // sent last time: their page starts fresh, no leftover "Sent" bar
     render();
     if (MODE === "hub") {
-      addCss(document, PAGE_CSS); loadStats(); loadRequests(); loadShop(); dropOnBoxes(); drawNav();
+      addCss(document, PAGE_CSS); loadStats(); loadRequests(); loadShop(); loadForm(); dropOnBoxes(); drawNav();
       var spyTick = false; window.addEventListener("scroll", function () { if (spyTick) return; spyTick = true; requestAnimationFrame(function () { spyTick = false; spy(); }); }, { passive: true });
       window.addEventListener("resize", function () { headRoom(); spy(true); });
     }
@@ -2567,7 +2739,7 @@
     else if (st.sent) { /* the dock already says it was sent */ }
   }
 
-  // The hidden door: press and hold the Stray Wolf badge (or data-door) for 1.2 seconds.
+  // The hidden door: press and hold the Stray Wolf badge (or data-door) for 0.9 seconds.
   // A press just beside it counts, and the pointer may drift a little while holding.
   // The site's own logo (data-door-logo) opens the same way, pressed on the logo itself.
   // A soft moonlight grows from it (the wolf's eyes glow orange too), then the light
@@ -2582,7 +2754,7 @@
     // under the finger either, but a logo still does, because that is where a thumb starts a swipe
     var prep = function () { doors().forEach(function (el) { el.style.webkitTouchCallout = "none"; el.style.webkitUserSelect = "none"; el.style.userSelect = "none"; if (!isLogo(el)) el.style.touchAction = "none"; }); };
     if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", prep); else prep();
-    var HOLD = 1200;   // how long to hold, in ms
+    var HOLD = 900;    // how long to hold, in ms (was 1200 until Nov 17 2026: Jeremy asked for about a quarter shorter)
     var REACH = 24;    // a press this many px outside the door still counts
     var DRIFT = 40;    // the pointer may wander this many px during the hold
     var THEIRS = "a, button, input, select, textarea, label, summary, [role=\"button\"]";   // a press on one of these is its own, never a near miss

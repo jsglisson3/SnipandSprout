@@ -2,8 +2,8 @@
   /* The Shop section (src/shop-section.html). First built for her Squarespace page, which is why the
      type variables fall back from her old theme's names and why there is no JavaScript: the tabs and
      the style picker are radio buttons styled with CSS. Colours are her palette. */
-  --sns-head: var(--heading-font-font-family, "Instrument Serif", Georgia, serif);
-  --sns-body: var(--body-font-font-family, "Newsreader", Georgia, serif);
+  --sns-head: var(--head);
+  --sns-body: var(--body);
   --sns-ink: #3f4439;
   --sns-text: #3f4439;
   --sns-btn-bg: #585f53;
@@ -78,7 +78,7 @@
 .sns-tab:hover .sns-tab__pic img{ transform: scale(1.04); }
 .sns-tab__cap{ display:flex; flex-direction:column; gap: 2px; padding: 14px 18px 16px; border-radius: 0 0 var(--sns-r) var(--sns-r); background: var(--sns-sage); color: var(--sns-ink); transition: background-color .25s var(--sns-ease), color .25s var(--sns-ease); }
 .sns-tab__top{ display:flex; align-items:baseline; justify-content:space-between; gap: 12px; }
-.sns-tab__name{ font-family: var(--sns-head); font-weight:400; font-size: 1.5rem; line-height:1.05; }
+.sns-tab__name{ font-family: var(--sns-head); font-weight:var(--head-w); font-size: 1.5rem; line-height:1.05; }
 .sns-tab__where{ font-size: .9375rem; opacity:.85; }
 .sns-tab:has(.sns-r:checked) .sns-tab__cap{ background: var(--sns-olive); color: var(--sns-paper); }
 .sns-tab__cap{ position:relative; }
@@ -116,7 +116,7 @@
 
 /* text */
 .sns-text{ display:flex; flex-direction:column; gap: 20px; min-width:0; position:sticky; top: calc(var(--navh, 0px) + 24px); }
-.sns-text h2{ font-family: var(--sns-head); font-weight:400; color: var(--sns-ink); font-size: clamp(2.125rem, 1.5rem + 1.6vw, 2.875rem); line-height: .98; letter-spacing:-.01em; }
+.sns-text h2{ font-family: var(--sns-head); font-weight:var(--head-w); color: var(--sns-ink); font-size: clamp(2.125rem, 1.5rem + 1.6vw, 2.875rem); line-height: .98; letter-spacing:-.01em; }
 .sns-shop .sns-lead{ font-size: 1.125rem; line-height:1.45; color: var(--sns-ink); }
 .sns-shop .sns-notice{ display:flex; gap: 12px; align-items:flex-start; padding: 14px 18px; border-radius: var(--sns-r-sm); background: var(--sns-sage); color: #262a21; font-weight: 600; line-height:1.4; }
 .sns-notice svg{ width:22px; height:22px; flex:none; margin-top:2px; }
@@ -172,7 +172,7 @@
 .sns-shop ::selection{ background: var(--sns-sage); color: var(--sns-olive-deep); }
 
 /* lists */
-.sns-inbox h3{ font-family: var(--sns-head); font-weight:400; color: var(--sns-ink); font-size: 1.625rem; line-height:1.05; margin-bottom: 10px; }
+.sns-inbox h3{ font-family: var(--sns-head); font-weight:var(--head-w); color: var(--sns-ink); font-size: 1.625rem; line-height:1.05; margin-bottom: 10px; }
 .sns-inbox ul{ display:grid; grid-template-columns: 1fr 1fr; gap: 4px 20px; }
 .sns-inbox > ul > li{ padding-left: 16px; position:relative; }
 .sns-inbox > ul > li::before{ content:""; position:absolute; left:0; top:.6em; width:7px; height:7px; border-radius:50%; background: var(--sns-moss); }
@@ -224,7 +224,7 @@
 /* ---- Where it happens: made at home vs made in the shop ---- */
 .sns-shop .sns-group{ display:flex; flex-direction:column; align-items:center; gap: 4px; padding-bottom: 12px; border-bottom: 3px solid var(--sns-btn-bg); color: var(--sns-ink); font-size: 1rem; line-height:1.25; text-align:center; }
 .sns-group__t{ display:inline-flex; align-items:center; gap: 10px; }
-.sns-group b{ font-family: var(--sns-head); font-weight:400; font-size: 1.5rem; line-height:1; }
+.sns-group b{ font-family: var(--sns-head); font-weight:var(--head-w); font-size: 1.5rem; line-height:1; }
 .sns-group svg{ width:24px; height:24px; flex:none; }
 .sns-group__n{ opacity: .85; }
 .sns-group.is-home{ grid-column: 1; grid-row: 1; }
@@ -321,8 +321,8 @@
 /* ---- Also in the shop: the live list from shop.js. Hidden until the list has drawn an item. ---- */
 .sns-shelf{ display:none; margin-top: 80px; }
 .sns-shelf:has([data-shop-ready]){ display:block; }
-.sns-shop .sns-shelf__title{ font-family: var(--sns-head); font-weight:400; color: var(--sns-ink); font-size: clamp(2.125rem, 1.5rem + 1.6vw, 2.875rem); line-height:.98; letter-spacing:-.01em; margin-bottom: 28px; }
-.sns-shop .sns-shelf .sw-shop-cat{ font-family: var(--sns-head); font-weight:400; font-size: 1.75rem; line-height:1.1; margin-bottom: 16px; }
+.sns-shop .sns-shelf__title{ font-family: var(--sns-head); font-weight:var(--head-w); color: var(--sns-ink); font-size: clamp(2.125rem, 1.5rem + 1.6vw, 2.875rem); line-height:.98; letter-spacing:-.01em; margin-bottom: 28px; }
+.sns-shop .sns-shelf .sw-shop-cat{ font-family: var(--sns-head); font-weight:var(--head-w); font-size: 1.75rem; line-height:1.1; margin-bottom: 16px; }
 
 /* ---- Vessel photos for the picker ---- */
 .sns-v-Closed{ background-image: url("img/shop/vessel-closed.webp"); }

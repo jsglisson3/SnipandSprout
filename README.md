@@ -49,16 +49,16 @@ Cloudflare Workers and Pages app on GitHub still has this repository under Repos
 
 | Path | What it is |
 |---|---|
-| `build.mjs` | The whole build. One block per page (Home, Shop, Workshops, Gallery, Visit, About, 404); the shared header and footer; the menu at the top of every page (a short numbered list set big like the sign at her Plant Bar, beside one photo with a ticket), the numbered sections of the inner pages and the ribbon of plant-marker sayings; the security policy; and the copy step. Facts that repeat (email, links, hours) are at the top. |
+| `build.mjs` | The whole build. One block per page (Home, Shop, Workshops, Gallery, Visit, About, 404); the shared header (her logo tag, then the menu with Shop first as a button) and footer; each page's own top, written inside that page's block; the sections of the inner pages (`course`) and their closing invitation (`invite`); the security policy; and the copy step. Facts that repeat (email, links, hours) are at the top. |
 | `src/site.css`, `src/site.js` | All styling and behaviour: open-now status in Central time (and today's line in the Visit hours), the calendar menu, the photo frame on Home, the Gallery's full-screen photo viewer, the private event form, and the shop scene in the footer (the watering can and the plants growing, with a pause button). Every page reads fine without the script. |
 | `src/shop-section.html`, `src/shop-section.css` | The Shop page's three tabs (DIY Terrarium Kits, Terrarium Bar, Plant Bar) in Dani's own words. No script: radio buttons and CSS. Prices and Square links are typed in here. |
 | `src/stray-badge.html` | The Stray Wolf footer badge, the dark logo version, copied unchanged from Stray Wolf's badge kit. Its styles are the kit's, in `site.css` under "Stray Wolf Technology footer badge". Holding it opens the Client Portal. |
 | `src/portal.html` | Her Client Portal page: Stray Wolf's standard page with her details. The build fills in her short name, the service address and the list of photos on her site. |
 | `src/shop-scene.svg` | Her shop across the top of the footer: the counter and wall shelves with plants, pots and her terrariums, and her watering can. A still picture until `site.js` plays it; still for anyone who asked for less motion. Drawn by `tools/make-shop-scene.py` (Python, no packages): change that and run it again rather than editing the SVG. |
-| `src/logo.svg`, `src/logo-reverse.svg`, `src/logo-tag.svg` | Her logo (Snip &, SPROUT, PLANT CO.), redrawn as outlines of Instrument Serif, its typeface: `logo.svg` for light grounds (Client Portal), `logo-reverse.svg` for dark grounds (footer), and `logo-tag.svg`, her logo on its olive box as she uses it, hanging from the header like a shop tag. |
-| `src/_headers`, `src/robots.txt`, `src/favicon.svg` | Cloudflare's response headers, the search-engine file, the tab icon. |
-| `img/`, `img/shop/`, `img/gal/` | Every photo the site uses, already cropped and sized (WebP). `img/gal/` holds the Gallery's 4:5 tiles, and the whole photo (`-full`) for the ones that are only on the Gallery. |
-| `fonts/` | Instrument Serif and Newsreader, served from the site itself (SIL Open Font License). |
+| `src/logo.svg`, `src/logo-tag.svg` | Her logo (Snip &, SPROUT, PLANT CO.), redrawn as outlines so it stays sharp at every size: `logo.svg` for light grounds (Client Portal), and `logo-tag.svg`, her logo on its olive box as she uses it, hanging from the header like a shop tag and sitting above the blurb in the footer. |
+| `src/_headers`, `src/robots.txt`, `src/favicon.svg` | Cloudflare's response headers, the search-engine file (the build adds the line naming `sitemap.xml`, the list of pages it writes), the tab icon. |
+| `img/`, `img/shop/`, `img/gal/` | Every photo the site uses, already cropped and sized (WebP). `img/gal/` holds the Gallery's 4:5 tiles, and the whole photo (`-full`) for the ones that are only on the Gallery. `img/share.jpg` (1200 × 630, her Plant Bar) is the picture shown when a link to the site is shared in a text or a post. |
+| `fonts/` | Figtree, the one typeface the site uses, served from the site itself (SIL Open Font License). |
 | `vendor/` | Stray Wolf's shared files, **copied unchanged**: `site-notes.js` and `html2canvas.min.js` (Client Portal), `shop.js` and `shop.css` (shop list). They must stay byte-identical to the copies on Stray Wolf's other client sites; per-site words go in `data-` settings in `build.mjs`. |
 | `portal-brand/` | The Stray Wolf logos and fonts the portal page uses, and `site-preview.jpg`, the small picture of the home page in its Edit mode card. |
 | `version.json` | The site's version and latest changes, newest first. The Stray Wolf admin reads it from the live site. It is public, so say only what a visitor could see. |
@@ -100,5 +100,6 @@ no MIME sniffing, no framing by other sites, and keeps the `.pages.dev` copy out
    Square items are Hidden because the Shop section shows them; her store's other items are On the site.
    Move the Squarespace store links to Square links when the Squarespace site retires.
 2. Cloudflare Pages, in Dani's account: connect the repository, build command `npm run build`, output `dist`.
-3. Set `DRAFT` to `false` in `build.mjs`, add the canonical address and a sitemap, set up Google Analytics.
+3. In `build.mjs`, set `DRAFT` to `false` and `C.url` to her own domain (each page's own address, the share picture,
+   `sitemap.xml` and `robots.txt` all follow it), and set up Google Analytics.
 4. Point her domain at Cloudflare Pages, then retire the Squarespace site.

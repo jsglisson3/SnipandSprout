@@ -32,6 +32,7 @@ cpSync(here + 'portal-brand', dist + 'portal/brand', { recursive: true });
 for (const f of ['site-notes.js', 'html2canvas.min.js', 'shop.js', 'shop.css']) cpSync(here + 'vendor/' + f, dist + f);
 
 const C = {
+  url: 'https://snipandsprout.pages.dev/',           // the site's address: her own domain at launch (see README, Launch)
   email: 'snipandsproutco@gmail.com',
   ig: 'https://www.instagram.com/snipandsprout.co/',
   etsy: 'https://www.etsy.com/shop/SnipAndSproutCo',
@@ -76,16 +77,15 @@ const HOURS3 = `<table class="hours3" data-hours3>
 
 const NEIGHBORS = `<div class="neighbors"><span>In Bloom Floral Company</span><span>Two Friends Community Books</span><span>KaGie's</span></div>`;
 
-const nav = (file) => `<header class="nav"><div class="nav__in">
+const NAV = [['shop.html', 'Shop'], ['workshops.html', 'Workshops'], ['gallery.html', 'Gallery'], ['visit.html', 'Visit Us'], ['about.html', 'About']];
+const nav = (file) => {
+  const link = ([h, t]) => `<a${h === 'shop.html' ? ' class="nav__shop"' : ''} href="${h}"${h === file ? ' aria-current="page"' : ''}>${t}</a>`;
+  return `<header class="nav"><nav class="nav__in" aria-label="Main">
+  <div class="nav__links">${NAV.slice(0, 3).map(link).join('')}</div>
   <a class="brand" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo-tag.svg" alt="" width="177" height="144"></a>
-  <nav class="nav__links" aria-label="Main">
-    ${[['workshops.html', 'Workshops'], ['gallery.html', 'Gallery'], ['visit.html', 'Visit Us'], ['about.html', 'About']].map(([h, t]) => `<a href="${h}"${h === file ? ' aria-current="page"' : ''}>${t}</a>`).join('\n    ')}
-  </nav>
-  <div class="nav__end">
-    <span class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></span>
-    <a class="btn btn--sm" href="shop.html"${file === 'shop.html' ? ' aria-current="page"' : ''}>Shop</a>
-  </div>
-</div></header>`;
+  <div class="nav__links nav__links--end">${NAV.slice(3).map(link).join('')}<span class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></span></div>
+</nav></header>`;
+};
 
 // The one inline script: marks the page as script-enabled before first paint, so entrances don't flash.
 const JS_FLAG = `document.documentElement.classList.add('js')`;
@@ -113,24 +113,35 @@ const secure = (html) => html.replace('<meta charset="utf-8">', '<meta charset="
   + (PREVIEW ? '' : `\n<meta http-equiv="Content-Security-Policy" content="${csp(html)}">`)
   + (DRAFT ? '\n<meta name="robots" content="noindex, nofollow">' : ''));
 
+// A page's own address: Cloudflare Pages serves shop.html at /shop.
+const url = (file) => C.url + (file === 'index.html' ? '' : file.replace(/\.html$/, ''));
+
+
 const head = (p) => `<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">${p.base ? `\n<base href="${p.base}">` : ''}
 <title>${p.title}</title>
-<meta name="description" content="${p.desc}">
+<meta name="description" content="${p.desc}">${p.file === '404.html' ? '' : `
+<link rel="canonical" href="${url(p.file)}">
+<meta property="og:url" content="${url(p.file)}">`}
+<meta property="og:site_name" content="Snip &amp; Sprout Co.">
 <meta property="og:title" content="${p.title}">
 <meta property="og:description" content="${p.desc}">
-<meta property="og:image" content="img/hero-dani.webp">
+<meta property="og:image" content="${C.url}img/share.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Plant Bar at Snip &amp; Sprout Co.: her Plant Bar sign, a tray of plant markers and stacks of pots">
 <meta property="og:type" content="website">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#dde2d3">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
-<link rel="preload" href="fonts/instrument-serif.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="fonts/newsreader.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">${(p.css || []).map((f) => `\n<link rel="stylesheet" href="${f}">`).join('')}
 <script>${JS_FLAG}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Snip & Sprout Co.","description":"Indoor plant boutique with pottery, a Plant Bar, a Terrarium Bar and workshops.","address":{"@type":"PostalAddress","streetAddress":"413 E. Emma Ave.","addressLocality":"Springdale","addressRegion":"AR","postalCode":"72764","addressCountry":"US"},"email":"${C.email}","sameAs":["${C.ig}","${C.etsy}"],"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday"],"opens":"10:00","closes":"15:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"09:00","closes":"14:00"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Snip & Sprout Co.","url":"${C.url}","image":"${C.url}img/share.jpg","logo":"${C.url}logo.svg","hasMap":"${C.maps}","description":"Indoor plant boutique with pottery, a Plant Bar, a Terrarium Bar and workshops.","address":{"@type":"PostalAddress","streetAddress":"413 E. Emma Ave.","addressLocality":"Springdale","addressRegion":"AR","postalCode":"72764","addressCountry":"US"},"email":"${C.email}","sameAs":["${C.ig}","${C.etsy}"],"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday"],"opens":"10:00","closes":"15:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"09:00","closes":"14:00"}]}</script>
 </head>
 <body class="${p.body || ''}">
 <a class="skip" href="#main">Skip to content</a>
@@ -146,7 +157,7 @@ const foot = (p) => `<footer class="foot">
 <div class="shop-scene" data-shop-scene><img src="shop-scene.svg" alt="" width="2400" height="214" loading="lazy" decoding="async"></div>
 <div class="wrap foot__grid">
   <div class="foot__brand">
-    <a class="foot__logo" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo-reverse.svg" alt="" width="149" height="113"></a>
+    <a class="foot__logo" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo-tag.svg" alt="" width="177" height="144"></a>
     <p>Snip &amp; Sprout Co. is an indoor plant boutique in Northwest Arkansas—offering thoughtfully curated houseplants, artisan pottery, plant care essentials, and hands-on workshops for anyone who wants to grow something.</p>
   </div>
   <div class="foot__col">
@@ -224,27 +235,10 @@ const workshopActs = `<div class="band__acts">
         ${calendar}
       </div>`;
 
-// The top of every page, built like the sign at her Plant Bar: a short numbered list set big (the menu),
-// beside one photograph with a ticket on it. The h1 is the small label above the menu.
-//   items: [{ t: line, v: value on the right (a price or hours), href: makes the line a link, days: hours rows }]
-const top = (t) => `<section class="top" aria-labelledby="top-title">
-  <div class="top__text">
-    <h1 class="kicker" id="top-title" data-in>${t.title}</h1>
-    <ol class="menu${t.hours ? ' menu--hours' : ''}"${t.hours ? ' id="hours" data-hours3' : ''}>
-      ${t.items.map((m) => `<li${m.days ? ` data-days="${m.days}"` : ''} data-in>${m.href ? `<a class="menu__item" href="${m.href}">${m.t}</a>` : `<span class="menu__item">${m.t}</span>`}${m.v ? `<span class="menu__value">${m.v}</span>` : ''}</li>`).join('\n      ')}
-    </ol>
-    <p class="top__lede" data-in>${t.lede}</p>${t.note ? `\n    <p class="top__note" data-in>${t.note}</p>` : ''}${t.acts ? `\n    <div class="acts" data-in>${t.acts}</div>` : ''}
-  </div>
-  <div class="plate">
-    <img src="img/${t.pic.src}" width="${t.pic.w}" height="${t.pic.h}" alt="${t.pic.alt}" fetchpriority="high"${t.pic.pos ? ` style="object-position:${t.pic.pos}"` : ''}>
-    <p class="ticket">${t.ticket}</p>
-  </div>
-</section>`;
-
-// A course: one numbered section of an inner page, its heading (and photo) beside the text.
+// A course: one section of an inner page, its heading (and photo) beside the text.
 const course = (c, body) => `<section class="course${c.cls ? ' ' + c.cls : ''}"${c.id ? ` id="${c.id}"` : ''} aria-labelledby="${c.key}-title"><div class="course__in">
   <div class="course__head">
-    ${c.n ? `<span class="course__n" aria-hidden="true">${c.n}</span>\n    ` : ''}<h2 class="h1" id="${c.key}-title" data-in>${c.title}</h2>${c.head ? `
+    <h2 class="h1" id="${c.key}-title" data-in>${c.title}</h2>${c.head ? `
     ${c.head}` : ''}${c.pic ? `\n    <img class="course__pic${c.pic.wide ? ' course__pic--wide' : ''}" src="img/${c.pic.src}" width="${c.pic.w}" height="${c.pic.h}" alt="${c.pic.alt}" loading="lazy"${c.pic.pos ? ` style="object-position:${c.pic.pos}"` : ''}>` : ''}
   </div>
   <div class="course__body">
@@ -262,23 +256,36 @@ const invite = (v) => `<section class="band" aria-labelledby="${v.key}-title"><d
   <img class="band__pic" src="img/${v.pic.src}" width="${v.pic.w}" height="${v.pic.h}" alt="${v.pic.alt}" loading="lazy"${v.pic.pos ? ` style="object-position:${v.pic.pos}"` : ''}>
 </div></section>`;
 
-// The sayings on her wooden plant markers. Written twice so the ribbon can loop without a seam; it is
-// decoration, so screen readers skip it.
-const SAYINGS = ['Stayin’ alive', 'Happy new home!', 'You grow girl!', 'Way to grow!', 'Little sprout', 'Love grows here'];
-const ribbon = `<div class="ribbon" aria-hidden="true"><div class="ribbon__track">
-  ${[...SAYINGS, ...SAYINGS].map((s) => `<span>${s}</span>`).join('')}
-</div></div>`;
 
 /* ---------------- Home ---------------- */
 page({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plants, pottery and workshops in Springdale, AR',
   desc: 'An indoor plant boutique at 413 E. Emma Ave. in downtown Springdale. Plants, pottery, a walk-in Plant Bar, a Terrarium Bar, take-home kits and workshops.' }, `<main id="main">
-${top({ title: 'The Plant Bar at Snip &amp; Sprout Co.',
-  items: [{ t: 'Pick your pot.' }, { t: 'Pick your plant.' }, { t: 'Pot it up.' }, { t: 'Make it yours.' }],
-  lede: 'Our Plant Bar is one of my favorite things ever! Stop by anytime we’re open, pick out a plant and pot, and make it your own. Trust me, you can’t really mess it up.',
-  acts: `<a class="btn" href="#visit">Plan your visit ${I.arrow}</a>\n      <a class="link" href="workshops.html">Book a workshop</a>`,
-  pic: { src: 'plant-bar-dani.webp', w: 1536, h: 2304, alt: 'Dani potting a plant at the Plant Bar, her Plant Bar sign behind her', pos: '58% 50%' },
-  ticket: `<span><b>No advance notice required</b><small>Walk in during shop hours!</small></span><span class="ticket__price">$22</span>` })}
-${ribbon}
+<section class="hero hero--home" aria-labelledby="top-title">
+  <div class="hero__text">
+    <p class="kicker" data-in>Welcome to Snip &amp; Sprout Co.!</p>
+    <h1 class="hero__title" id="top-title" data-in>Where your love for plants grows even deeper.</h1>
+    <p class="hero__lede" data-in>From lush indoor plants to hand-picked propagated stems and the cutest plant accessories, we’ve got everything you need to green up your space.</p>
+    <div class="acts" data-in><a class="btn" href="shop.html">Shop ${I.arrow}</a>
+      <a class="link" href="#visit">Plan your visit</a></div>
+  </div>
+  <img class="hero__pic" src="img/dani-alocasia.webp" width="818" height="1022" alt="Dani in the shop, smiling, holding up an alocasia in a burlap pot" fetchpriority="high">
+</section>
+
+<section class="pbar" id="plant-bar" aria-labelledby="pbar-title"><div class="wrap pbar__grid">
+  <img class="pbar__pic" src="img/pbar-scoop.webp" width="1536" height="2304" alt="Hands scooping soil around a new ivy at the Plant Bar, the Plant Bar sign behind" loading="lazy" data-in>
+  <div class="pbar__text">
+    <p class="kicker" data-in>The Plant Bar</p>
+    <h2 class="display" id="pbar-title" data-in>Pick out a plant and pot, and make it your own</h2>
+    <p data-in>Our Plant Bar is one of my favorite things ever! Stop by anytime we’re open. Trust me, you can’t really mess it up.</p>
+    <ol class="steps">
+      <li data-in><b>Pick your pot</b><span>Choose the one that speaks to you</span></li>
+      <li data-in><b>Pick your plant</b><span>Find the perfect little plant to call it home</span></li>
+      <li data-in><b>Pot it up</b><span>Add soil and settle your new plant in</span></li>
+      <li data-in><b>Make it yours</b><span>Add in moss, a fun plant marker, or mini decor</span></li>
+    </ol>
+    <div class="pbar__foot" data-in><p><b class="price">$22</b>No advance notice required. Walk in during shop hours!</p><a class="btn btn--tone" href="shop.html#pbar">See the Plant Bar ${I.arrow}</a></div>
+  </div>
+</div></section>
 
 <section class="ways" id="ways" aria-labelledby="ways-title"><div class="wrap">
   <div class="ways__head">
@@ -405,41 +412,57 @@ const shopSection = read('src/shop-section.html')
   .replace('aria-labelledby="sns-shop-title"', 'aria-label="DIY Terrarium Kits, Terrarium Bar and Plant Bar"');
 page({ file: 'shop.html', body: 'shop-page', shop: true, css: ['shop-section.css', 'shop.css'], title: 'Shop · DIY Terrarium Kits, Terrarium Bar and Plant Bar · Snip & Sprout Co.',
   desc: 'Take-home DIY terrarium kits, the in-shop Terrarium Bar and the walk-in Plant Bar at Snip & Sprout Co. in Springdale. Secure checkout through Square.' }, `<main id="main">
-${top({ title: 'The Shop at Snip &amp; Sprout Co.',
-  items: [{ t: 'DIY Terrarium Kits', v: '$55', href: '#kits' }, { t: 'Terrarium Bar', v: 'from $45', href: '#tbar' }, { t: 'Plant Bar', v: '$22', href: '#pbar' }],
-  lede: 'Bring the Snip &amp; Sprout experience to your kitchen table with a DIY kit, or come create with us at the Terrarium Bar or the Plant Bar!',
-  pic: { src: 'kit-flatlay.webp', w: 1536, h: 1920, alt: 'A DIY terrarium kit laid out in labelled bags: drainage layer, soil, moss and the how-to card' },
-  ticket: `<span><b>Secure checkout through Square</b><small>Kits are ready for pickup at 413 E. Emma Ave.</small></span>` })}
+<section class="hero hero--center" aria-labelledby="top-title">
+  <h1 class="hero__title" id="top-title" data-in>The Shop</h1>
+  <p class="hero__lede" data-in>Bring the Snip &amp; Sprout experience to your kitchen table with a DIY kit, or come create with us at the Terrarium Bar or the Plant Bar!</p>
+  <ul class="jump" role="list" data-in>
+    <li><a href="#kits">DIY Terrarium Kits<span>$55</span></a></li>
+    <li><a href="#tbar">Terrarium Bar<span>from $45</span></a></li>
+    <li><a href="#pbar">Plant Bar<span>$22</span></a></li>
+  </ul>
+  <p class="hero__note" data-in>Secure checkout through Square. Kits are ready for pickup at 413 E. Emma Ave.</p>
+</section>
 ${shopSection}</main>
 `);
 
 /* ---------------- Workshops ---------------- */
 page({ file: 'workshops.html', shop: true, css: ['shop.css'], title: 'Workshops · Snip & Sprout Co., Springdale',
   desc: 'Hands-on terrarium workshops at 413 E. Emma Ave. in Springdale. All supplies included, take home what you make. Private events too.' }, `<main id="main">
-${top({ title: 'Workshops at Snip &amp; Sprout Co.',
-  items: [{ t: 'Gather.' }, { t: 'Create.' }, { t: 'Grow.' }],
-  lede: 'Slow down, get your hands dirty, and create something beautiful. Bring a friend or come solo and enjoy a little creative time surrounded by plants.',
-  acts: `<a class="btn" href="#next">The next workshop ${I.arrow}</a>\n      <a class="link" href="#private">Private events</a>`,
-  pic: { src: 'apron-dodeca.webp', w: 1440, h: 1800, alt: 'An open geometric glass terrarium held in front of a Snip &amp; Sprout apron' },
-  ticket: `<span><b>Next: Sunday, November 22</b><small>1 PM at 413 E. Emma Ave.</small></span><span class="ticket__price">from $40</span>` })}
+<section class="hero hero--ws" aria-labelledby="top-title">
+  <div class="hero__text">
+    <p class="kicker" data-in>Workshops at Snip &amp; Sprout Co.</p>
+    <h1 class="hero__title" id="top-title" data-in>Gather. Create. Grow.</h1>
+    <p class="hero__lede" data-in>Slow down, get your hands dirty, and create something beautiful. Bring a friend or come solo and enjoy a little creative time surrounded by plants.</p>
+    <a class="next" href="#next" data-in>
+      <span class="next__when"><b>Sunday, November 22</b>1 PM at 413 E. Emma Ave.</span>
+      <span class="next__price">from $40</span>
+      <span class="next__go">The next workshop ${I.arrow}</span>
+    </a>
+    <p data-in><a class="link" href="#private">Private events</a></p>
+  </div>
+  <div class="duo">
+    <img src="img/gal/workshop-table.webp" width="720" height="900" alt="Guests building terrariums around the workshop table" fetchpriority="high">
+    <img src="img/apron-dodeca.webp" width="1440" height="1800" alt="An open geometric glass terrarium held in front of a Snip &amp; Sprout apron">
+  </div>
+</section>
 <div class="courses">
-${course({ key: 'next', id: 'next', n: '01', title: 'November Terrarium Workshop',
+${course({ key: 'next', id: 'next', title: 'November Terrarium Workshop',
   pic: { src: 'ig-teardrop.webp', w: 1100, h: 1375, alt: 'A glass teardrop terrarium with an air plant, white sand and tiny decor', pos: '50% 75%' } }, `    ${slip}
     <div data-in>${workshopActs}</div>`)}
-${course({ key: 'incl', n: '02', title: 'What every workshop includes',
+${course({ key: 'incl', title: 'What every workshop includes',
   pic: { src: 'ig-trio.webp', w: 1024, h: 1024, alt: 'Three workshop guests holding the terrariums they made' } }, `    <ul class="facts" data-in>
       <li><b>Hands-on learning.</b> Every workshop includes step-by-step instruction in a relaxed, welcoming environment.</li>
       <li><b>All supplies included.</b> We will provide everything you need, just bring yourself and enjoy creating.</li>
       <li><b>Take home your creation.</b> Leave with a finished project you’ll be proud to display at home.</li>
       <li><b>Community.</b> Meet fellow plant lovers while enjoying a fun, creative evening.</li>
     </ul>`)}
-${course({ key: 'past', n: '03', title: 'Earlier this fall' }, `    <ul class="past" data-in>
+${course({ key: 'past', title: 'Earlier this fall' }, `    <ul class="past" data-in>
       <li><span>Witchy Terrarium Night</span><span>Oct 9</span></li>
       <li><span>Fall at the Shop, with In Bloom and KaGie's</span><span>Oct 16 – 18</span></li>
       <li><span>Emma After Dark</span><span>Oct 30</span></li>
     </ul>
     <p data-in>Missed one? Keep an eye on our <a class="link" href="${C.ig}" target="_blank" rel="noopener">Instagram</a> for the next dates!</p>`)}
-${course({ key: 'priv', id: 'private', n: '04', title: 'Gather your favorite people',
+${course({ key: 'priv', id: 'private', title: 'Gather your favorite people',
   pic: { src: 'ig-group.webp', w: 1100, h: 1952, alt: 'A private workshop group around the table, holding their terrariums', pos: '50% 46%' } }, `    <p data-in>We host private workshops for birthdays, bridal showers, team building, client appreciation gatherings, and more. We’ll bring the plants, supplies, and instructions. You simply gather your guests!</p>
     <div class="panel" data-in>
       <form class="form" data-inquiry action="mailto:${C.email}">
@@ -464,26 +487,34 @@ ${invite({ key: 'bar', title: 'Looking for an everyday creative experience?',
 /* ---------------- Visit ---------------- */
 page({ file: 'visit.html', title: 'Visit · 413 E. Emma Ave., Springdale · Snip & Sprout Co.',
   desc: 'Hours, parking and directions for Snip & Sprout Co. at 413 E. Emma Ave. in downtown Springdale, AR. Open every day.' }, `<main id="main">
-${top({ title: 'Visit us at 413 E. Emma Ave.', hours: true,
-  items: [{ t: 'Mon – Tue', v: '10 AM – 3 PM', days: '1,2' }, { t: 'Wed – Fri', v: '9 AM – 6 PM', days: '3,4,5' }, { t: 'Sat – Sun', v: '9 AM – 2 PM', days: '6,0' }],
-  lede: 'Come wander the shelves, smell the soil, and ask us the things you’ve been googling at midnight. No appointment needed!',
-  note: 'Planning a Terrarium Bar visit? At least one day’s advance notice is required so we can prepare your vessel.',
-  acts: `<a class="btn" href="${C.maps}" target="_blank" rel="noopener">Get directions ${I.out}</a>\n      <button class="textbtn" type="button" data-copy="413 E. Emma Ave., Springdale, AR 72764">Copy the address</button>`,
-  pic: { src: 'ig-window.webp', w: 1080, h: 1350, alt: 'Dani outside the shop window, lettered Snip &amp; Sprout Co.', pos: '40% 50%' },
-  ticket: `<span><b>413 E. Emma Ave.</b><small>Street parking out front, and a bench for waiting friends</small></span><span class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></span>` })}
+<section class="hero hero--visit" aria-labelledby="top-title"><div class="hero--visit__in">
+  <div class="place" data-in>
+    <p class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></p>
+    <h1 class="hero__title" id="top-title">Come see us!</h1>
+    <address>413 E. Emma Ave.<br>Springdale, AR 72764</address>
+    <div id="hours">${HOURS3}</div>
+    <div class="acts"><a class="btn" href="${C.maps}" target="_blank" rel="noopener">Get directions ${I.out}</a>
+      <button class="textbtn" type="button" data-copy="413 E. Emma Ave., Springdale, AR 72764">Copy the address</button></div>
+  </div>
+  <div class="hero--visit__side">
+    <img class="hero__pic" src="img/ig-window.webp" width="1080" height="1350" alt="Dani outside the shop window, lettered Snip &amp; Sprout Co." fetchpriority="high">
+    <p class="hero__lede" data-in>Come wander the shelves, smell the soil, and ask us the things you’ve been googling at midnight. No appointment needed!</p>
+    <p class="hero__note" data-in>Planning a Terrarium Bar visit? At least one day’s advance notice is required so we can prepare your vessel.</p>
+  </div>
+</div></section>
 <div class="courses">
-${course({ key: 'find', n: '01', title: 'What you\'ll find in the shop',
+${course({ key: 'find', title: 'What you\'ll find in the shop',
   pic: { src: 'shop-shelves.webp', w: 1200, h: 1800, alt: 'Shelves of plants, pots and baskets inside the shop' } }, `    <ul class="facts" data-in>
       <li><b>Plants and pottery.</b> A thoughtfully curated selection of healthy plants and timeless pottery.</li>
       <li><b>Plant care help.</b> Helpful plant care resources to support you long after you bring a plant home.</li>
       <li><b>The Plant Bar and Terrarium Bar.</b> Get your hands a little dirty while you're here!</li>
       <li><b>Workshops and seasonal arrivals.</b> Fresh workshops, seasonal arrivals, and new finds throughout the year.</li>
     </ul>`)}
-${course({ key: 'nb', n: '02', title: 'Under the same roof',
+${course({ key: 'nb', title: 'Under the same roof',
   pic: { src: 'ig-storefront.webp', w: 860, h: 627, alt: 'The white storefront at 413 E. Emma Ave. in downtown Springdale', wide: true } }, `    <p data-in>Four locally female-owned businesses, one beautiful shared space, and a whole lot of creativity! Flowers, cards, books, candles, and more, all under one roof.</p>
     <div data-in>${NEIGHBORS}</div>
     <p data-in>Street parking out front, and a bench for waiting friends.</p>`)}
-${course({ key: 'hello', n: '03', title: 'Say hello' }, `    <p data-in>Plant questions welcome, always. Email Dani about a plant, a workshop or a private event.</p>
+${course({ key: 'hello', title: 'Say hello' }, `    <p data-in>Plant questions welcome, always. Email Dani about a plant, a workshop or a private event.</p>
     <p data-in><a class="btn" href="mailto:${C.email}">Email Dani ${I.arrow}</a></p>`)}
 </div>
 </main>
@@ -492,15 +523,20 @@ ${course({ key: 'hello', n: '03', title: 'Say hello' }, `    <p data-in>Plant qu
 /* ---------------- About ---------------- */
 page({ file: 'about.html', title: 'About Dani · Snip & Sprout Co.',
   desc: 'Snip & Sprout Co. is an indoor plant boutique in Northwest Arkansas, started by Dani to make plant care approachable and to give people a place to gather.' }, `<main id="main">
-${top({ title: 'About Snip &amp; Sprout Co.',
-  items: [{ t: 'Slow down.' }, { t: 'Learn something new.' }, { t: 'Get your hands dirty.' }],
-  lede: 'A little shop rooted in the love of plants and community.',
-  acts: `<a class="btn" href="visit.html">Plan your visit ${I.arrow}</a>\n      <a class="link" href="workshops.html">See workshops</a>`,
-  pic: { src: 'dani-overalls.webp', w: 1280, h: 1920, alt: 'Dani in overalls holding up a potted plant, surrounded by plants', pos: '50% 30%' },
-  ticket: `<span><b>Hi everyone, I’m Dani!</b><small>In downtown Springdale since August 2026</small></span>` })}
+<section class="hero hero--about" aria-labelledby="top-title">
+  <img class="hero__pic" src="img/dani-overalls.webp" width="1280" height="1920" alt="Dani in overalls holding up a potted plant, surrounded by plants" fetchpriority="high">
+  <div class="hero__text">
+    <p class="kicker" data-in>About Snip &amp; Sprout Co.</p>
+    <h1 class="hero__title" id="top-title" data-in>Hi everyone, I’m Dani!</h1>
+    <p class="hero__lede" data-in>A little shop rooted in the love of plants and community. In downtown Springdale since August 2026.</p>
+    <ul class="trio" role="list" data-in><li>Slow down.</li><li>Learn something new.</li><li>Get your hands dirty.</li></ul>
+    <div class="acts" data-in><a class="btn" href="visit.html">Plan your visit ${I.arrow}</a>
+      <a class="link" href="workshops.html">See workshops</a></div>
+  </div>
+</section>
 <div class="courses">
-${course({ key: 'story', n: '01', title: 'Plants have always been more than decor to me',
-  pic: { src: 'pbar-scoop.webp', w: 1536, h: 2304, alt: 'Hands scooping soil around a new ivy at the Plant Bar', pos: '50% 62%' } }, `    <p data-in>They’ve been a way to slow down, create something beautiful, and bring life into everyday spaces. I created Snip &amp; Sprout Co. to make indoor plant care feel approachable, inspiring, and fun for EVERYONE.</p>
+${course({ key: 'story', title: 'Plants have always been more than decor to me',
+  pic: { src: 'dani-pothos.webp', w: 1200, h: 1800, alt: 'Dani holding a satin pothos', pos: '50% 45%' } }, `    <p data-in>They’ve been a way to slow down, create something beautiful, and bring life into everyday spaces. I created Snip &amp; Sprout Co. to make indoor plant care feel approachable, inspiring, and fun for EVERYONE.</p>
     <p data-in>Snip &amp; Sprout Co. has been a dream in the making, and I still can’t quite believe this space and love of mine is so real! It was created to be more than just a place to buy plants and attend workshops; it’s a space to slow down, learn something new, get your hands dirty, and leave feeling a little more connected.</p>
     <p class="statement" data-in>“Whether you’ve kept a fiddle leaf fig alive for years or accidentally loved one too hard (we’ve all been there), you are SO welcome here!”</p>
     <p data-in>Dani</p>
@@ -509,8 +545,7 @@ ${course({ key: 'story', n: '01', title: 'Plants have always been more than deco
       <img src="img/markers-gold.webp" width="1100" height="1650" alt="Plant markers in a gold pot: I will survive, You grow girl, I am rooting for you" loading="lazy">
       <figcaption class="small muted">Inside the shop on Emma Avenue.</figcaption>
     </figure>`)}
-${course({ key: 'val', n: '02', title: 'What we’re about in three words',
-  pic: { src: 'dani-pothos.webp', w: 1200, h: 1800, alt: 'Dani holding a satin pothos', pos: '50% 45%' } }, `    <div class="vals">
+${course({ key: 'val', title: 'What we’re about in three words', cls: 'course--row' }, `    <div class="vals">
       <div data-in><h3>Approachable</h3><p>Plant care shouldn’t feel like a test.</p></div>
       <div data-in><h3>Gathering</h3><p>Workshops and community nights. More than just a plant shop, I wanted to create a place where people gather.</p></div>
       <div data-in><h3>Genuine guidance</h3><p>Honest answers about light, water, and what will actually be happy where you want to put it.</p></div>
@@ -528,7 +563,7 @@ ${invite({ key: 'go', title: 'Let’s grow something together',
 // to the whole photo; site.js opens it in the photo viewer below, with her caption. Without script the link opens
 // the photo itself. Every caption is a line from her own posts, her Plant Bar sign or her Shop text.
 const GALLERY = [
-  { key: 'terrariums', title: 'Terrariums', line: 'Each one tells its own little story: plants, moss, crystals &amp; all!',
+  { key: 'terrariums', cover: 'spooky', title: 'Terrariums', line: 'Each one tells its own little story: plants, moss, crystals &amp; all!',
     link: ['shop.html#kits', 'Shop terrarium kits'], photos: [
     ['spooky', 'ig-globe.webp', 'A round glass terrarium with succulents, moss, white stones and tiny pumpkins', 'Just a few of our favorite spooky terrariums from this season'],
     ['winter', 'ig-teardrop.webp', 'A glass teardrop terrarium with an air plant and tiny holiday decor, hanging among Christmas decorations', 'A tiny winter wonderland you make with your own hands'],
@@ -537,7 +572,7 @@ const GALLERY = [
     ['dino-kit', 'gal/dino-kit-full.webp', 'A mini terrarium kit: a glass jar, bags of soil and stones, a little plant and a toy dinosaur', 'Our newest mini terrarium kit! Dino lovers… get ready.'],
     ['kit', 'kit-flatlay.webp', 'A DIY terrarium kit laid out in labelled bags: drainage layer, soil, moss and the how-to card', 'Make it at your kitchen table with a DIY kit'],
   ] },
-  { key: 'plant-bar', title: 'The Plant Bar', line: 'Stop by anytime we’re open, pick out a plant and pot, and make it your own.',
+  { key: 'plant-bar', cover: 'ivy', title: 'The Plant Bar', line: 'Stop by anytime we’re open, pick out a plant and pot, and make it your own.',
     link: ['shop.html#pbar', 'See the Plant Bar'], photos: [
     ['plant-bar', 'plant-bar-dani.webp', 'Dani potting a plant at the Plant Bar, her Plant Bar sign behind her', 'Our Plant Bar is one of my favorite things ever!'],
     ['ivy', 'pbar-ivy.webp', 'A little ivy potted at the Plant Bar, with moss and a tiny mushroom, in front of the Plant Bar sign', 'Add soil and settle your new plant in'],
@@ -546,7 +581,7 @@ const GALLERY = [
     ['markers', 'stakes-tall.webp', 'Wooden plant markers with sayings like Little sprout and Way to grow, beside stacks of pastel pots', 'Choose the one that speaks to you'],
     ['markers-gold', 'markers-gold.webp', 'Plant markers in a gold pot: I will survive, You grow girl, I am rooting for you', 'Add in moss, a fun plant marker, or mini decor'],
   ] },
-  { key: 'workshops', title: 'Workshops', line: 'A fun night out with the girls, a date night activity, or just an excuse to make something green and happy!',
+  { key: 'workshops', cover: 'group', title: 'Workshops', line: 'A fun night out with the girls, a date night activity, or just an excuse to make something green and happy!',
     link: ['workshops.html', 'Book a workshop'], photos: [
     ['group', 'ig-group.webp', 'A group around a workshop table in the shop, smiling, with their finished terrariums', 'Gather your favorite people and make something that grows'],
     ['trio', 'ig-trio.webp', 'Three friends holding up the terrariums they made at the Merry Terrarium Workshop', 'A season full of creativity, community, and growing together'],
@@ -555,7 +590,7 @@ const GALLERY = [
     ['apron', 'apron-dodeca.webp', 'Dani in her Snip &amp; Sprout Co. apron holding a geometric glass terrarium', 'We’ll guide you every step of the way'],
     ['lantern', 'tbar-lantern.webp', 'Dani holding an empty glass lantern terrarium, ready to fill', 'Choose your terrarium style, then come build it with us'],
   ] },
-  { key: 'plants', title: 'Plants', line: 'Here’s to the roots that keep us all growing together.',
+  { key: 'plants', cover: 'mama-pothos', title: 'Plants', line: 'Here’s to the roots that keep us all growing together.',
     link: ['visit.html', 'Plan your visit'], photos: [
     ['mama-pothos', 'gal/mama-pothos-full.webp', 'A full golden pothos glowing in the afternoon sun', 'One of our sweet mama plants, glowing in the afternoon sun'],
     ['monstera-leaf', 'gal/monstera-leaf-full.webp', 'A new monstera leaf unfurling by a sunny window', 'This baby Monstera leaf is just starting to unfurl'],
@@ -569,14 +604,16 @@ let galCount = 0;
 const galTotal = GALLERY.reduce((n, g) => n + g.photos.length, 0);
 page({ file: 'gallery.html', title: 'Gallery · Terrariums, the Plant Bar and workshops · Snip & Sprout Co.',
   desc: 'Photos from Snip & Sprout Co. in downtown Springdale: terrariums, the Plant Bar, workshops and plants.' }, `<main id="main">
-${top({ title: 'Gallery',
-  items: GALLERY.map((g) => ({ t: g.title + '.', href: '#' + g.key })),
-  lede: 'Watching this space fill with laughter and new faces has been the best part.',
-  acts: `<a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a>`,
-  pic: { src: 'dani-tee.webp', w: 1280, h: 1920, alt: 'Dani in her Snip &amp; Sprout Co. tee, tending a plant', pos: '50% 35%' },
-  ticket: `<span><b>For the ones who grow wild</b><small>Our Snip &amp; Sprout Co. tee</small></span>` })}
+<section class="hero hero--center hero--gal" aria-labelledby="top-title">
+  <h1 class="hero__title" id="top-title" data-in>Gallery</h1>
+  <p class="hero__lede" data-in>Watching this space fill with laughter and new faces has been the best part.</p>
+  <ul class="groups" role="list">
+    ${GALLERY.map((g) => `<li data-in><a href="#${g.key}"><img src="img/gal/${g.cover}.webp" width="720" height="900" alt=""><span>${g.title}</span></a></li>`).join('\n    ')}
+  </ul>
+  <div class="acts" data-in><a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a></div>
+</section>
 <div class="courses">
-${GALLERY.map((g, n) => course({ key: g.key, id: g.key, n: String(n + 1).padStart(2, '0'), title: g.title, cls: 'course--gal',
+${GALLERY.map((g) => course({ key: g.key, id: g.key, title: g.title, cls: 'course--gal',
   head: `<p class="course__line" data-in>${g.line}</p>\n    <a class="link" href="${g.link[0]}" data-in>${g.link[1]}</a>` },
 `    <ul class="gal" role="list">
 ${g.photos.map(([tile, full, alt, cap]) => `      <li data-in><a class="gal__item" href="img/${full}" data-cap="${cap}" data-n="${++galCount}"><img src="img/gal/${tile}.webp" width="720" height="900" alt="${alt}" loading="lazy" decoding="async"></a></li>`).join('\n')}
@@ -598,11 +635,16 @@ if (galCount !== galTotal) throw new Error('gallery numbering');
 /* ---------------- Not found ---------------- */
 // Cloudflare Pages serves 404.html for any address that doesn't exist, at any depth, hence the base tag.
 page({ file: '404.html', base: '/', title: 'Page not found · Snip & Sprout Co.', desc: 'That page isn’t here. Find the shop, the workshops and our hours from the home page.' }, `<main id="main">
-${top({ title: 'Oops! This page didn’t take root',
-  items: [{ t: 'The home page', href: 'index.html' }, { t: 'The Shop', href: 'shop.html' }, { t: 'Workshops', href: 'workshops.html' }, { t: 'Hours and directions', href: 'visit.html' }],
-  lede: 'It may have moved. Try one of these instead!',
-  pic: { src: 'stakes-tall.webp', w: 1086, h: 1357, alt: 'Wooden plant markers and pastel pots at the Plant Bar', pos: '50% 100%' },
-  ticket: `<span><b>Stayin’ alive</b><small>One of the plant markers at the Plant Bar</small></span>` })}
+<section class="hero hero--center" aria-labelledby="top-title">
+  <h1 class="hero__title" id="top-title" data-in>Oops! This page didn’t take root</h1>
+  <p class="hero__lede" data-in>It may have moved. Try one of these instead!</p>
+  <ul class="jump" role="list" data-in>
+    <li><a href="index.html">The home page</a></li>
+    <li><a href="shop.html">The Shop</a></li>
+    <li><a href="workshops.html">Workshops</a></li>
+    <li><a href="visit.html">Hours and directions</a></li>
+  </ul>
+</section>
 </main>
 `);
 
@@ -633,6 +675,10 @@ writeFileSync(dist + 'workshop.ics', ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:
   'UID:nov-2026-terrarium-workshop@snipandsproutco.com', 'DTSTAMP:20261115T000000Z', 'DTSTART:20261122T190000Z', 'DTEND:20261122T200000Z',
   'SUMMARY:November Terrarium Workshop at Snip & Sprout Co.', 'LOCATION:413 E. Emma Ave.\\, Springdale\\, AR 72764',
   'DESCRIPTION:Starts at 1 PM. Seating is limited.', 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n'));
-for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-reverse.svg', 'logo-tag.svg', 'shop-scene.svg', 'robots.txt', '_headers']) cpSync(here + 'src/' + f, dist + f);
+for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-tag.svg', 'shop-scene.svg', '_headers']) cpSync(here + 'src/' + f, dist + f);
+// The list of pages for search engines (not the 404 page or the portal), named at the end of robots.txt.
+writeFileSync(dist + 'sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${
+  [...written.keys()].filter((f) => f !== '404.html').map((f) => `  <url><loc>${url(f)}</loc></url>`).join('\n')}\n</urlset>\n`);
+writeFileSync(dist + 'robots.txt', read('src/robots.txt') + `Sitemap: ${C.url}sitemap.xml\n`);
 cpSync(here + 'version.json', dist + 'version.json');   // the Stray Wolf admin reads the site's version from here
 console.log(`built ${written.size} pages (the 404 page among them) and the Client Portal${PREVIEW ? ' (preview)' : ''}`);
