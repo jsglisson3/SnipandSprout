@@ -68,7 +68,7 @@ html{ -webkit-text-size-adjust:100%; scroll-behavior:smooth; scroll-padding-top:
 @media (min-width:1800px){ html{ font-size:112.5%; } }
 @media (min-width:2400px){ html{ font-size:131.25%; } }
 @media (min-width:3200px){ html{ font-size:156.25%; } }
-body{ margin:0; background:var(--paper); color:var(--ink); font-family:var(--body); font-size:var(--t-body); line-height:1.65; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
+body{ margin:0; background:var(--paper) url(leaves.svg) 0 0 / 460px repeat; color:var(--ink); font-family:var(--body); font-size:var(--t-body); line-height:1.65; -webkit-font-smoothing:antialiased; text-rendering:optimizeLegibility; }
 img{ display:block; max-width:100%; height:auto; }
 figure{ margin:0; }
 a{ color:inherit; text-underline-offset:.22em; text-decoration-thickness:1px; }
@@ -152,6 +152,9 @@ ul,ol{ padding:0; list-style:none; }
 @keyframes breathe{ 70%{ box-shadow:0 0 0 7px rgb(93 143 69 / 0); } 100%{ box-shadow:0 0 0 0 rgb(93 143 69 / 0); } }
 
 /* ---------- the top of each page: every page has its own ---------- */
+/* Behind every page: fine leaf outlines (src/leaves.svg, made by tools/make-leaves.py) and a soft sage wash
+   across the top, both faint enough that the page still reads as her cream paper. */
+main{ background:radial-gradient(1100px 560px at 78% -80px, rgb(214 222 200 / .55), rgb(214 222 200 / 0) 72%) no-repeat; }
 .hero{ max-width:var(--max); margin:0 auto; padding:clamp(72px,6.5vw,104px) var(--pad) clamp(48px,5.5vw,80px); }
 .hero__title{ font-size:var(--t-hero); line-height:1.06; }
 .hero__lede{ font-size:clamp(1.0625rem,1.25vw,1.25rem); line-height:1.6; color:var(--muted); max-width:34em; }
@@ -161,8 +164,11 @@ ul,ol{ padding:0; list-style:none; }
 .hero__pic{ display:block; width:100%; height:auto; aspect-ratio:4/5; object-fit:cover; border-radius:var(--r-lg); box-shadow:var(--sh-2); }
 
 /* Home: her welcome beside one photograph */
-.hero--home{ display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); align-items:center; gap:clamp(32px,5vw,88px); }
+.hero--home{ display:grid; grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr); align-items:center; gap:clamp(32px,5vw,88px); padding-top:clamp(40px,3.5vw,56px); }
 .hero--home .hero__pic, .hero--about .hero__pic{ max-height:calc(100svh - var(--navh) - 120px); min-height:380px; }
+/* Home: the photo stays no taller than about one and a half times her welcome, so the words sit close under her
+   logo tag instead of floating in the middle of a tall photo. */
+.hero--home .hero__pic{ max-height:min(calc(400px + 12vw), calc(100svh - var(--navh) - 96px)); aspect-ratio:5/6; }
 
 /* About: Dani first, then her hello and the three things the shop is for */
 .hero--about{ display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); align-items:center; gap:clamp(32px,5vw,88px); }
@@ -330,7 +336,7 @@ html:has(.lb[open]){ overflow:hidden; }
 .slipq figcaption b{ display:block; font-size:var(--t-body); color:var(--ink); }
 
 /* ---------- one frame, contents change ---------- */
-.reel{ background:var(--paper); padding:var(--section) 0; }
+.reel{ background:transparent; padding:var(--section) 0; }
 .reel__grid{ display:grid; grid-template-columns:minmax(0,5fr) minmax(0,6fr); gap:clamp(32px,5vw,88px); align-items:center; }
 .frame{ position:relative; aspect-ratio:4/5; max-width:min(58svh,440px); overflow:hidden; background:var(--cream); cursor:pointer; border:0; padding:0; width:100%; display:block; border-radius:var(--r-lg); box-shadow:var(--sh-2); }
 .frame img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; opacity:0; transition:opacity .7s ease, transform 1.2s var(--ease); }
@@ -511,6 +517,7 @@ html:has(.lb[open]){ overflow:hidden; }
   .hero--home, .hero--about, .hero--ws, .hero--visit__in, .pbar__grid{ grid-template-columns:1fr; }
   .hero--about .hero__pic{ order:2; }
   .hero--home .hero__pic, .hero--about .hero__pic, .pbar__pic{ min-height:0; max-height:none; aspect-ratio:4/3; }
+  .hero--home{ padding-top:clamp(72px,6.5vw,104px); }   /* stacked, the words start under her logo tag */
   .hero--home .hero__pic{ object-position:50% 18%; }
   .hero--about .hero__pic{ object-position:50% 30%; }
   .ways__head{ grid-template-columns:1fr; }

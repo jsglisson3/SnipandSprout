@@ -60,12 +60,11 @@
  *   one stands: Received, Working on it, Stray Wolf has a question, Done, Not doing this one. It is the
  *   same status Stray Wolf picks in the admin (POST /api/my-requests). A question gets an Answer button
  *   (POST /api/my-request/answer {batch, n, text}). Nothing sent yet = the card stays hidden.
- * Your shop (their own page only): <section data-shop-portal hidden> holding <p data-shop-count>,
- *   <button data-shop-add>, <div data-shop-form> and <div data-shop-list>. For a client whose website sells
- *   things (kit/shop): they add, change and delete items, type the shown price right in each row, and set
- *   each item's photo and checkout link (POST /api/my-shop, /api/my-shop/item, /item/delete, /prices,
- *   /pic?id=). Stray Wolf sets the shop's kind of checkout: Square (only Square links) or Generic (any https
- *   checkout link); the card's words follow it. No shop (Stray Wolf starts one) = the card stays hidden.
+ * Your shop (their own page only): <section data-shop-portal hidden> holding <div data-shop-list> (an older page's
+ *   [data-shop-add] and [data-shop-form] are hidden). For a client whose website sells things (kit/shop), it holds
+ *   the shop manager, the same screen as Stray Wolf's admin: shop-manager.js and shop-manager.css, copied next to
+ *   this file and fetched only when they have a shop (POST /api/my-shop and its calls; SW Core 2.2 or newer).
+ *   Stray Wolf starts the shop and sets its kind of checkout. No shop = the card stays hidden.
  * Messages from your website (their own page only): for a client whose website form sends to the notes service.
  *   A page places its own empty <section data-form-portal hidden> where it wants it; otherwise this script adds
  *   one under the boxes of what's on their site (or under the shop or Your requests on an older page). It's a
@@ -83,6 +82,8 @@
  *   "On your site now" from <template data-site-photos> on their page:
  *     <img src="small.jpg" data-big="big.jpg" alt="what it shows" data-on="Homepage|About page">
  *   data-more="Your project pages have more photos." data-more-url="/projects" on the template adds a link.
+ *   When the photos are on two or more pages, a row of page buttons (All, then each page with its count)
+ *   shows one page at a time; Download all and the big view follow the page picked.
  */
 (function () {
   "use strict";
@@ -204,8 +205,6 @@
     arrow: ["M5 12h14", "M13 6l6 6-6 6"],
     plus: ["M12 5v14", "M5 12h14"],
     download: ["M12 4v11", "M7 10.5l5 5 5-5", "M5 20h14"],
-    ext: ["M14 4h6v6", "M10 14L20 4", "M19 14v5a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h5"],
-    tag: ["M20.6 13.4l-7.2 7.2a2 2 0 0 1-2.8 0L3 13V3h10l7.6 7.6a2 2 0 0 1 0 2.8z", "M7.5 7.5h.01"],
     phone: ["M5 4h4l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v4a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"],
     reply: ["M9 14L4 9l5-5", "M4 9h10.5a5.5 5.5 0 0 1 0 11H11"],
     mail: ["M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z", "M3 7l9 6 9-6"],
@@ -478,7 +477,12 @@
     ".tag.on{background:#e3efe6;color:#22603a}.tag.off{background:#f0ebe4;color:#5f5a53;padding-left:10px}.tag.yes{background:#fbeee6;color:#9a4315;padding-left:10px}",
     ".pg-none{margin:0;padding:18px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;font-size:15.5px}",
     ".pg-more{margin:0;font-size:15.5px;color:var(--muted)}.pg-more a{color:var(--accent);font-weight:600}",
-    "@media (max-width:719px){.pg-grid{grid-template-columns:1fr 1fr;gap:14px 10px}.pg-sec{padding:16px;border-radius:16px}.pg-top h1{font-size:21px}.pg-back{min-height:44px;padding:0 14px 0 10px}.pg-in{padding-top:14px;gap:14px}.pg-act .b{width:100%}.tag{font-size:12.5px;padding:5px 8px}.tag.off,.tag.yes{padding-left:8px}.card.photo .hd h2{font-size:17px}}",
+    /* "On your site now": one button per page of their site, the picked one dark */
+    ".pg-pages{display:flex;flex-wrap:wrap;gap:8px}",
+    ".pg-page{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-size:15px;font-weight:500}",
+    ".pg-page:hover{border-color:#bdb5a9}.pg-page .n{color:var(--muted);font-size:13.5px}",
+    ".pg-page[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}.pg-page[aria-pressed=true] .n{color:#d9d4cc}",
+    "@media (max-width:719px){.pg-grid{grid-template-columns:1fr 1fr;gap:14px 10px}.pg-sec{padding:16px;border-radius:16px}.pg-top h1{font-size:21px}.pg-back{min-height:44px;padding:0 14px 0 10px}.pg-in{padding-top:14px;gap:14px}.pg-act .b{width:100%}.pg-pages{gap:6px}.pg-page{min-height:36px;padding:0 11px;gap:6px;font-size:14px}.tag{font-size:12.5px;padding:5px 8px}.tag.off,.tag.yes{padding-left:8px}.card.photo .hd h2{font-size:17px}}",
     ".card.help .hd{padding:26px 26px 6px}.card.help .hd h2{font-size:23px}.card.help .hd p{font-size:16px;margin-top:5px}",
     ".card.help .bd{padding:14px 26px 22px;gap:12px}.card.help .ft{padding:16px 26px calc(20px + env(safe-area-inset-bottom,0px))}.card.help .ft .b{min-height:56px;font-size:18px}",
     "@media (max-width:719px){.card.help .hd{padding:22px 20px 4px}.card.help .bd{padding:12px 20px 18px}.card.help .ft{padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px))}}",
@@ -607,150 +611,20 @@
     // Let's talk, in the header beside Help and Log out
     ".head-acts .talk{background:var(--sage);color:#fff;margin-right:8px;padding:0 13px}.head-acts .talk:hover{background:#4d5e42}",
     "@media (max-width:640px){.head-acts .talk{display:none}}",   // on a phone the welcome has its own Let's talk button
-    // Your shop
+    // Your shop: the card around the shop manager (shop-manager.css styles the manager itself)
     ".rq:not([hidden]):has(+ .sp:not([hidden])),.edit:has(+ .rq[hidden] + .sp:not([hidden])){margin-bottom:16px}",
-    ".sp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:visible}",
+    ".sp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px}",
     ".sp-hd{display:flex;gap:12px 16px;align-items:center;justify-content:space-between;padding:18px 22px 14px}",
     ".sp-hd h2{font:700 22px/1.2 var(--slab);margin:0}",
     ".sp-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}",
-    ".sp-add{flex:none;display:inline-flex;align-items:center;gap:7px;min-height:40px;padding:0 16px 0 13px;font:650 14px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--accent);background:var(--accent-soft);border:1px solid #f1d3c0;border-radius:999px;cursor:pointer;transition:background .15s,color .15s}",
-    ".sp-add:hover{background:var(--accent);border-color:var(--accent);color:#fff}",
-    ".sp-add[hidden]{display:none}",
-    ".sp svg{flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}",
-    ".sp-add svg{width:16px;height:16px;stroke-width:2.4}",
-    ".sp-cat{margin:0;padding:16px 22px 4px;border-top:1px solid var(--line);font:500 11px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage)}",
-    ".sp-items{list-style:none;margin:0;padding:0}",
-    ".sp-cat + .sp-items > .sp-row:first-child{border-top:0}",
-    ".sp-row{display:grid;grid-template-columns:56px minmax(0,1fr) 136px 156px 92px;grid-template-areas:\"pic what price tag act\";gap:6px 16px;align-items:center;padding:12px 22px;border-top:1px solid var(--line)}",
-    ".sp-row.open{background:#faf8f4}",
-    // the photo: a button that adds or changes it
-    ".sp-pic{grid-area:pic;position:relative;display:grid;place-items:center;width:56px;height:56px;padding:0;border:0;border-radius:11px;background:var(--stone) center/cover no-repeat;color:var(--soft);overflow:hidden}",
-    "button.sp-pic{cursor:pointer;font:inherit}",
-    ".sp-pic svg{width:20px;height:20px;stroke-width:1.8}",
-    ".sp-pic.none{align-content:center;gap:1px;background:var(--card);border:1.5px dashed #cdc4b6;color:var(--muted)}",
-    ".sp-pic.none svg{width:18px;height:18px}",
-    ".sp-pic-say{font:650 10.5px/1.1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;letter-spacing:.01em}",
-    ".sp-pic:not(.none) .sp-pic-say{position:absolute;inset:0;display:grid;place-items:center;background:rgba(36,34,31,.55);color:#fff;opacity:0;transition:opacity .15s}",
-    "button.sp-pic:hover .sp-pic-say,button.sp-pic:focus-visible .sp-pic-say{opacity:1}",
-    "button.sp-pic.none:hover,.sp-pic.over{border-color:var(--accent);color:var(--accent);background-color:var(--accent-soft)}",
-    ".sp-pic.over{box-shadow:0 0 0 2px var(--accent)}",
-    ".sp-pic.busy{opacity:.55;cursor:progress}",
-    ".sp-row.off .sp-pic:not(.none){opacity:.6}.sp-row.off .sp-what b{color:var(--muted)}",
-    ".sp-what{grid-area:what;display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-width:0}",
-    ".sp-what b{font-size:16px;font-weight:600;line-height:1.3;overflow-wrap:anywhere}",
-    ".sp-m{max-width:100%;color:var(--muted);font-size:13.5px;line-height:1.35;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
-    // the checkout link, and changing it in its row
-    ".sp-links{display:flex;flex-wrap:wrap;align-items:baseline;gap:2px 12px}",
-    ".sp-sq{display:inline-flex;align-items:center;gap:5px;font-size:13.5px;font-weight:600;color:var(--sage);text-decoration:none;white-space:nowrap}",
-    ".sp-sq:hover{text-decoration:underline;text-underline-offset:3px}",
-    ".sp-sq svg{width:13px;height:13px;stroke-width:2.2}",
-    ".sp-link,.sp-diff button{font:650 13.5px/1.35 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--accent);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
-    ".sp-relink{font:600 13px/1.35 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--muted);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-decoration-color:#cdc4b6;text-underline-offset:3px}",
-    ".sp-relink:hover{color:var(--ink);text-decoration-color:currentColor}",
-    ".sp-linkedit{display:flex;flex-direction:column;gap:4px;width:100%;margin-top:4px}",
-    ".sp-lrow{display:flex;gap:6px;width:100%}",
-    ".sp-lin{flex:1;min-width:0;height:38px;padding:0 11px;font:inherit;font-size:14.5px;color:var(--ink);background:#fff;border:1px solid #d8d1c6;border-radius:9px}",
-    ".sp-lin:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}",
-    ".sp-mini{flex:none;height:38px;padding:0 13px;font:650 13.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:9px;cursor:pointer}",
-    ".sp-mini:hover{border-color:var(--ink)}",
-    ".sp-mini.go{color:#fff;background:var(--accent);border-color:var(--accent)}.sp-mini.go:hover{background:#a94816}.sp-mini[disabled]{opacity:.6;cursor:default}",
-    ".sp-lerr{color:#b4361c;font-size:13px;line-height:1.35}.sp-lerr[hidden]{display:none}",
-    ".sp-lhelp{color:var(--soft);font-size:12.5px;line-height:1.35}",
-    // the shown price
-    ".sp-price{grid-area:price;display:flex;flex-direction:column;gap:3px;min-width:0}",
-    ".sp-box{display:flex;align-items:center;gap:3px;height:40px;padding:0 10px;background:#fff;border:1px solid #d8d1c6;border-radius:10px;cursor:text}",
-    ".sp-box span{color:var(--soft);font-weight:600}",
-    ".sp-box input{flex:1;width:100%;min-width:0;border:0;padding:0;background:none;outline:none;font:600 15px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;font-variant-numeric:tabular-nums;color:var(--ink)}",
-    ".sp-box input::placeholder{color:var(--soft);font-weight:400}",
-    ".sp-box:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}",
-    ".sp-box.diff{border-color:#e39a6c;background:var(--accent-soft)}",
-    ".sp-diff{font-size:12.5px;line-height:1.35;color:#a94816}.sp-diff button{font-size:12.5px}",
-    // Active or Inactive: a switch
-    ".sp-on{grid-area:tag;display:flex;align-items:center;gap:4px;justify-self:start}",
-    ".sp-sw{position:relative;display:inline-flex;align-items:center;gap:9px;cursor:pointer;font:600 14px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink)}",
-    ".sp .sp-sw input{position:absolute;left:0;top:0;width:40px;height:24px;min-height:0;margin:0;padding:0;opacity:0;cursor:pointer}",
-    ".sp-track{position:relative;flex:none;width:40px;height:24px;border-radius:999px;background:#cfc8bd;transition:background .15s}",
-    ".sp-track::after{content:\"\";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(36,34,31,.3);transition:transform .15s}",
-    ".sp-sw input:checked + .sp-track{background:var(--sage)}",
-    ".sp-sw input:checked + .sp-track::after{transform:translateX(16px)}",
-    ".sp-sw input:focus-visible + .sp-track{outline:3px solid var(--accent-hi);outline-offset:2px}",
-    ".sp-sw input:disabled + .sp-track{opacity:.55}",
-    ".sp-row.off .sp-sw-w{color:var(--muted)}",
-    // a "?" with a few words: on hover or focus, or a tap
-    ".sp-tipw{position:relative;display:inline-flex}",
-    ".sp-q{display:grid;place-items:center;width:26px;height:26px;padding:0;border:0;border-radius:50%;background:none;color:var(--soft);cursor:pointer}",
-    ".sp-q svg{width:17px;height:17px}",
-    ".sp-q:hover,.sp-tipw.show .sp-q{color:var(--ink)}",
-    ".sp-tip{position:absolute;z-index:4;right:-12px;bottom:calc(100% + 8px);width:280px;padding:10px 12px;border-radius:10px;background:var(--char,#24221F);color:#fff;font-size:13.5px;line-height:1.45;font-weight:400;text-align:left;box-shadow:0 14px 30px -14px rgba(0,0,0,.5);opacity:0;visibility:hidden;transform:translateY(4px);transition:opacity .15s,transform .15s,visibility .15s;pointer-events:none}",
-    ".sp-q:hover + .sp-tip,.sp-q:focus-visible + .sp-tip,.sp-tipw.show .sp-tip{opacity:1;visibility:visible;transform:none}",
-    ".sp-btn{grid-area:act;justify-self:end;min-height:38px;padding:0 15px;font:650 14px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;cursor:pointer}",
-    ".sp-btn:hover{border-color:var(--ink)}",
+    ".sp-add[hidden]{display:none}",   // the manager has its own Add an item
+    ".sp .swm{border-width:1px 0 0;border-radius:0}",
+    ".sp .ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}",
     ".sp-none{margin:0;padding:16px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}",
     ".sp-foot{margin:0;padding:12px 22px 14px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.45;color:var(--soft)}",
-    ".sp-dl{display:flex;flex-wrap:wrap;gap:8px 18px;padding:12px 22px;border-top:1px solid var(--line)}",
-    ".sp-dl button{display:inline-flex;align-items:center;gap:7px;padding:4px 0;border:0;background:none;font:600 14px/1.3 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink);cursor:pointer;text-decoration:underline;text-decoration-color:var(--line);text-underline-offset:4px}",
-    ".sp-dl button:hover{text-decoration-color:currentColor}.sp-dl button[disabled]{opacity:.6;cursor:progress}.sp-dl svg{width:17px;height:17px;flex:none}",
-    // adding or changing one item: under its row, or at the top for a new one
-    ".sp-open{list-style:none}",
-    ".sp-form{padding:18px 22px 20px;background:#faf8f4;border-top:1px solid var(--line)}",
-    ".sp-row.open + .sp-open .sp-form{border-top:1px dashed var(--line)}",
-    ".sp-hd2 h3{font:700 18px/1.25 var(--slab);margin:0}",
-    ".sp-hd2 p{margin:2px 0 14px;color:var(--muted);font-size:14px}",
-    ".sp-top{display:grid;grid-template-columns:172px minmax(0,1fr);gap:20px;align-items:start}",
-    ".sp-drop{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;width:172px;height:172px;padding:14px;font:inherit;font-size:13px;line-height:1.35;text-align:center;color:var(--muted);background:#fff center/cover no-repeat;border:1.5px dashed #cdc4b6;border-radius:14px;cursor:pointer;overflow:hidden;transition:border-color .15s,background-color .15s}",
-    ".sp-drop svg{width:30px;height:30px;stroke-width:1.6;color:var(--soft)}",
-    ".sp-drop b{color:var(--ink);font-size:14.5px;font-weight:650}",
-    ".sp-drop:hover,.sp-drop.over{border-color:var(--accent);background-color:var(--accent-soft)}",
-    ".sp-drop.has{justify-content:flex-end;padding:0;border-style:solid;border-color:var(--line)}",
-    ".sp-drop-say{width:100%;padding:8px;background:rgba(36,34,31,.62);color:#fff;font-size:12.5px;font-weight:650}",
-    ".sp-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px 18px}",
-    ".sp-f{display:flex;flex-direction:column;gap:5px;min-width:0}",
-    ".sp-f.wide,.sp-check.wide{grid-column:1/-1}",
-    ".sp-f label,.sp-lbl{font-size:14px;font-weight:650}",
-    ".sp-f > input,.sp-f > select,.sp-f > textarea{width:100%;min-height:44px;font:inherit;font-size:15px;color:var(--ink);background:#fff;border:1px solid #d8d1c6;border-radius:10px;padding:9px 12px}",
-    ".sp-f textarea{min-height:68px;resize:vertical}",
-    ".sp-f > input:focus,.sp-f > select:focus,.sp-f > textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.2)}",
-    ".sp-f .sp-box{height:44px}.sp-f .sp-box input{font-size:15px}",
-    ".sp-f small{color:var(--soft);font-size:12.5px;line-height:1.35}",
-    ".sp-lblrow{display:flex;align-items:baseline;justify-content:space-between;gap:10px}",
-    ".sp-test{display:inline-flex;align-items:center;gap:4px;font-size:13px;font-weight:600;color:var(--sage);text-decoration:none;white-space:nowrap}",
-    ".sp-test:hover{text-decoration:underline;text-underline-offset:3px}.sp-test svg{width:12px;height:12px}.sp-test[hidden]{display:none}",
-    ".sp-activef{flex-direction:row;flex-wrap:wrap;align-items:center;gap:6px 14px;padding:11px 14px;background:#fff;border:1px solid var(--line);border-radius:12px}",
-    ".sp-activef .sp-sw b{font-size:15px;font-weight:650}",
-    ".sp-activef small{font-size:13.5px;color:var(--muted)}",
-    ".sp-more{margin-top:16px;padding-top:12px;border-top:1px solid var(--line)}",
-    ".sp-more summary{cursor:pointer;width:max-content;max-width:100%;font-size:14.5px;font-weight:650;color:var(--ink)}",
-    ".sp-more summary:hover{color:var(--accent)}",
-    ".sp-more[open] summary{margin-bottom:14px}",
-    ".sp-kinds{display:flex;flex-wrap:wrap;gap:8px}",
-    ".sp-kind{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:0 15px;font-size:14.5px;font-weight:500;background:#fff;border:1px solid #d8d1c6;border-radius:999px;cursor:pointer}",
-    ".sp-kind input{margin:0;accent-color:var(--accent)}",
-    ".sp-kind:has(input:checked){border-color:var(--accent);background:var(--accent-soft)}",
-    ".sp-class{display:contents}.sp-class[hidden]{display:none}",
-    ".sp-check{display:flex;align-items:flex-start;gap:10px;font-size:14px;color:var(--muted);cursor:pointer}",
-    ".sp-check input{flex:none;width:18px;height:18px;margin:2px 0 0;accent-color:var(--accent)}",
-    ".sp-check b{color:var(--ink);font-weight:650}",
-    ".sp-ft{display:flex;flex-wrap:wrap;align-items:center;gap:10px 12px;margin-top:16px}",
-    ".sp-ft .gap{flex:1}",
-    ".sp-form > .rq-err{margin-top:12px}",
-    ".sp-del{font:650 14px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:#b4361c;background:none;border:0;padding:8px 0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
-    ".sp-sure{display:flex;flex-wrap:wrap;align-items:center;gap:6px 12px;font-size:14px}",
-    ".sp-sure .sp-del{min-height:40px;padding:0 14px;color:#fff;background:#b4361c;border-radius:10px;text-decoration:none}",
-    ".sp-sure .sp-del:hover{background:#962b14}",
-    ".sp button:focus-visible,.sp a:focus-visible,.sp summary:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}",
-    "@media (min-width:1800px){.sp-hd h2{font-size:24px}.sp-what b{font-size:17px}}",
-    "@media (min-width:2400px){.sp-hd h2{font-size:27px}.sp-hd p,.sp-hd2 p{font-size:16px}.sp-what b{font-size:18.5px}.sp-m,.sp-sq,.sp-relink{font-size:14.5px}.sp-sw{font-size:15px}",
-    "  .sp-row{grid-template-columns:64px minmax(0,1fr) 150px 172px 104px}.sp-pic{width:64px;height:64px}.sp-box{height:46px}.sp-box input{font-size:16.5px}.sp-btn,.sp-add{font-size:15.5px;min-height:46px}",
-    "  .sp-f label,.sp-lbl{font-size:15.5px}.sp-f > input,.sp-f > select,.sp-f > textarea{font-size:16.5px;min-height:48px}.sp-f small,.sp-foot{font-size:14px}.sp-hd2 h3{font-size:21px}}",
-    "@media (max-width:720px){",
-    "  .sp-hd{flex-wrap:wrap;padding:16px 16px 12px}.sp-hd h2{font-size:20px}",
-    "  .sp-row{grid-template-columns:52px 40px minmax(0,1fr) auto;grid-template-areas:\"pic what what what\" \"price price tag act\";gap:10px 8px;padding:12px 16px}",
-    "  .sp-pic{width:52px;height:52px;align-self:start}.sp-what{align-self:center}.sp-price{align-self:center}.sp-what{padding-left:4px}.sp-box{width:100%}.sp-btn{align-self:center;padding:0 12px}",
-    "  .sp-cat,.sp-none,.sp-foot{padding-left:16px;padding-right:16px}",
-    "  .sp-tip{position:fixed;left:16px;right:16px;bottom:16px;width:auto;font-size:14.5px}",
-    "  .sp-form{padding:16px}.sp-top{grid-template-columns:minmax(0,1fr)}.sp-drop{width:100%;height:150px}.sp-fields{grid-template-columns:minmax(0,1fr)}",
-    "  .sp-ft .rq-go{flex:1 1 100%;min-height:48px;order:3}",
-    "}",
+    "@media (min-width:1800px){.sp-hd h2{font-size:24px}}",
+    "@media (min-width:2400px){.sp-hd h2{font-size:27px}.sp-hd p{font-size:16px}.sp-foot{font-size:14px}}",
+    "@media (max-width:720px){.sp-hd{flex-wrap:wrap;padding:16px 16px 12px}.sp-hd h2{font-size:20px}.sp-none,.sp-foot{padding-left:16px;padding-right:16px}}",
     // The header's links to each part of the page ([data-portal-nav]); the part on screen is underlined
     ".sw-nav{border-top:1px solid var(--line)}",
     ".sw-nav .nav-in{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:4px;min-height:50px;overflow-x:auto;scrollbar-width:none}",
@@ -1715,6 +1589,8 @@
     var book = (box.getAttribute("data-booking-url") || "").trim();
     if (book) window.open(book, "_blank", "noopener"); else goToPart(box);
   }
+  // "Builders page" on a page button reads "Builders"; "Homepage" stays as it is.
+  function shortPage(pg) { return pg.replace(/\s+page$/i, "") || pg; }
   function sitePhotos() {
     var tpl = document.querySelector("template[data-site-photos]");
     var imgs = tpl && tpl.content ? tpl.content.querySelectorAll("img") : [];
@@ -1761,16 +1637,42 @@
     // 3. on the site now
     var site = sitePhotos(), siteSec = null;
     if (site.list.length) {
-      var siteItems = site.list.map(function (p) { return { src: p.src, title: p.title || "On your site", cap: p.on.length ? p.on.join(", ") : "on your website now" }; });
-      siteSec = h("section", { class: "pg-sec site", "aria-label": "On your site now" }, [
-        h("div", { class: "pg-hd" }, [h("div", { class: "grow" }, [h("h2", { text: "On your site now" }), h("p", { class: "pg-sub", text: plural(site.list.length, "photo") + ". Tap one to see it bigger." })]),
-          dlButton("Download all", function (b) { downloadAll(siteItems, fileName((NAME || "website") + " photos on the website", "zip"), b); }, null, "Every photo on your website, in one .zip file, each named for what it shows.")]),
-        h("div", { class: "pg-grid" }, site.list.map(function (p, k) {
-          return h("button", { class: "pg-ph", type: "button", "aria-label": (p.title || "Photo " + (k + 1)) + ". See it bigger.", onclick: function () { lightbox(siteItems, k, function (it) { askSwap(it.title); }); } }, [
+      // The pages their photos are on, in the order they first appear, each with how many photos it has.
+      var pages = [], counts = {};
+      site.list.forEach(function (p) { p.on.forEach(function (pg) { if (!counts[pg]) { counts[pg] = 0; pages.push(pg); } counts[pg]++; }); });
+      var unpaged = site.list.filter(function (p) { return !p.on.length; }).length;
+      if (unpaged && pages.length) { pages.push(""); counts[""] = unpaged; }   // "" = photos with no page named
+      var pick = null, shown = site.list;   // pick: null = All
+      var siteSub = h("p", { class: "pg-sub" }), siteGrid = h("div", { class: "pg-grid" });
+      var siteDl = dlButton("Download all", function (b) {
+        downloadAll(siteItems(), fileName((NAME || "website") + " photos " + (pick == null ? "on the website" : pick ? "on " + shortPage(pick) : "on other pages"), "zip"), b);
+      }, null, "The photos shown here, in one .zip file, each named for what it shows.");
+      var siteItems = function () { return shown.map(function (p) { return { src: p.src, title: p.title || "On your site", cap: p.on.length ? p.on.join(", ") : "on your website now" }; }); };
+      var pageBtns = pages.length > 1 ? [null].concat(pages).map(function (pg) {
+        return h("button", { class: "pg-page", type: "button", "aria-pressed": pg === pick ? "true" : "false", title: pg == null ? "Every photo on your website" : pg ? "Only the photos on your " + pg : "Photos not tied to one page",
+          onclick: function () { showPage(pg); } }, [h("span", { text: pg == null ? "All" : pg ? shortPage(pg) : "Other" }), h("span", { class: "n", text: String(pg == null ? site.list.length : counts[pg]) })]);
+      }) : [];
+      var showPage = function (pg) {
+        pick = pg;
+        shown = pg == null ? site.list : site.list.filter(function (p) { return pg ? p.on.indexOf(pg) >= 0 : !p.on.length; });
+        pageBtns.forEach(function (b, k) { b.setAttribute("aria-pressed", (k ? pages[k - 1] : null) === pg ? "true" : "false"); });
+        siteSub.textContent = plural(shown.length, "photo") + (pg ? " on your " + pg : "") + ". Tap one to see it bigger.";
+        siteDl.lastChild.textContent = pg == null ? "Download all" : "Download these";
+        var items = siteItems();
+        siteGrid.textContent = "";
+        shown.forEach(function (p, k) {
+          siteGrid.appendChild(
+            h("button", { class: "pg-ph", type: "button", "aria-label": (p.title || "Photo " + (k + 1)) + ". See it bigger.", onclick: function () { lightbox(items, k, function (it) { askSwap(it.title); }); } }, [
             h("span", { class: "im" }, [h("img", { src: p.thumb, alt: "", loading: "lazy", decoding: "async" })]),
             h("span", { class: "tag on" }, [icon("check"), h("span", { text: "On your site" })]),
-            p.on.length ? h("span", { class: "dt", text: p.on.join(", ") }) : null]);
-        })),
+            p.on.length ? h("span", { class: "dt", text: p.on.join(", ") }) : null]));
+        });
+      };
+      showPage(null);
+      siteSec = h("section", { class: "pg-sec site", "aria-label": "On your site now" }, [
+        h("div", { class: "pg-hd" }, [h("div", { class: "grow" }, [h("h2", { text: "On your site now" }), siteSub]), siteDl]),
+        pageBtns.length ? h("div", { class: "pg-pages", role: "group", "aria-label": "Show the photos on one page" }, pageBtns) : null,
+        siteGrid,
         site.more ? h("p", { class: "pg-more" }, [site.more + " ", site.moreUrl ? h("a", { href: site.moreUrl, target: "_blank", rel: "noopener", text: "See them" }) : null]) : null]);
     }
 
@@ -2294,389 +2196,72 @@
     return { ok: false, status: 404, error: "Not found." };
   }
 
-  // "Your shop" on their page ([data-shop-portal]): what their website sells (kit/shop draws it there). They keep
-  // it themselves, the same as Stray Wolf in the admin. Each row does the everyday jobs in place: the photo (tap it
-  // or drop one on it), the shown price (typed right there), the checkout link (Change link), and Active or
-  // Inactive (one switch). Add an item and Change open a short form for the rest. Every Buy opens the item's
-  // checkout link, so no payment ever comes through here. Stray Wolf starts the shop in the admin, imports into it
-  // there, and picks its kind of checkout (shop.checkout): "square" takes only Square links and keeps Square's own
-  // price beside the shown one; "generic" takes any https checkout link. No shop, or an older service: no card.
-  var SHOP_SWITCH_TIP = "Active: on your website with its Buy button. Inactive: taken off your website within a minute. It stays saved here with its price, photo and link, so you can switch it back on anytime.";
-  // The card's words for each kind of checkout. A shop from a service that doesn't say its kind is a Square shop.
-  var SHOP_KINDS = {
-    square: { link: "Square checkout link", ph: "square.link/u/…", add: "Add the Square link", buys: "your Square checkout",
-      says: "Only Square checkout links work here, so every payment goes through Square.",
-      help: "In Square: Payment links, then copy the link. The Buy button opens it.",
-      need: "Add its Square checkout link first, then switch it to Active.",
-      seats: "Shown beside the date. Square keeps the real count.", priced: "Price saved. Change it in Square too, so checkout matches." },
-    generic: { link: "Checkout link", ph: "https://buy.stripe.com/…", add: "Add the checkout link", buys: "the checkout link you set for it",
-      says: "Paste the link to the page where people pay you, at Stripe, PayPal, Etsy or anywhere else. No payment comes through here.",
-      help: "The page where people pay for this. The Buy button opens it.",
-      need: "Add its checkout link first, then switch it to Active.",
-      seats: "Shown beside the date. Your checkout keeps the real count.", priced: "Price saved. Change it at your checkout too, so the two match." }
-  };
-  var PHOTO_TYPES = /^image\/(jpeg|png|webp)$/, PHOTO_MAX = 3 * 1024 * 1024;
-  function shopSquare() { return !spShop || spShop.checkout !== "generic"; }
-  function shopKind() { return SHOP_KINDS[shopSquare() ? "square" : "generic"]; }
-  // their shop; the item being added or changed (a copy, no id = new); Delete asked once; the row whose link is being changed
-  var spShop = null, spEdit = null, spDel = false, spLink = null, spLinkOn = false;   // spLink: the row whose link is being changed; spLinkOn: switch it on once the link is in
+  // "Your shop" on their page ([data-shop-portal]): what their website sells (kit/shop draws it there). It is the shop
+  // manager, the same screen Stray Wolf uses in the admin; shop-manager.js and .css sit next to this file and are
+  // fetched only for a client who has a shop. Search, prices typed in the row, up to 5 photos an item found on their
+  // own website, sales, options, many items at once, and Changes with Undo. Every Buy button opens the item's own
+  // checkout link, so no payment ever comes through here. Stray Wolf starts the shop, imports into it and picks its
+  // kind of checkout in the admin. No shop: no card.
+  var SHOP_FILES = "1";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
+  var spShop = null, spMgr = null, spDemo = null, spPics = {};
   function loadShop() {
-    if (!document.querySelector("[data-shop-portal]")) return;
-    shopCall("").then(function (d) { if (d && d.ok && d.shop && Array.isArray(d.shop.items)) { spShop = d.shop; drawShop(); } });
-  }
-  function shopCall(path, body) { return DEMO ? Promise.resolve(demoShopCall(path, body || {})) : api("/api/my-shop" + path, { token: getToken(), body: body || {} }); }
-  function shopTrouble(d, what) {
-    return d.status === 401 ? "Your login timed out. Log in again to " + what + "." : d.status === 0 ? d.error : d.error || "That didn't " + what + ". Try again in a minute.";
-  }
-  function money(c) { return "$" + (c / 100).toLocaleString("en-US", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }); }
-  function dollars(c) { return c == null ? "" : (c / 100).toFixed(2); }
-  // Everything the service needs to save one item, with some of it changed: one call does the switch or the link.
-  function shopFields(x, change) {
-    var f = { id: x.id, name: x.name, kind: x.kind, price: dollars(x.price), was: dollars(x.was), link: x.link || "", cat: x.cat || "",
-      when: x.when || "", seats: x.seats || "", show: x.show, desc: x.desc || "" };
-    for (var k in change) f[k] = change[k];
-    return f;
-  }
-  function photoProblem(file) {
-    return !PHOTO_TYPES.test(file.type) ? "That isn't a JPG, PNG or WebP photo." : file.size > PHOTO_MAX ? "That photo is too big (3 MB at most)." : "";
-  }
-  // A class's date is kept as the client typed it (2026-12-06T10:00, their own time), so it is read as written.
-  function classWhen(s) {
-    var m = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/.exec(s || ""); if (!m) return "";
-    var d = new Date(+m[1], m[2] - 1, +m[3], +m[4], +m[5]);
-    return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" }) + ", " + d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit" });
-  }
-  // Photos come from the shop's public address, read as a file so their page's policy never needs that address.
-  var spPics = {};
-  function shopPic(key) {
-    if (!spPics[key]) spPics[key] = DEMO ? Promise.resolve(key.indexOf("data:") === 0 ? key : demoPic(key))
-      : fetch(API + "/api/shop/pic?key=" + encodeURIComponent(key)).then(function (r) { return r.ok ? r.blob() : null; })
-          .then(function (b) { return b ? keepBlob(b) : ""; }, function () { return ""; });
-    return spPics[key];
-  }
-  function shopThumb(x) {
-    var t = h("span", { class: "sp-pic", "aria-hidden": "true" }, x.photo ? [] : [icon("tag")]);
-    if (x.photo) shopPic(x.photo).then(function (u) { if (u) t.style.backgroundImage = 'url("' + u + '")'; });
-    return t;
-  }
-  // Redraws the card. Whatever had the cursor (a price box, while tabbing down the list) keeps it.
-  function shopSaved(d, words) {
-    var at = document.activeElement, label = at && at.getAttribute && at.getAttribute("aria-label");
-    spShop = d.shop; drawShop(); if (words) toast(words);
-    if (label) { var back = document.querySelector('[data-shop-portal] [aria-label="' + label.replace(/["\\]/g, "\\$&") + '"]'); if (back) back.focus({ preventScroll: true }); }
-  }
-  function drawShop() {
-    var box = document.querySelector("[data-shop-portal]"), list = box && box.querySelector("[data-shop-list]"); if (!list || !spShop) return;
-    var items = spShop.items, shown = items.filter(function (x) { return x.show !== "hidden"; }).length;
-    var count = box.querySelector("[data-shop-count]");
-    if (count) count.textContent = "What your website sells. " + (items.length ? plural(items.length, "item") + ": " + shown + " active, " + (items.length - shown) + " inactive." : "Nothing in it yet.");
-    var foot = box.querySelector(".sp-foot");
-    if (foot) foot.textContent = "Every Buy button on your website opens " + shopKind().buys + ", so payments never come through here. Changes show on your website within a minute.";
-    var add = box.querySelector("[data-shop-add]");
-    if (add) { add.hidden = !!(spEdit && !spEdit.id); add.onclick = function () { editShopItem(null); }; }
-    var top = box.querySelector("[data-shop-form]");
-    if (top) { top.textContent = ""; if (spEdit && !spEdit.id) top.appendChild(shopForm()); }
-    list.textContent = "";
-    if (!items.length) list.appendChild(h("p", { class: "sp-none", text: "Add the first thing your website sells. It stays inactive, off your website, until you switch it on." }));
-    // grouped by category, first seen first, no category last
-    var cats = [];
-    items.forEach(function (x) { if (cats.indexOf(x.cat || "") < 0) cats.push(x.cat || ""); });
-    cats.sort(function (a, z) { return !a ? 1 : !z ? -1 : 0; });
-    cats.forEach(function (cat) {
-      if (cats.length > 1 || cat) list.appendChild(h("h3", { class: "sp-cat", text: cat || "No category" }));
-      var ul = h("ul", { class: "sp-items" });
-      items.filter(function (x) { return (x.cat || "") === cat; }).forEach(function (x) {
-        ul.appendChild(shopRow(x));
-        if (spEdit && spEdit.id === x.id) ul.appendChild(h("li", { class: "sp-open" }, [shopForm()]));
-      });
-      list.appendChild(ul);
+    var box = document.querySelector("[data-shop-portal]"); if (!box || spMgr) return;
+    (DEMO ? Promise.resolve({ ok: true, shop: demoShop(), today: new Date().toLocaleDateString("en-CA") }) : api("/api/my-shop", { token: getToken() })).then(function (d) {
+      if (!d || !d.ok || !d.shop || !Array.isArray(d.shop.items)) return;
+      [].forEach.call(box.querySelectorAll("[data-shop-add], [data-shop-form]"), function (el) { el.hidden = true; });
+      spShop = d.shop; box.hidden = false; drawNav();
+      // SW Core before 2.2 sends no date with the shop, and the manager needs its newer calls.
+      if (!d.today) { shopNote(box, "Your shop is getting an update. Check back in a few minutes."); return; }
+      shopFiles().then(function (ok) { if (ok) mountShop(box, d); else shopNote(box, "Your shop didn't load. Check your internet, then reload this page."); });
     });
-    if (items.length) {
-      var withPics = items.filter(function (x) { return x.photo; });
-      list.appendChild(h("div", { class: "sp-dl" }, [
-        dlButton("Download the list as a spreadsheet", function () { saveFile(shopCsv(items), fileName((NAME || "your") + " shop", "csv")); toast("Downloading your shop list. It opens in Excel, Numbers or Google Sheets."); }, "",
-          "Every item with its category, price, Active or not, and checkout link, in one file that opens in Excel, Numbers or Google Sheets."),
-        withPics.length ? dlButton("Download all the photos", function (b) { downloadAll(withPics.map(function (x) { return { title: x.name, src: shopPic(x.photo) }; }), fileName((NAME || "your") + " shop photos", "zip"), b); }, "",
-          "Every item's photo in one .zip file, each named after its item.") : null]));
-    }
-    box.hidden = false;
-    drawNav();
   }
-  // The shop as a spreadsheet: one row per item, prices in dollars. A cell that starts like a formula gets a ' in
-  // front, so a spreadsheet shows it as words instead of running it.
-  function shopCsv(items) {
-    var q = function (v) { v = v == null ? "" : String(v); if (/^[=+\-@]/.test(v)) v = "'" + v; return /[",\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v; };
-    var usd = function (c) { return c == null ? "" : (c / 100).toFixed(2); };
-    var rows = [["Item", "Category", "Kind", "Shown price", "Was price", "On the website", "Checkout link", "Class date", "Seats", "Description"]].concat(items.map(function (x) {
-      return [x.name, x.cat, x.kind === "class" ? "Class or workshop" : "Item", usd(x.price), usd(x.was), x.show === "hidden" ? "Inactive" : x.show === "sold" ? "Sold out" : "Active", x.link, x.when ? String(x.when).replace("T", " ") : "", x.seats, x.desc];
-    }));
-    return new Blob(["\ufeff" + rows.map(function (r) { return r.map(q).join(","); }).join("\r\n") + "\r\n"], { type: "text/csv;charset=utf-8" });
+  function shopNote(box, text) { (box.querySelector("[data-shop-list]") || box).replaceChildren(h("p", { class: "sp-none", text: text })); }
+  // The manager's two files, from the folder this file came from.
+  function shopFiles() {
+    if (window.SWShopManager) return Promise.resolve(true);
+    var at = function (f) { return new URL(f + "?v=" + SHOP_FILES, S.src).href; };
+    var add = function (el) { return new Promise(function (done) { el.onload = function () { done(true); }; el.onerror = function () { done(false); }; document.head.appendChild(el); }); };
+    return Promise.all([add(h("link", { rel: "stylesheet", href: at("shop-manager.css") })), add(h("script", { src: at("shop-manager.js") }))])
+      .then(function (r) { return r[0] && r[1] && !!window.SWShopManager; });
   }
-  function editShopItem(x) {
-    spEdit = x ? JSON.parse(JSON.stringify(x)) : { kind: "item", show: "hidden" }; spDel = false; spLink = null; spLinkOn = false; drawShop();
-    var f = document.getElementById("sp-name"); if (f) { f.scrollIntoView({ block: "center" }); f.focus({ preventScroll: true }); }
+  function mountShop(box, d) {
+    if (DEMO) spDemo = SWShopManager.demo(d.shop, demoPic);
+    var photos = h("button", { class: "swm-btn plain", type: "button", title: "Every item's photos in one .zip file, each named after its item", onclick: function () { shopPhotos(this); } },
+      [icon("download", 15), h("span", { text: "Photos" })]);
+    spMgr = SWShopManager.mount(box.querySelector("[data-shop-list]") || box, { mode: "portal", shop: d.shop, today: d.today, site: SITE, name: NAME,
+      call: function (path, body) { return spDemo ? spDemo.call(path, body) : api("/api/my-shop" + path, { token: getToken(), body: body }); },
+      upload: function (query, file) { return spDemo ? spDemo.upload(query, file) : api("/api/my-shop/photo" + query, { token: getToken(), raw: file, type: file.type }); },
+      image: shopImage, extra: [photos], onChange: function (shop) { spShop = shop; drawNav(); } });
+    // The open item's title stays under their page's sticky header.
+    var head = document.querySelector(".sw-head"), fit = function () { box.style.setProperty("--swm-top", (head ? head.offsetHeight : 0) + "px"); };
+    fit(); window.addEventListener("resize", fit);
   }
-  // One row: the photo, the name and its checkout link, the shown price (typed right here), Active or Inactive, Change.
-  // x.via is whose checkout the link opens, as the service names it ("Square", "Stripe", or the link's own address).
-  function shopRow(x) {
-    var words = shopKind(), off = shopSquare() && x.sqPrice != null && x.price !== x.sqPrice;
-    var price = h("input", { class: "sp-in", inputmode: "decimal", autocomplete: "off", placeholder: "none", "aria-label": "Shown price for " + x.name });
-    price.value = dollars(x.price);
-    var save = function (v, said) {
-      shopCall("/prices", { prices: [{ id: x.id, price: v }] }).then(function (d) {
-        if (!d.ok) { toast(shopTrouble(d, "save")); drawShop(); return; }
-        var now = d.shop.items.filter(function (y) { return y.id === x.id; })[0] || x;
-        shopSaved(d, said || (shopSquare() && now.sqPrice != null && now.price === now.sqPrice ? "Price saved. It matches Square." : words.priced));
-      });
-    };
-    // after Tab has moved on, so the next price box keeps the cursor
-    price.onchange = function () { var v = price.value.trim(); if (v !== dollars(x.price)) setTimeout(function () { save(v); }, 0); };
-    price.onkeydown = function (e) { if (e.key === "Enter") { e.preventDefault(); price.blur(); } else if (e.key === "Escape") { price.value = dollars(x.price); price.blur(); } };
-    var sub = [x.kind === "class" ? classWhen(x.when) || "Class" : "", x.kind === "class" ? x.seats : ""].filter(Boolean).join(" · ") || x.desc || "";
-    var open = spEdit && spEdit.id === x.id;
-    return h("li", { class: "sp-row" + (x.show === "hidden" ? " off" : "") + (open ? " open" : "") }, [shopPhotoButton(x),
-      h("div", { class: "sp-what" }, [h("b", { text: x.name }), sub ? h("span", { class: "sp-m", text: sub }) : null, spLink === x.id ? linkEditor(x) : linkLine(x)]),
-      h("div", { class: "sp-price" }, [h("label", { class: "sp-box" + (off ? " diff" : "") }, [h("span", { "aria-hidden": "true", text: "$" }), price]),
-        x.was != null ? h("span", { class: "sp-m", text: "Was " + money(x.was) }) : null,
-        off ? h("span", { class: "sp-diff" }, ["Square charges " + money(x.sqPrice) + " · ",
-          h("button", { type: "button", text: "Use " + money(x.sqPrice), onclick: function () { save(dollars(x.sqPrice), "Price saved. It matches Square."); } })]) : null]),
-      shopSwitch(x),
-      open ? null : h("button", { class: "sp-btn", type: "button", text: "Change", "aria-label": "Change " + x.name, onclick: function () { editShopItem(x); } })]);
+  // A photo for the manager ("/api/shop/pic?key=..." or a website photo through "/api/shop/peek?..."), read as a file
+  // so their page's policy never needs SW Core's address for images, and kept for Photos below.
+  function shopImage(path) {
+    return spPics[path] = spPics[path] || (spDemo ? Promise.resolve(spDemo.image(path))
+      : fetch(API + path).then(function (r) { return r.ok ? r.blob() : null; }).then(function (b) { return b ? keepBlob(b) : ""; }, function () { return ""; }));
   }
-  // The picture in each row is also how it's added or changed: tap it to choose a photo, or drop one on it.
-  // It goes up straight away.
-  function shopPhotoButton(x) {
-    var b = h("button", { class: "sp-pic" + (x.photo ? "" : " none"), type: "button", "aria-label": (x.photo ? "Change the photo of " : "Add a photo of ") + x.name },
-      x.photo ? [h("span", { class: "sp-pic-say", text: "Change" })] : [icon("photo"), h("span", { class: "sp-pic-say", text: "Add photo" })]);
-    if (x.photo) shopPic(x.photo).then(function (u) { if (u) b.style.backgroundImage = 'url("' + u + '")'; });
-    var take = function (file) {
-      if (!file) return;
-      var no = photoProblem(file); if (no) { toast(no); return; }
-      b.disabled = true; b.classList.add("busy");
-      shopPhoto(x.id, file).then(function (d) {
-        if (!d.ok) { toast("The photo didn't upload. " + shopTrouble(d, "upload")); drawShop(); return; }
-        shopSaved(d, "Photo saved. Your website shows it within a minute.");
-      });
-    };
-    b.onclick = function () { pickPhoto(take); };
-    dropPhoto(b, take);
-    return b;
+  // Photos: every item's photos in one .zip, each named after its item ("Plant Bar", "Plant Bar 2", ...).
+  function shopPhotos(btn) {
+    var all = [];
+    spShop.items.forEach(function (x) { (x.photos || []).forEach(function (p, i) { all.push({ title: x.name + (i ? " " + (i + 1) : ""), src: shopImage("/api/shop/pic?key=" + encodeURIComponent(p.key)) }); }); });
+    if (!all.length) { toast("No photos yet. Add them to your items first."); return; }
+    downloadAll(all, fileName((NAME || "your") + " shop photos", "zip"), btn);
   }
-  function pickPhoto(take) { var f = h("input", { type: "file", accept: "image/jpeg,image/png,image/webp" }); f.onchange = function () { take(f.files[0]); }; f.click(); }
-  // A photo dropped on this spot comes here, not to the note boxes around it.
-  function dropPhoto(spot, take) {
-    spot.addEventListener("dragover", function (e) { if (!hasFiles(e)) return; e.preventDefault(); e.stopPropagation(); e.dataTransfer.dropEffect = "copy"; spot.classList.add("over"); });
-    spot.addEventListener("dragleave", function () { spot.classList.remove("over"); });
-    spot.addEventListener("drop", function (e) { if (!hasFiles(e)) return; e.preventDefault(); e.stopPropagation(); spot.classList.remove("over"); take(e.dataTransfer.files[0]); });
-  }
-  // Under the name: whose checkout the Buy button opens, and Change link right beside it.
-  function linkLine(x) {
-    var words = shopKind(), via = x.via || "Square";
-    var change = function () { spLink = x.id; spLinkOn = false; spEdit = null; drawShop(); var i = document.querySelector("[data-shop-portal] .sp-lin"); if (i) { i.focus(); i.select(); } };
-    return h("span", { class: "sp-links" }, x.link
-      ? [h("a", { class: "sp-sq", href: x.link, target: "_blank", rel: "noopener", "aria-label": "Open the " + via + " checkout for " + x.name + " (new tab)" }, [via + " checkout", icon("ext")]),
-         h("button", { class: "sp-relink", type: "button", text: "Change link", "aria-label": "Change the checkout link for " + x.name, onclick: change })]
-      : [h("button", { class: "sp-link", type: "button", text: words.add, "aria-label": words.add + " for " + x.name, onclick: change })]);
-  }
-  // The checkout link, changed right in its row: Enter or Save keeps it, Esc or Cancel leaves it as it was.
-  // Opened by switching an item on without a link, saving the link also switches it on.
-  function linkEditor(x) {
-    var words = shopKind(), err = h("span", { class: "sp-lerr", role: "alert", hidden: true });
-    var box = h("input", { class: "sp-lin", inputmode: "url", autocomplete: "off", autocapitalize: "off", spellcheck: "false", placeholder: words.ph, "aria-label": words.link + " for " + x.name });
-    box.value = x.link || "";
-    var go = h("button", { class: "sp-mini go", type: "submit", text: spLinkOn ? "Save and switch on" : "Save" });
-    // back on the button that opened it: Change link, or Add the link when it has none
-    var cancel = function () {
-      spLink = null; spLinkOn = false; drawShop();
-      var q = function (label) { return '[data-shop-portal] [aria-label="' + label.replace(/["\\]/g, "\\$&") + '"]'; };
-      var b = document.querySelector(q("Change the checkout link for " + x.name) + "," + q(words.add + " for " + x.name)); if (b) b.focus();
-    };
-    box.onkeydown = function (e) { if (e.key === "Escape") { e.preventDefault(); cancel(); } };
-    return h("form", { class: "sp-linkedit", onsubmit: function (e) {
-      e.preventDefault(); err.hidden = true; go.disabled = true;
-      var link = box.value.trim(), on = spLinkOn && link;
-      shopCall("/item", { item: shopFields(x, on ? { link: link, show: "live" } : { link: link }) }).then(function (d) {
-        go.disabled = false;
-        if (!d.ok) { err.textContent = shopTrouble(d, "save"); err.hidden = false; box.focus(); return; }
-        spLink = null; spLinkOn = false;
-        shopSaved(d, !link ? "Link removed." : on ? "Link saved and switched to Active. Your website shows it within a minute."
-          : x.show === "hidden" ? "Link saved. Switch it to Active when you're ready." : "Link saved. The Buy button opens it within a minute.");
-      });
-    } }, [h("span", { class: "sp-lrow" }, [box, go, h("button", { class: "sp-mini", type: "button", text: "Cancel", onclick: cancel })]), err,
-      h("span", { class: "sp-lhelp", text: words.help })]);
-  }
-  // Active or Inactive, one switch per row. Switching on needs a checkout link (the service asks for one too).
-  function shopSwitch(x) {
-    var on = x.show !== "hidden", tip = "sp-tip-" + x.id;
-    var box = h("input", { type: "checkbox", role: "switch", "aria-label": x.name + " on your website", "aria-describedby": tip });
-    box.checked = on;
-    box.onchange = function () {
-      if (box.checked && !x.link) {
-        box.checked = false; toast(shopKind().need); spLink = x.id; spLinkOn = true; spEdit = null; drawShop();
-        var i = document.querySelector("[data-shop-portal] .sp-lin"); if (i) i.focus();
-        return;
-      }
-      box.disabled = true;
-      shopCall("/item", { item: shopFields(x, { show: box.checked ? "live" : "hidden" }) }).then(function (d) {
-        if (!d.ok) { toast(shopTrouble(d, "save")); drawShop(); return; }
-        shopSaved(d, box.checked ? "Active. Your website shows it within a minute." : "Inactive. It's off your website within a minute and stays saved here.");
-      });
-    };
-    return h("div", { class: "sp-on" }, [
-      h("label", { class: "sp-sw" }, [box, h("span", { class: "sp-track", "aria-hidden": "true" }),
-        h("span", { class: "sp-sw-w", text: x.show === "sold" ? "Sold out" : on ? "Active" : "Inactive" })]),
-      tipButton(SHOP_SWITCH_TIP, tip)]);
-  }
-  // A small "?" that shows a few words on hover, on focus, or on a tap (a second tap, Esc or a tap elsewhere hides them).
-  function tipButton(text, id) {
-    var wrap = h("span", { class: "sp-tipw" }), q = h("button", { class: "sp-q", type: "button", "aria-label": "What Active and Inactive mean", "aria-expanded": "false" }, [icon("help")]);
-    var shut = function () { wrap.classList.remove("show"); q.setAttribute("aria-expanded", "false"); document.removeEventListener("click", away, true); };
-    var away = function (e) { if (!wrap.contains(e.target)) shut(); };
-    q.onclick = function () { if (wrap.classList.toggle("show")) { q.setAttribute("aria-expanded", "true"); document.addEventListener("click", away, true); } else shut(); };
-    q.onkeydown = function (e) { if (e.key === "Escape") shut(); };
-    wrap.appendChild(q); wrap.appendChild(h("span", { class: "sp-tip", role: "tooltip", id: id, text: text }));
-    return wrap;
-  }
-  // Add or change one item. Up front: the photo, the name, the price, the checkout link and Active. The rest
-  // (kind, category, sale price, words, a class's date and seats, Sold out) waits under More options.
-  function shopForm() {
-    var s = spEdit, isNew = !s.id, words = shopKind(), file = null, preview = "";
-    var input = function (id, value, props) { props.id = id; props.autocomplete = "off"; var i = h("input", props); i.value = value || ""; return i; };
-    var field = function (label, el, help, cls) { return h("div", { class: "sp-f" + (cls ? " " + cls : "") }, [h("label", { for: el.id, text: label }), el, help ? h("small", { text: help }) : null]); };
-    var cats = (spShop.items || []).map(function (x) { return x.cat; }).filter(function (c, i, all) { return c && all.indexOf(c) === i; });
-    var name = input("sp-name", s.name, { maxlength: "100", placeholder: "What it's called" }),
-        price = input("sp-price", dollars(s.price), { inputmode: "decimal", placeholder: "18.00" }),
-        link = input("sp-link", s.link, { inputmode: "url", placeholder: words.ph, autocapitalize: "off", spellcheck: "false" }),
-        was = input("sp-was", dollars(s.was), { inputmode: "decimal", placeholder: "Leave empty" }),
-        cat = input("sp-cat", s.cat, { maxlength: "60", list: "sp-cats", placeholder: cats[0] || "Bread" }),
-        when = input("sp-when", s.when, { type: "datetime-local" }),
-        seats = input("sp-seats", s.seats, { maxlength: "40", placeholder: "8 seats" }),
-        desc = h("textarea", { id: "sp-desc", rows: "2", maxlength: "400", placeholder: "One or two lines your website shows under the name." }),
-        active = h("input", { type: "checkbox", role: "switch", id: "sp-active", "aria-describedby": "sp-active-say" }),
-        sold = h("input", { type: "checkbox", id: "sp-sold" }),
-        err = h("p", { class: "rq-err", role: "alert", hidden: true }),
-        go = h("button", { class: "rq-go", type: "submit", text: isNew ? "Add it" : "Save" });
-    desc.value = s.desc || ""; active.checked = s.show !== "hidden"; sold.checked = s.show === "sold";
-    // the kind: something to buy or a class; a class also gets its date and seats
-    var kinds = h("div", { class: "sp-kinds", role: "radiogroup", "aria-label": "Kind" }), kind = s.kind === "class" ? "class" : "item";
-    var classBits = h("div", { class: "sp-class", hidden: kind !== "class" }, [field("Date and time", when, "When it starts."), field("Seats", seats, words.seats)]);
-    [["item", "Something to buy"], ["class", "A class or workshop"]].forEach(function (k) {
-      var r = h("input", { type: "radio", name: "sp-kind", value: k[0], id: "sp-kind-" + k[0] }); r.checked = kind === k[0];
-      r.onchange = function () { kind = k[0]; classBits.hidden = kind !== "class"; };
-      kinds.appendChild(h("label", { class: "sp-kind", for: r.id }, [r, h("span", { text: k[1] })]));
-    });
-    // the photo: tap the square to choose one, or drop it there; it shows straight away and goes up with Save
-    var pic = h("button", { class: "sp-drop" + (s.photo ? " has" : ""), type: "button", "aria-label": s.photo ? "Change the photo" : "Add a photo" });
-    var paint = function () {
-      pic.textContent = "";
-      if (preview || s.photo) pic.appendChild(h("span", { class: "sp-drop-say", text: "Change photo" }));
-      else { pic.appendChild(icon("photo")); pic.appendChild(h("b", { text: "Add a photo" })); pic.appendChild(h("span", { text: "Tap to choose one, or drop it here" })); }
-      pic.classList.toggle("has", !!(preview || s.photo));
-    };
-    var take = function (f) {
-      if (!f) return;
-      var no = photoProblem(f); if (no) { err.textContent = no; err.hidden = false; return; }
-      err.hidden = true; file = f; if (preview) URL.revokeObjectURL(preview); preview = URL.createObjectURL(f);
-      pic.style.backgroundImage = 'url("' + preview + '")'; paint();
-    };
-    if (s.photo) shopPic(s.photo).then(function (u) { if (u && !preview) pic.style.backgroundImage = 'url("' + u + '")'; });
-    pic.onclick = function () { pickPhoto(take); };
-    dropPhoto(pic, take); paint();
-    // the link: Test it opens what was typed, once it looks like an address
-    var test = h("a", { class: "sp-test", target: "_blank", rel: "noopener", hidden: true }, ["Test the link", icon("ext")]);
-    var testable = function () { var v = link.value.trim(); test.hidden = !/^(https:\/\/)?[\w-]+(\.[\w-]+)+\/\S*/i.test(v); test.href = /^https:/i.test(v) ? v : "https://" + v; };
-    link.oninput = testable; testable();
-    var activeSay = h("small", { id: "sp-active-say" });
-    var sayActive = function () { activeSay.textContent = active.checked ? (sold.checked ? "On your website, marked sold out, with no Buy button." : "On your website with its Buy button.") : "Saved here, not on your website. Switch it on when it's ready."; };
-    active.onchange = sold.onchange = sayActive; sayActive();
-    var more = h("details", { class: "sp-more" }, [h("summary", { text: "More options: kind, category, sale price, description, sold out" }),
-      h("div", { class: "sp-fields" }, [
-        h("div", { class: "sp-f wide" }, [h("span", { class: "sp-lbl", text: "Kind" }), kinds]), classBits,
-        field("Category", cat, "Groups things on your website. Pick one you use, or type a new one.", ""),
-        field("Was (optional)", was, "A higher price shown crossed out, for a sale.", ""),
-        field("Description", desc, "", "wide"),
-        h("label", { class: "sp-check wide", for: "sp-sold" }, [sold, h("span", {}, [h("b", { text: "Sold out" }), " Shown on your website without a Buy button."])])])]);
-    if (!isNew && (s.kind === "class" || s.cat || s.was != null || s.desc || s.show === "sold")) more.open = true;
-    var problem = function (text, at) { err.textContent = text; err.hidden = false; go.disabled = false; if (at) at.focus(); };
-    var done = function (d, said) { if (preview) URL.revokeObjectURL(preview); spEdit = null; spDel = false; shopSaved(d, said); };
-    var close = function () { var id = s.id; if (preview) URL.revokeObjectURL(preview); spEdit = null; spDel = false; drawShop(); var back = document.querySelector(id ? '[data-shop-portal] [aria-label="Change ' + (s.name || "").replace(/["\\]/g, "\\$&") + '"]' : "[data-shop-add]"); if (back) back.focus(); };
-    var del = isNew ? null : spDel
-      ? h("span", { class: "sp-sure" }, [h("span", { text: "Take it off your shop and your website?" }),
-          h("button", { class: "sp-del", type: "button", text: "Yes, delete", onclick: function () {
-            shopCall("/item/delete", { id: s.id }).then(function (d) { if (!d.ok) { toast(shopTrouble(d, "delete")); return; } done(d, "Deleted. It's off your website within a minute."); });
-          } }),
-          h("button", { class: "rq-no", type: "button", text: "Keep it", onclick: function () { spDel = false; drawShop(); } })])
-      : h("button", { class: "sp-del", type: "button", text: "Delete", onclick: function () { spDel = true; drawShop(); var y = document.querySelector("[data-shop-portal] .sp-sure .sp-del"); if (y) y.focus(); } });
-    return h("form", { class: "sp-form", "aria-label": isNew ? "Add an item" : "Change " + s.name, onsubmit: function (e) {
-      e.preventDefault(); err.hidden = true;
-      if (!name.value.trim()) return problem("Give it a name first.", name);
-      if (active.checked && !link.value.trim()) return problem(words.need, link);
-      var show = !active.checked ? "hidden" : sold.checked ? "sold" : "live";
-      go.disabled = true;
-      shopCall("/item", { item: { id: s.id, name: name.value, kind: kind, price: price.value, was: was.value, link: link.value, cat: cat.value,
-        when: kind === "class" ? when.value : "", seats: kind === "class" ? seats.value : "", show: show, desc: desc.value } }).then(function (d) {
-        if (!d.ok) return problem(shopTrouble(d, "save"));
-        var said = show === "hidden" ? (isNew ? "Added. It's inactive, off your website, until you switch it on." : "Saved.") : (isNew ? "Added. " : "Saved. ") + "Your website shows it within a minute.";
-        if (!file) return done(d, said);
-        spShop = d.shop; s.id = d.item.id;   // saved; if the photo fails the form stays open on the saved item
-        shopPhoto(d.item.id, file).then(function (p) {
-          if (!p.ok) { spEdit = JSON.parse(JSON.stringify(d.item)); drawShop(); toast("Saved, but the photo didn't upload. " + shopTrouble(p, "upload")); return; }
-          done(p, said);
-        });
-      });
-    } }, [
-      h("div", { class: "sp-hd2" }, [h("h3", { text: isNew ? "Add an item" : "Change " + s.name }), h("p", { text: words.says })]),
-      h("div", { class: "sp-top" }, [pic,
-        h("div", { class: "sp-fields" }, [
-          field("Name", name, "What your website calls it.", "wide"),
-          h("div", { class: "sp-f" }, [h("label", { for: "sp-price", text: "Price" }), h("label", { class: "sp-box" }, [h("span", { "aria-hidden": "true", text: "$" }), price]),
-            h("small", { text: shopSquare() && s.sqPrice != null ? "Square charges " + money(s.sqPrice) + "." : "What your website shows. Empty shows no price." })]),
-          h("div", { class: "sp-f" }, [h("span", { class: "sp-lblrow" }, [h("label", { for: "sp-link", text: words.link }), test]), link, h("small", { text: words.help })]),
-          h("div", { class: "sp-f wide sp-activef" }, [h("label", { class: "sp-sw", for: "sp-active" }, [active, h("span", { class: "sp-track", "aria-hidden": "true" }), h("b", { text: "Active" })]), activeSay])])]),
-      more,
-      cats.length ? h("datalist", { id: "sp-cats" }, cats.map(function (c) { return h("option", { value: c }); })) : null,
-      err,
-      h("div", { class: "sp-ft" }, [del, h("span", { class: "gap" }), h("button", { class: "rq-no", type: "button", text: "Cancel", onclick: close }), go])]);
-  }
-  // A photo goes up as the raw file, like the photos in their notes.
-  function shopPhoto(id, file) {
-    if (DEMO) return new Promise(function (done) {
-      var r = new FileReader();
-      r.onload = function () { spShop.items.forEach(function (x) { if (x.id === id) x.photo = r.result; }); done({ ok: true, shop: spShop }); };
-      r.readAsDataURL(file);
-    });
-    return api("/api/my-shop/pic?id=" + encodeURIComponent(id), { token: getToken(), raw: file, type: file.type });
-  }
-  // Demo only: a made-up bakery with a Square shop, kept in this page, with the service's own checks.
-  function demoShopCall(path, b) {
-    if (!spShop) {
-      var two = function (n) { return (n < 10 ? "0" : "") + n; };
-      var d = function (n, hr) { var t = new Date(Date.now() + n * 864e5); return t.getFullYear() + "-" + two(t.getMonth() + 1) + "-" + two(t.getDate()) + "T" + two(hr) + ":00"; };
-      spShop = { items: [
-        { id: "s1", name: "Sourdough loaf", kind: "item", cat: "Bread", desc: "Baked Friday mornings.", price: 900, sqPrice: 900, show: "live", link: "https://square.link/u/demo1", photo: "demo1" },
-        { id: "s2", name: "Rye sandwich loaf", kind: "item", cat: "Bread", desc: "", price: 1000, show: "live", link: "https://square.link/u/demo2", photo: "demo2" },
-        { id: "s3", name: "Pecan pie", kind: "item", cat: "Holiday", desc: "Order by Nov 24.", price: 3200, was: 3600, sqPrice: 3000, show: "live", link: "https://square.link/u/demo3", photo: "demo3" },
-        { id: "s4", name: "Gift card, $25", kind: "item", cat: "Holiday", desc: "", price: 2500, show: "hidden", link: "" },
-        { id: "s5", name: "Bread baking class", kind: "class", cat: "Classes", desc: "", price: 6500, show: "live", when: d(12, 10), seats: "8 seats", link: "https://square.link/u/demo5", photo: "demo4" },
-        { id: "s6", name: "Holiday cookie class", kind: "class", cat: "Classes", desc: "", price: 4500, show: "sold", when: d(20, 14), seats: "Full", link: "https://square.link/u/demo6", photo: "demo5" } ] };
-    }
-    var cents = function (v) { if (v === "" || v == null) return null; var n = Number(String(v).replace(/[$,\s]/g, "")); return isFinite(n) && n >= 0 ? Math.round(n * 100) : undefined; };
-    var no = function (error) { return { ok: false, status: 400, error: error }; };
-    if (path === "") return { ok: true, shop: spShop };
-    if (path === "/prices") {
-      var p = b.prices[0], it = spShop.items.filter(function (x) { return x.id === p.id; })[0], c = cents(p.price);
-      if (c === undefined) return no("That price doesn't look right. Type it like 12.50.");
-      it.price = c; return { ok: true, shop: spShop };
-    }
-    if (path === "/item/delete") { spShop.items = spShop.items.filter(function (x) { return x.id !== b.id; }); return { ok: true, shop: spShop }; }
-    var i = b.item, old = spShop.items.filter(function (x) { return x.id === i.id; })[0], link = String(i.link || "").trim();
-    if (link && !/^(https:\/\/)?(square\.link|[\w-]+\.square\.site|([\w-]+\.)?squareup\.com)\//i.test(link)) return no("The checkout link must be a Square link, like square.link/u/…, so every payment goes through Square.");
-    if (cents(i.price) === undefined || cents(i.was) === undefined) return no("That price doesn't look right. Type it like 12.50.");
-    var item = { id: old ? old.id : "d" + Date.now(), name: i.name.trim(), kind: i.kind, cat: i.cat.trim(), desc: i.desc.trim(), price: cents(i.price), link: link ? (/^https:/.test(link) ? link : "https://" + link) : "", show: i.show };
-    if (cents(i.was) != null) item.was = cents(i.was);
-    if (i.kind === "class") { if (i.when) item.when = i.when; if (i.seats) item.seats = i.seats; }
-    if (old) { if (old.photo) item.photo = old.photo; if (old.sqPrice != null) item.sqPrice = old.sqPrice; spShop.items[spShop.items.indexOf(old)] = item; } else spShop.items.push(item);
-    return { ok: true, item: item, shop: spShop };
+  // Demo only: a made-up bakery with a Square shop, kept in this page and answered by the manager's own demo.
+  function demoShop() {
+    var two = function (n) { return (n < 10 ? "0" : "") + n; };
+    var d = function (n, hr) { var t = new Date(Date.now() + n * 864e5); return t.getFullYear() + "-" + two(t.getMonth() + 1) + "-" + two(t.getDate()) + "T" + two(hr) + ":00"; };
+    var pics = function (name, keys) { return keys.map(function (k, i) { return { key: k, alt: i ? name + ", another view" : name }; }); };
+    return { checkout: "square", updated: new Date(Date.now() - 2 * 36e5).toISOString(), by: "sw", history: [], items: [
+      { id: "s1", name: "Sourdough loaf", kind: "item", cat: "Bread", desc: "Baked Friday mornings.", price: 900, sqPrice: 900, show: "live", link: "https://square.link/u/demo1", photos: pics("Sourdough loaf", ["demo1", "demo2"]), tag: "featured" },
+      { id: "s2", name: "Rye sandwich loaf", kind: "item", cat: "Bread", desc: "", price: 1000, show: "live", link: "https://square.link/u/demo2", photos: pics("Rye sandwich loaf", ["demo3"]) },
+      { id: "s3", name: "Pecan pie", kind: "item", cat: "Holiday", desc: "Order by Nov 24.", price: 3600, sale: { price: 3200 }, sqPrice: 3000, show: "live", link: "https://square.link/u/demo3", photos: pics("Pecan pie", ["demo4"]),
+        options: [{ name: "Size", choices: [{ name: "9 inch" }, { name: "Mini, box of 4", price: 2400 }] }] },
+      { id: "s4", name: "Gift card, $25", kind: "item", cat: "Holiday", desc: "", price: 2500, show: "hidden", link: "", photos: [] },
+      { id: "s5", name: "Bread baking class", kind: "class", cat: "Classes", desc: "", price: 6500, show: "live", when: d(12, 10), seats: "8 seats", link: "https://square.link/u/demo5", photos: pics("Bread baking class", ["demo5"]), tag: "new" },
+      { id: "s6", name: "Holiday cookie class", kind: "class", cat: "Classes", desc: "", price: 4500, show: "sold", when: d(20, 14), seats: "Full", link: "https://square.link/u/demo6", photos: pics("Holiday cookie class", ["demo2"]) } ] };
   }
 
   // Photos dragged from the computer straight onto a box on their page: the box lights up

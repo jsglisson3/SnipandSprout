@@ -29,7 +29,7 @@ mkdirSync(dist + 'portal', { recursive: true });
 cpSync(here + 'img', dist + 'img', { recursive: true });
 cpSync(here + 'fonts', dist + 'fonts', { recursive: true });
 cpSync(here + 'portal-brand', dist + 'portal/brand', { recursive: true });
-for (const f of ['site-notes.js', 'html2canvas.min.js', 'shop.js', 'shop.css']) cpSync(here + 'vendor/' + f, dist + f);
+for (const f of ['site-notes.js', 'shop-manager.js', 'shop-manager.css', 'html2canvas.min.js', 'shop.js', 'shop.css']) cpSync(here + 'vendor/' + f, dist + f);
 
 const C = {
   url: 'https://snipandsprout.pages.dev/',           // the site's address: her own domain at launch (see README, Launch)
@@ -676,7 +676,7 @@ writeFileSync(dist + 'workshop.ics', ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:
   'UID:nov-2026-terrarium-workshop@snipandsproutco.com', 'DTSTAMP:20261115T000000Z', 'DTSTART:20261122T190000Z', 'DTEND:20261122T200000Z',
   'SUMMARY:November Terrarium Workshop at Snip & Sprout Co.', 'LOCATION:413 E. Emma Ave.\\, Springdale\\, AR 72764',
   'DESCRIPTION:Starts at 1 PM. Seating is limited.', 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n'));
-for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-tag.svg', 'shop-scene.svg', '_headers']) cpSync(here + 'src/' + f, dist + f);
+for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-tag.svg', 'shop-scene.svg', 'leaves.svg', '_headers']) cpSync(here + 'src/' + f, dist + f);
 // The list of pages for search engines (not the 404 page or the portal), named at the end of robots.txt.
 writeFileSync(dist + 'sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${
   [...written.keys()].filter((f) => f !== '404.html').map((f) => `  <url><loc>${url(f)}</loc></url>`).join('\n')}\n</urlset>\n`);
