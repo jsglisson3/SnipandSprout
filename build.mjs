@@ -263,11 +263,11 @@ page({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plants, po
   desc: 'An indoor plant boutique at 413 E. Emma Ave. in downtown Springdale. Plants, pottery, a walk-in Plant Bar, a Terrarium Bar, take-home kits and workshops.' }, `<main id="main">
 <section class="hero hero--home" aria-labelledby="top-title">
   <div class="hero__text">
-    <p class="kicker" data-in>Welcome to Snip &amp; Sprout Co.!</p>
-    <h1 class="hero__title" id="top-title" data-in>Where your love for plants grows even deeper.</h1>
-    <p class="hero__lede" data-in>From lush indoor plants to hand-picked propagated stems and the cutest plant accessories, we’ve got everything you need to green up your space.</p>
-    <div class="acts" data-in><a class="btn" href="shop.html">Shop ${I.arrow}</a>
-      <a class="link" href="#visit">Plan your visit</a></div>
+    <!-- Her words, as on her current home page (snipandsproutco.com) -->
+    <h1 class="hero__title" id="top-title" data-in>Plants that make a house feel like home</h1>
+    <p class="hero__lede" data-in>We’re Snip &amp; Sprout Co., an indoor plant boutique in Northwest Arkansas. Come in, take your time, and let us help you find something that will be happy in your window – and easy for you to keep.</p>
+    <div class="acts" data-in><a class="btn" href="#visit">Plan your visit ${I.arrow}</a>
+      <a class="link" href="workshops.html">Book a workshop</a></div>
   </div>
   <img class="hero__pic" src="img/dani-overalls.webp" width="1280" height="1920" alt="Dani in overalls holding up a potted plant, surrounded by plants" fetchpriority="high">
 </section>
@@ -531,7 +531,7 @@ page({ file: 'about.html', title: 'About Dani · Snip & Sprout Co.',
     <h1 class="hero__title" id="top-title" data-in>Hi everyone, I’m Dani!</h1>
     <p class="hero__lede" data-in>A little shop rooted in the love of plants and community. In downtown Springdale since August 2026.</p>
     <ul class="trio" role="list" data-in><li>Slow down.</li><li>Learn something new.</li><li>Get your hands dirty.</li></ul>
-    <div class="acts" data-in><a class="btn" href="visit.html">Plan your visit ${I.arrow}</a>
+    <div class="acts" data-in><a class="btn" href="#visit">Plan your visit ${I.arrow}</a>
       <a class="link" href="workshops.html">See workshops</a></div>
   </div>
 </section>

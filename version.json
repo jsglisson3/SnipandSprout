@@ -1,6 +1,8 @@
 {
-  "version": "V7.6",
+  "version": "V7.8",
   "changes": [
+    { "version": "V7.8", "date": "2026-11-17", "note": "Client Portal: Contact info, Shop hours and Your social pages are each one tidy list, every row the same height, and each social page has its own logo beside its name (Instagram, Etsy, Facebook, Google)." },
+    { "version": "V7.7", "date": "2026-11-17", "note": "Home opens in her own words from her current site: Plants that make a house feel like home, her welcome, and Plan your visit and Book a workshop. Visit Us: the photo of Dani at the shop window shows her face." },
     { "version": "V7.6", "date": "2026-11-17", "note": "Client Portal: Your shop is the same shop manager Stray Wolf uses: every item in one list with its photo, price and whether it shows on the website; add, change, sale prices, photos, Undo and a list of changes, download the photos or a spreadsheet. Needs SW Core 2.2." },
     { "version": "V7.5", "date": "2026-11-17", "note": "Home opens tighter: her welcome sits closer under the logo tag and the photo is a little shorter, so the words and the photo line up. Every page gets a very faint leaf pattern and a soft sage wash across the top, so the cream reads less like empty white." },
     { "version": "V7.4", "date": "2026-11-17", "note": "Client Portal: On your site now has a button for each page of the website (All, then each page), with how many photos each has. Tap one to see only that page's photos; Download these saves just those." },

@@ -47,6 +47,10 @@
  *     data-note-fields="Facebook|Instagram"         one line to fill in for each
  *     data-note-now="Phone=423-555-0100|Email=..."  what's on the site now: those lines show the
  *                   current value with a Change button, so they only type what's new
+ *     A fields list naming social sites (Instagram, Etsy, Google...) shows each with its own logo.
+ *   data-brand="instagram"  on any element (a row of "On your site now"): puts that site's logo before
+ *                   its words (Facebook, Instagram, LinkedIn, Google, Etsy, TikTok, YouTube, Pinterest, X;
+ *                   any other name gets a plain link logo)
  * "Show me on the site": a page opened with #sw-find={...} (the admin builds it from a note's
  *   sel/path/fx/fy/snip) scrolls to that spot and rings it. Each note sends url, sel, path,
  *   fx, fy, py (how far down the page, 0 to 1), snip (its words) and vw (screen width), plus
@@ -211,17 +215,39 @@
     clip: ["M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"],
     calendar: ["M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z", "M16 3v4", "M8 3v4", "M3 10h18"]
   };
-  // Social sites the portal knows by name: their own colors, logo and an example of the address to paste.
+  // Social sites the portal knows by name: the site's own logo (drawn in a 24 by 24 box), the name it goes by when
+  // that isn't the field's own ("Google" = Google business), and an example of the address to paste. A social page
+  // it doesn't know gets LINK_LOGO. Logo shapes: Simple Icons (CC0), the Google "G" from Google's own mark.
   var BRANDS = {
-    facebook: { bg: "#1877F2", ph: "facebook.com/yourpage",
-      svg: '<path fill="#fff" d="M13.6 21v-7.4h2.5l.4-2.9h-2.9V8.9c0-.8.2-1.4 1.4-1.4h1.6V4.9c-.3 0-1.2-.1-2.3-.1-2.3 0-3.8 1.4-3.8 3.9v2.1H8v2.9h2.5V21z"/>' },
-    instagram: { bg: "radial-gradient(circle at 30% 107%,#fdf497 0%,#fdf497 5%,#fd5949 45%,#d6249f 60%,#285AEB 90%)", ph: "instagram.com/yourname",
-      svg: '<g fill="none" stroke="#fff" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="4.5"/><circle cx="12" cy="12" r="3.8"/></g><circle cx="16.8" cy="7.2" r="1.2" fill="#fff"/>' },
-    linkedin: { bg: "#0A66C2", ph: "linkedin.com/company/yourname",
-      svg: '<g fill="#fff"><circle cx="7" cy="6.8" r="1.8"/><rect x="5.5" y="9.6" width="3" height="9.4" rx=".4"/><path d="M10.8 9.6h2.9v1.3c.5-.9 1.6-1.6 3.1-1.6 2.5 0 3.4 1.6 3.4 4.2V19h-3v-4.9c0-1.3-.3-2.2-1.6-2.2s-1.8.9-1.8 2.2V19h-3z"/></g>' },
-    google: { bg: "#fff", ph: "Your Google Maps or business link",
-      svg: '<g fill="none" stroke-width="3.2"><path stroke="#EA4335" d="M16.95 7.05A7 7 0 0 0 5.94 8.5"/><path stroke="#FBBC05" d="M5.94 8.5A7 7 0 0 0 5.94 15.5"/><path stroke="#34A853" d="M5.94 15.5A7 7 0 0 0 16.95 16.95"/><path stroke="#4285F4" d="M16.95 16.95A7 7 0 0 0 19 12H12"/></g>' }
+    facebook: { ph: "facebook.com/yourpage",
+      svg: '<circle cx="12" cy="12" r="11" fill="#fff"/><path fill="#0866FF" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/>' },
+    instagram: { ph: "instagram.com/yourname",
+      svg: '<radialGradient id="swn-ig" cx=".3" cy="1.07" r="1.5"><stop offset=".05" stop-color="#fdf497"/><stop offset=".45" stop-color="#fd5949"/><stop offset=".6" stop-color="#d6249f"/><stop offset=".9" stop-color="#285aeb"/></radialGradient><rect width="24" height="24" rx="6" fill="url(#swn-ig)"/><path fill="#fff" transform="translate(4.5 4.5) scale(.625)" d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/>' },
+    linkedin: { ph: "linkedin.com/company/yourname",
+      svg: '<rect x="2" y="2" width="20" height="20" fill="#fff"/><path fill="#0A66C2" d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>' },
+    google: { name: "Google business", ph: "Your Google Maps or business link",
+      svg: '<path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>' },
+    etsy: { ph: "etsy.com/shop/yourshop",
+      svg: '<rect width="24" height="24" rx="6" fill="#F1641E"/><path fill="#fff" transform="translate(6 6) scale(.5)" d="M8.559 2.445c0-.325.033-.52.59-.52h7.465c1.3 0 2.02 1.11 2.54 3.193l.42 1.666h1.27c.23-4.728.43-6.784.43-6.784s-3.196.36-5.09.36H6.635L1.521.196v1.37l1.725.326c1.21.24 1.5.496 1.6 1.606 0 0 .11 3.27.11 8.64 0 5.385-.09 8.61-.09 8.61 0 .973-.39 1.333-1.59 1.573l-1.722.33V24l5.13-.165h8.55c1.935 0 6.39.165 6.39.165.105-1.17.75-6.48.855-7.064h-1.2l-1.284 2.91c-1.005 2.28-2.476 2.445-4.11 2.445h-4.906c-1.63 0-2.415-.64-2.415-2.05V12.8s3.62 0 4.79.096c.912.064 1.463.325 1.76 1.598l.39 1.695h1.41l-.09-4.278.192-4.305h-1.391l-.45 1.89c-.283 1.244-.48 1.47-1.754 1.6-1.666.17-4.815.14-4.815.14V2.45h-.05z"/>' },
+    tiktok: { name: "TikTok", ph: "tiktok.com/@yourname",
+      svg: '<rect width="24" height="24" rx="6" fill="#000"/><g transform="translate(5.5 5) scale(.58)"><path id="swn-tt" fill="#25F4EE" transform="translate(-.9 -.9)" d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/><use href="#swn-tt" fill="#FE2C55" transform="translate(1.8 1.8)"/><use href="#swn-tt" fill="#fff" transform="translate(.9 .9)"/></g>' },
+    youtube: { name: "YouTube", ph: "youtube.com/@yourname",
+      svg: '<path fill="#fff" d="M9 8l7 4-7 4z"/><path fill="#FF0000" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>' },
+    pinterest: { ph: "pinterest.com/yourname",
+      svg: '<circle cx="12" cy="12" r="11" fill="#fff"/><path fill="#E60023" d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.099.12.112.225.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.401.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.354-.629-2.758-1.379l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.607 0 11.985-5.365 11.985-11.987C23.97 5.39 18.592.026 11.985.026L12.017 0z"/>' },
+    x: { name: "X", ph: "x.com/yourname",
+      svg: '<rect width="24" height="24" rx="6" fill="#000"/><path fill="#fff" transform="translate(6 6) scale(.5)" d="M18.901 1.153h3.68l-8.04 9.19L24 22.846h-7.406l-5.8-7.584-6.638 7.584H.474l8.6-9.83L0 1.154h7.594l5.243 6.932ZM17.61 20.644h2.039L6.486 3.24H4.298Z"/>' }
   };
+  var LINK_LOGO = '<rect width="24" height="24" rx="6" fill="#ece7df"/><g fill="none" stroke="#5f5a53" stroke-width="2.6" stroke-linecap="round" transform="translate(4 4) scale(.667)">' +
+    '<path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></g>';
+  // The site a name means: "Instagram", "Google business", "Twitter" (now X). Null = not one this list knows.
+  function brandOf(name) { var k = String(name || "").toLowerCase().replace(/\s+business$/, "").trim(); return BRANDS[k === "twitter" ? "x" : k] || null; }
+  // A site's logo (or the plain link logo), in a <span> of the class given.
+  function brandLogo(b, cls) {
+    var t = document.createElement("span"); t.className = cls;
+    t.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">' + (b ? b.svg : LINK_LOGO) + "</svg>";
+    return t;
+  }
   // Other boxes a "fields" list often asks for: the keyboard a phone should show, and an example.
   // Any other name without its own example ("Label=example") gets a plain text box.
   var FIELD_KINDS = {
@@ -231,12 +257,6 @@
     area: { mode: "text", ph: "For example: Cleveland and Chattanooga" },
     website: { mode: "url", ph: "For example: yourbusiness.com" }
   };
-  function brandLogo(b) {
-    var t = document.createElement("span"); t.className = "logo"; t.style.background = b.bg;
-    if (b.bg === "#fff") t.style.boxShadow = "inset 0 0 0 1px #e2dcd2";
-    t.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true">' + b.svg + "</svg>";
-    return t;
-  }
   function icon(name, size) {
     var ns = "http://www.w3.org/2000/svg", s = document.createElementNS(ns, "svg");
     s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true"); s.setAttribute("class", "ic");
@@ -335,28 +355,30 @@
     ".card .ft{padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;background:var(--paper)}",
     ".num{display:inline-grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50% 50% 50% 6px;background:var(--accent);color:#fff;font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}",
     "label.q{font-weight:600;font-size:17px}",
-    ".fields{display:grid;gap:10px}.field{display:grid;grid-template-columns:96px 1fr;align-items:center;gap:10px}.field label{font-weight:600;font-size:16px}",
-    ".field input{font:inherit;font-size:17px;color:var(--ink);width:100%;min-width:0;min-height:50px;border:2px solid var(--line);border-radius:12px;padding:8px 12px;background:var(--soft)}",
-    ".field input:focus{outline:none;border-color:var(--accent);background:#fff}",
-    "@media (max-width:420px){.field{grid-template-columns:1fr;gap:4px}}.fields.stack .field{grid-template-columns:1fr;gap:4px}",
-    /* social pages: one roomy row per site, with that site's own logo and an example address */
-    ".fields.brands{gap:12px}",
-    ".field .lb{font-weight:600;font-size:16px}.field.brand .lb{font-size:17px;line-height:1.2}",
+    /* lines to fill in (Shop hours, Contact info...): one white list, a fine line between rows, each row its name then
+       what is on the site now (with Change) or a box to type in, all the same height */
+    ".fields{display:grid;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:clip}",   // clip, not hidden: a phone's short sheet scrolls it instead of squeezing it
+    ".field{display:grid;grid-template-columns:116px minmax(0,1fr);align-items:center;gap:6px 12px;min-height:58px;padding:7px 7px 7px 14px}",
+    ".field+.field{border-top:1px solid var(--line)}.field:focus-within{background:#fdfaf7}",
+    ".field .lb{font-weight:600;font-size:15.5px;line-height:1.25}",
+    ".field input{font:inherit;font-size:16.5px;color:var(--ink);width:100%;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--soft)}",
+    ".field input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(194,84,27,.12)}",
+    ".fields.stack .field{grid-template-columns:1fr;padding:10px 12px 12px 14px}",
+    "@media (max-width:480px){.field{grid-template-columns:96px minmax(0,1fr);column-gap:10px}.cur>svg{display:none}.cur .chg{padding:0 12px}}",   // a phone: room for the value
+    "@media (max-width:360px){.field{grid-template-columns:1fr;padding:10px 10px 12px 14px}}",
     ".fv{min-width:0}.fv [hidden]{display:none!important}",
-    ".cur{display:flex;align-items:center;gap:10px;min-height:50px;padding:5px 5px 5px 12px;border:1px solid var(--line);border-radius:12px;background:#fff}",
-    ".cur svg{flex:none;width:18px;height:18px;color:var(--go)}",
+    ".cur{display:flex;align-items:center;gap:9px;min-height:44px}",
+    ".cur svg{flex:none;width:17px;height:17px;color:var(--go)}",
     ".cur .val{flex:1;min-width:0;font-size:16.5px;line-height:1.3;overflow-wrap:break-word}",
     ".cur .chg,.ed .undo{flex:none;border:0;min-height:40px;padding:0 14px;border-radius:10px;font-size:15px;font-weight:600}",
     ".cur .chg{background:var(--accent-soft);color:var(--accent)}.cur .chg:hover{background:#f6dccd}",
-    ".ed{display:flex;align-items:center;gap:8px}.ed input{flex:1}",
+    ".ed{display:flex;align-items:center;gap:6px}.ed input{flex:1}",
     ".ed .undo{background:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:0 8px}",
-    ".field.brand .cur{min-height:48px}",
-    ".field.brand{grid-template-columns:48px minmax(0,1fr);gap:6px 14px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:14px;padding:12px 14px}",
-    ".field.brand .logo{grid-row:span 2;width:48px;height:48px;border-radius:12px;display:grid;place-items:center;color:#fff}",
-    ".field.brand .logo svg{width:28px;height:28px}",
-    ".field.brand label{font-size:17px;line-height:1.2}",
-    ".field.brand input{min-height:48px;font-size:16.5px;background:var(--soft)}",
-    ".field.brand:focus-within{border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.12)}",
+    /* social pages: the site's own logo beside its name, the link on one line under them */
+    ".field.brand{grid-template-columns:minmax(0,1fr);padding:10px 7px 10px 14px}",
+    ".field.brand .lb{display:flex;align-items:center;gap:10px}",
+    ".field .logo{flex:none;width:24px;height:24px}.field .logo svg{display:block;width:100%;height:100%}",
+    ".field.brand .cur .val{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
     ".tip{display:flex;gap:10px;align-items:flex-start;margin:-4px 0 0;color:var(--muted);font-size:15px;line-height:1.45}.tip .ic{flex:none;width:20px;height:20px;margin-top:1px;color:var(--accent)}",
     ".note.wide{width:480px}",
     /* photos: a big tap/drop area, big pictures with their words under them, idea chips */
@@ -645,8 +667,18 @@
     ".sw-nav .nav-edit svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}",
     "@media (min-width:2400px){.sw-nav .nav-in{max-width:1400px}.sw-nav a{font-size:16px}}",
     "@media (max-width:1060px){.sw-nav .nav-fill,.sw-nav .nav-edit{display:none}}",   // the Edit mode card is right under the welcome
-    "@media (max-width:720px){.sw-nav .nav-in{padding:0 8px;gap:0}.sw-nav a{height:46px;padding:0 10px;font-size:14px}}"
+    "@media (max-width:720px){.sw-nav .nav-in{padding:0 8px;gap:0}.sw-nav a{height:46px;padding:0 10px;font-size:14px}}",
+    // a social site's logo before its name ([data-brand])
+    "[data-brand]{display:inline-flex;align-items:center;gap:8px}",
+    ".sw-logo{flex:none;width:18px;height:18px}.sw-logo svg{display:block;width:100%;height:100%}"
   ].join("\n");
+
+  // On their page, each element marked data-brand="instagram" (like a row of "On your site now") gets that site's logo.
+  function paintBrands() {
+    Array.prototype.forEach.call(document.querySelectorAll("[data-brand]"), function (el) {
+      if (!el.querySelector(".sw-logo")) el.insertBefore(brandLogo(brandOf(el.getAttribute("data-brand")), "sw-logo"), el.firstChild);
+    });
+  }
 
   var host, root, layer;
   // Styles go in as constructed sheets where possible, because sites with strict
@@ -959,16 +991,18 @@
     text.value = note.fields ? note.extra || "" : note.text;
     // A box can ask for a few named things, one line each (like Facebook, Instagram...).
     // "Label" or "Label=example text"
+    // A list of social pages (any field named for a site, like Instagram) shows every row with a logo, and a link box.
+    var social = (note.fields || []).some(function (raw) { return raw.indexOf("=") < 0 && brandOf(raw); });
     var fieldEls = (note.fields || []).map(function (raw, k) {
       var f = raw.split("=")[0], ex = raw.split("=")[1];
-      var b = !ex && BRANDS[f.toLowerCase()], kind = !ex && !b && FIELD_KINDS[f.toLowerCase()];
-      var inp = h("input", b ? { type: "text", id: "swn-f" + k, inputmode: "url", autocapitalize: "off", autocomplete: "off", placeholder: b.ph }
+      var b = !ex && brandOf(f), kind = !ex && !social && FIELD_KINDS[f.toLowerCase()];
+      var inp = h("input", social ? { type: "text", id: "swn-f" + k, inputmode: "url", autocapitalize: "off", autocomplete: "off", placeholder: ex || (b ? b.ph : "Paste the link") }
                              : { type: "text", id: "swn-f" + k, inputmode: kind ? kind.mode : "text", autocapitalize: kind && kind.mode !== "text" ? "off" : null, autocomplete: "off",
                                  placeholder: ex || (kind ? kind.ph : "Type it here") });
       inp.value = (note.vals && note.vals[f]) || "";
       // Already on their site: show it, with a Change button. Only a tap on Change opens the box,
       // filled in with what's there now, so they fix it instead of typing it all again.
-      var now = note.now && note.now[f], slot = inp, fe = { name: f, input: inp, brand: !!b, now: now || "" };
+      var now = note.now && note.now[f], slot = inp, fe = { name: f, input: inp, now: now || "" };
       if (now) {
         var cur = h("div", { class: "cur" }), ed = h("div", { class: "ed" });
         var open = function (on, focus) {
@@ -977,16 +1011,16 @@
           if (!on) inp.value = "";
           if (on && focus) { inp.focus(); try { inp.select(); } catch (e) {} }
         };
-        cur.append(icon("check"), h("span", { class: "val" }, now.replace(/([@\/?])/g, "$1\u0001").split("\u0001").reduce(function (a, p, i) { if (i) a.push(h("wbr")); a.push(p); return a; }, [])), h("button", { class: "chg", type: "button", text: "Change", "aria-label": "Change " + f, onclick: function () { open(true, true); } }));
+        cur.append(icon("check"), h("span", social ? { class: "val", title: now, text: now }   // a link stays on one line (… if it's long)
+          : { class: "val" }, social ? null : now.replace(/([@\/?])/g, "$1\u0001").split("\u0001").reduce(function (a, p, i) { if (i) a.push(h("wbr")); a.push(p); return a; }, [])), h("button", { class: "chg", type: "button", text: "Change", "aria-label": "Change " + f, onclick: function () { open(true, true); } }));
         ed.append(inp, h("button", { class: "undo", type: "button", text: "Undo", "aria-label": "Keep " + f + " as it is", onclick: function () { open(false); } }));
         slot = h("div", { class: "fv" }, [cur, ed]);
         open(!!inp.value && inp.value !== now);
       }
-      fe.row = b ? h("div", { class: "field brand" }, [brandLogo(b), h(now ? "span" : "label", now ? { class: "lb", text: f === "Google" ? "Google business" : f } : { for: "swn-f" + k, text: f === "Google" ? "Google business" : f }), slot])
-                 : h("div", { class: "field" }, [h(now ? "span" : "label", now ? { class: "lb", text: f } : { for: "swn-f" + k, text: f }), slot]);
+      fe.row = h("div", { class: social ? "field brand" : "field" }, [
+        h(now ? "span" : "label", { class: "lb", for: now ? null : "swn-f" + k }, social ? [brandLogo(b, "logo"), (b && b.name) || f] : [f]), slot]);
       return fe;
     });
-    var brands = fieldEls.length && fieldEls.every(function (f) { return f.brand; });
     var hasNow = fieldEls.some(function (f) { return f.now; });
     if (note.fields) { text.placeholder = "Anything else? (You can leave this empty.)"; text.style.minHeight = "70px"; }
     text.addEventListener("paste", function (e) { var f = e.clipboardData && e.clipboardData.files; if (f && f.length) { e.preventDefault(); addPictures(f); } });
@@ -1001,7 +1035,7 @@
       }))]) : null;
 
     if (note.photos) { text.placeholder = "Anything else about these photos? (optional)"; text.style.minHeight = "70px"; }
-    var card = h("div", { class: "card note" + (brands || hasNow || note.photos ? " wide" : "") + (note.photos ? " photos" : "") + (phone ? " sheet" : ""), role: "dialog", tabindex: "-1", "aria-label": "Note " + (i + 1) + ", about " + short(note.on, 60) }, [
+    var card = h("div", { class: "card note" + (social || hasNow || note.photos ? " wide" : "") + (note.photos ? " photos" : "") + (phone ? " sheet" : ""), role: "dialog", tabindex: "-1", "aria-label": "Note " + (i + 1) + ", about " + short(note.on, 60) }, [
       h("div", { class: "dropcover", "aria-hidden": "true" }, [icon("photo"), h("b", { text: "Drop your photos here" })]),
       h("div", { class: "hd" }, [
         h("span", { class: "num", text: String(i + 1) }),
@@ -1011,8 +1045,8 @@
       h("div", { class: "bd" }, [
         h("div", { class: "where" }, [h("span", { text: "About:" }), h("b", { text: note.on })]),
         h("label", { class: "q", for: note.fields ? "swn-f0" : "swn-text", text: note.ask || "What would you like changed?" }),
-        brands ? h("p", { class: "tip" }, [icon("help"), h("span", { text: "Not sure where to find it? Open your page, then copy the address from the top of the screen." })]) : null,
-        note.fields ? h("div", { class: "fields" + (brands ? " brands" : fieldEls.some(function (f) { return f.name.length > 11; }) ? " stack" : "") }, fieldEls.map(function (f) { return f.row; })) : null,
+        social ? h("p", { class: "tip" }, [icon("help"), h("span", { text: "Not sure where to find it? Open your page, then copy the address from the top of the screen." })]) : null,
+        note.fields ? h("div", { class: "fields" + (!social && !hasNow && fieldEls.some(function (f) { return f.name.length > 11; }) ? " stack" : "") }, fieldEls.map(function (f) { return f.row; })) : null,
         note.photos ? drop : null, note.photos ? thumbs : null, ideas,
         text, note.photos ? null : thumbs, note.photos || note.fields ? null : drop
       ]),
@@ -2407,7 +2441,7 @@
     if (MODE === "hub" && st.sent) newList(true);   // sent last time: their page starts fresh, no leftover "Sent" bar
     render();
     if (MODE === "hub") {
-      addCss(document, PAGE_CSS); loadStats(); loadRequests(); loadShop(); loadForm(); dropOnBoxes(); drawNav();
+      addCss(document, PAGE_CSS); paintBrands(); loadStats(); loadRequests(); loadShop(); loadForm(); dropOnBoxes(); drawNav();
       var spyTick = false; window.addEventListener("scroll", function () { if (spyTick) return; spyTick = true; requestAnimationFrame(function () { spyTick = false; spy(); }); }, { passive: true });
       window.addEventListener("resize", function () { headRoom(); spy(true); });
     }
