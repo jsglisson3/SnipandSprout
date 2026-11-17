@@ -48,3 +48,9 @@
 .is-sold .sw-shop-strip{opacity:.6}
 .sw-shop-sr{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
 @media (prefers-reduced-motion:reduce){.sw-shop-go,.sw-shop-dots span{transition:none}}
+/* An item the page shows in its own design ([data-shop-item], see shop.js): out of sight when it's set to Hidden or
+   deleted; when sold out, its Buy links give way to its [data-shop-sold] note. */
+[data-shop-state="hidden"]{display:none!important}
+[data-shop-state="sold"] [data-shop-buy]{display:none!important}
+[data-shop-sold]{display:none}
+[data-shop-state="sold"] [data-shop-sold]{display:revert}

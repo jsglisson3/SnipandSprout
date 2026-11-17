@@ -18,6 +18,13 @@
  *   data-kind="class" only classes and workshops;  data-kind="item" only things to buy
  *   data-cat="Bread"  only that category
  *   data-group="off"  one list, without a heading per category
+ * An item the page shows in its own design (a tab, a section) is kept up to date instead of being listed again:
+ *   <div data-shop-item="diy-kit">   the item's ID from the import file, or its name
+ *     … <span data-shop-price>$55</span> …  <a data-shop-buy href="…">Buy</a> …  <p data-shop-sold>Sold out for now</p>
+ *   [data-shop-price] shows today's price (a sale's, with the regular one crossed out) and every [data-shop-buy]
+ *   link opens the item's checkout. The element gets data-shop-state: "live"; "sold" (shop.css hides its Buy
+ *   links and shows its [data-shop-sold]); or "hidden" when the item is set to Hidden or deleted (shop.css hides
+ *   the whole element, and a radio tab inside it hands its turn to the next one still showing).
  * Each item shows its photos (up to 5: swipe, or the arrows, to see the next), its price (a sale's price with the
  * regular one crossed out, and the sale's last day), its options (Size: S, M, L), and a tag for a sale, New or Featured.
  * The page's policy must allow SW Core: connect-src and img-src https://site-notes.jsglisson.workers.dev
@@ -83,24 +90,34 @@
     if (!list.length) return null;
     var box = el("p", "sw-shop-tags"); list.forEach(function (t) { box.appendChild(t); }); return box;
   }
-  // The price: one amount, or "From" the lowest when its choices cost different amounts. On a sale, the regular
-  // price is crossed out beside it.
-  function price(x) {
+  // Today's price: the lowest of the item's and its choices' (from: they differ), and on a sale the regular one.
+  function cost(x) {
     var now = [], was = [];
     if (x.price != null) { now.push(x.price); was.push(x.was != null ? x.was : x.price); }
     (x.options || []).forEach(function (o) {
       (o.choices || []).forEach(function (c) { if (c.price != null) { now.push(c.price); was.push(c.was != null ? c.was : c.price); } });
     });
     if (!now.length) return null;
-    var low = Math.min.apply(null, now), from = Math.max.apply(null, now) > low, before = Math.min.apply(null, was);
-    var p = el("p", "sw-shop-price");
-    if (from) p.appendChild(document.createTextNode("From "));
-    if (x.was != null && before > low) {
-      p.appendChild(el("span", "sw-shop-sr", "Was ")); p.appendChild(el("s", "sw-shop-was", money(before)));
-      p.appendChild(document.createTextNode(" ")); p.appendChild(el("span", "sw-shop-sr", "now "));
+    var low = Math.min.apply(null, now), before = Math.min.apply(null, was);
+    return { low: low, from: Math.max.apply(null, now) > low, before: x.was != null && before > low ? before : null };
+  }
+  // The amount, with the regular price crossed out in front of it on a sale.
+  function amount(c) {
+    var f = document.createDocumentFragment();
+    if (c.before != null) {
+      f.appendChild(el("span", "sw-shop-sr", "Was ")); f.appendChild(el("s", "sw-shop-was", money(c.before)));
+      f.appendChild(document.createTextNode(" ")); f.appendChild(el("span", "sw-shop-sr", "now "));
     }
-    p.appendChild(document.createTextNode(money(low)));
-    return { el: p, low: low, from: from };
+    f.appendChild(document.createTextNode(money(c.low)));
+    return f;
+  }
+  // The price on a card: one amount, or "From" the lowest when its choices cost different amounts.
+  function price(x) {
+    var c = cost(x); if (!c) return null;
+    var p = el("p", "sw-shop-price");
+    if (c.from) p.appendChild(document.createTextNode("From "));
+    p.appendChild(amount(c));
+    return { el: p, low: c.low, from: c.from };
   }
   // Each option as one line, "Size: S, M, L", with each choice's price when that option's choices have their own.
   function options(x) {
@@ -150,10 +167,36 @@
     });
     box.replaceChildren(out); box.setAttribute("data-shop-ready", "");
   }
+  // The items the page shows in its own design, kept up to date (see the top of this file). Returns those items.
+  function spots(items) {
+    var key = function (s) { return String(s || "").trim().toLowerCase(); }, used = [];
+    var within = function (box, sel) { var list = Array.prototype.slice.call(box.querySelectorAll(sel)); if (box.matches(sel)) list.unshift(box); return list; };
+    Array.prototype.forEach.call(document.querySelectorAll("[data-shop-item]"), function (box) {
+      var want = key(box.getAttribute("data-shop-item"));
+      var x = items.filter(function (i) { return [i.ref, i.id, i.name].some(function (k) { return k && key(k) === want; }); })[0];
+      box.setAttribute("data-shop-state", !x ? "hidden" : x.soldOut ? "sold" : "live");
+      if (!x) return;
+      used.push(x);
+      var c = cost(x);
+      if (c) within(box, "[data-shop-price]").forEach(function (p) { p.replaceChildren(amount(c)); });
+      if (/^https:\/\//.test(x.buy || "")) within(box, "a[data-shop-buy]").forEach(function (a) { a.href = x.buy; });
+    });
+    // A radio tab that just went out of sight hands its turn to the first one still showing.
+    var gone = '[data-shop-state="hidden"]';
+    Array.prototype.forEach.call(document.querySelectorAll(gone + ' input[type="radio"]:checked'), function (r) {
+      var next = Array.prototype.filter.call(document.getElementsByName(r.name), function (o) { return !o.closest(gone); })[0];
+      if (next) { next.checked = true; next.dispatchEvent(new Event("change", { bubbles: true })); }
+    });
+    return used;
+  }
   function start() {
-    var boxes = document.querySelectorAll("[data-shop]"); if (!boxes.length || !SITE) return;
+    var boxes = document.querySelectorAll("[data-shop]"); if ((!boxes.length && !document.querySelector("[data-shop-item]")) || !SITE) return;
     fetch(API + "/api/shop?site=" + encodeURIComponent(SITE)).then(function (r) { return r.ok ? r.json() : null; })
-      .then(function (d) { if (d && d.ok && Array.isArray(d.items)) Array.prototype.forEach.call(boxes, function (b) { fill(b, d.items); }); })
+      .then(function (d) {
+        if (!d || !d.ok || !Array.isArray(d.items)) return;
+        var used = spots(d.items), rest = d.items.filter(function (x) { return used.indexOf(x) < 0; });
+        Array.prototype.forEach.call(boxes, function (b) { fill(b, rest); });
+      })
       .catch(function () {});   // can't reach it: the page keeps what it had
   }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", start); else start();

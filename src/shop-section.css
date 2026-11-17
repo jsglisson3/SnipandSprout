@@ -329,3 +329,19 @@
 .sns-v-Open{ background-image: url("img/shop/vessel-open.webp"); }
 .sns-v-Skull{ background-image: url("img/shop/vessel-skull.webp"); }
 .sns-v-Teardrop{ background-image: url("img/shop/vessel-teardrop.webp"); }
+
+/* Shown in place of the Buy links when the item is Sold out in her shop list (shop.js sets data-shop-state). */
+.sns-shop .sns-sold{ margin: 4px 0 0; padding: 14px 20px; border-radius: 999px; background: var(--sns-cream); color: var(--sns-ink); font-weight: 600; text-align: center; }
+.sns-shop [data-shop-state="sold"] .sns-fine{ display:none; }   /* "Choose Closed under Vessel Type" goes with the Buy link */
+
+/* A tab her shop list hides (Hidden or deleted; shop.js sets data-shop-state="hidden" on the tab and its panel):
+   its group heading goes when nothing is left under it, and the row closes up so no column stays empty. */
+.sns-tabs:has(> [data-shop-item="diy-kit"][data-shop-state="hidden"]) > .sns-group.is-home,
+.sns-tabs:has(> [data-shop-item="terrarium-bar"][data-shop-state="hidden"]):has(> [data-shop-item="plant-bar"][data-shop-state="hidden"]) > .sns-group.is-shop{ display:none; }
+@media (min-width: 601px){
+  .sns-tabs:has(> .sns-tab[data-shop-state="hidden"]){ grid-template-columns: repeat(2, 1fr); }
+  .sns-tabs:has(> [data-shop-item="diy-kit"][data-shop-state="hidden"]) > .sns-group.is-shop{ grid-column: 1 / 3; }
+  .sns-tabs:has(> [data-shop-item="diy-kit"]:not([data-shop-state="hidden"])):has(> .sns-tab[data-shop-state="hidden"]) > .sns-group.is-shop{ grid-column: 2 / 3; }
+  .sns-tabs:has(> .sns-tab[data-shop-state="hidden"] ~ .sns-tab[data-shop-state="hidden"]){ grid-template-columns: minmax(0, 440px); }
+  .sns-tabs:has(> .sns-tab[data-shop-state="hidden"] ~ .sns-tab[data-shop-state="hidden"]) > .sns-group.is-shop{ grid-column: 1 / 2; }
+}
