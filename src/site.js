@@ -27,7 +27,7 @@
   };
   const paintHours = () => {
     const s = state();
-    $$('[data-open]').forEach((el) => { el.classList.toggle('is-open', s.open); const t = $('[data-open-text]', el); if (t) t.textContent = s.short; });
+    $$('[data-open]').forEach((el) => { el.classList.toggle('is-open', s.open); el.classList.toggle('is-closed', !s.open); const t = $('[data-open-text]', el); if (t) t.textContent = s.short; });
     $$('[data-open-long]').forEach((el) => { el.textContent = s.long; });
     $$('[data-hours3] [data-days]').forEach((row) => row.classList.toggle('is-today', row.dataset.days.split(',').includes(String(s.day))));
     return s;

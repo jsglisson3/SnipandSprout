@@ -1,12 +1,14 @@
 /* Snip & Sprout Co. website, by Stray Wolf Technology.
    Clean type (see the tokens below) and her palette (cream, olive, dusty rose, terracotta).
-   One typeface for everything (Figtree), so her logo is the only decorative lettering on the page.
+   One clean typeface for the page (Figtree), with a soft serif (Lora) for the header menu beside her logo.
    Every page has its own top (.hero--home, --center, --ws, --visit, --about), built around what that page is for;
    inner pages then run as sections between ruled lines, each heading beside its text.
    Plain CSS, no preprocessing. */
 
-/* The typeface, served from this site (SIL Open Font License), one variable file. */
+/* The typefaces, served from this site (SIL Open Font License), each one variable file: Figtree for everything,
+   Lora (a soft serif) for the header menu only. */
 @font-face{ font-family:"Figtree"; font-style:normal; font-weight:300 900; font-display:swap; src:url("fonts/figtree.woff2") format("woff2"); }
+@font-face{ font-family:"Lora"; font-style:normal; font-weight:400 600; font-display:swap; src:url("fonts/lora.woff2") format("woff2"); }
 
 /* ---------- tokens ---------- */
 :root{
@@ -129,20 +131,24 @@ ul,ol{ padding:0; list-style:none; }
 .brand{ order:-1; flex:none; margin-right:auto; align-self:flex-start; height:var(--navh); position:relative; z-index:1; }
 .brand img{ display:block; height:calc(var(--navh) + 56px); width:auto; max-width:none; border-radius:0 0 14px 14px; box-shadow:0 1px 2px rgb(30 34 28 / .18), 0 16px 28px -14px rgb(30 34 28 / .5); }
 .nav__links{ display:flex; align-items:center; gap:clamp(18px,2.2vw,34px); }
-.nav__links a{ position:relative; text-decoration:none; font-size:1rem; font-weight:500; padding:6px 0; }
+.nav__links a{ position:relative; text-decoration:none; font-family:"Lora", Georgia, serif; font-size:1.0625rem; font-weight:500; padding:6px 0; }
 .nav__links a::after{ content:""; position:absolute; left:0; right:0; bottom:0; height:2px; border-radius:2px; background:var(--clay); transform:scaleX(0); transform-origin:left; transition:transform .3s var(--ease); }
 .nav__links a:hover::after, .nav__links a[aria-current="page"]::after{ transform:scaleX(1); }
 /* Shop leads the menu, as a button */
-.nav__links a.nav__shop{ padding:9px 22px; border-radius:999px; background:var(--olive-ink); color:var(--on-dark); font-weight:600; transition:background-color .2s var(--ease); }
+.nav__links a.nav__shop{ padding:9px 22px; border-radius:999px; background:var(--olive-ink); color:var(--on-dark); font-family:var(--body); font-size:1rem; font-weight:600; transition:background-color .2s var(--ease); }
 .nav__links a.nav__shop::after{ display:none; }
 .nav__links a.nav__shop:hover, .nav__links a.nav__shop[aria-current="page"]{ background:#20241d; }
 /* the open-now line, as a pill */
 .nav__links .open{ padding:7px 14px 7px 12px; border-radius:999px; background:rgb(255 253 249 / .6); border:1px solid rgb(44 48 39 / .1); font-size:.875rem; font-weight:500; line-height:1.2; white-space:nowrap; }
 
-/* open now: a quiet dot that breathes while the shop is open */
+/* open now: a green dot that breathes while the shop is open, a red one while it's closed (grey until the script knows) */
 .open{ display:inline-flex; align-items:center; gap:9px; font-weight:600; text-wrap:balance; }
 .open__dot{ width:8px; height:8px; border-radius:50%; background:#9a9e92; flex:none; }
-.open.is-open .open__dot{ background:#5d8f45; box-shadow:0 0 0 0 rgb(93 143 69 / .45); animation:breathe 2.6s ease-out infinite; }
+.open.is-open .open__dot{ background:#4f8a3a; box-shadow:0 0 0 0 rgb(79 138 58 / .45); animation:breathe 2.6s ease-out infinite; }
+.open.is-closed .open__dot{ background:#c2493a; }
+/* the header's pill takes a soft tint of the same colour */
+.nav__links .open.is-open{ background:#e6f0dd; border-color:rgb(79 138 58 / .3); color:#2f5a22; }
+.nav__links .open.is-closed{ background:#f6e3df; border-color:rgb(194 73 58 / .28); color:#8a2f22; }
 @keyframes breathe{ 70%{ box-shadow:0 0 0 7px rgb(93 143 69 / 0); } 100%{ box-shadow:0 0 0 0 rgb(93 143 69 / 0); } }
 
 /* ---------- the top of each page: every page has its own ---------- */
@@ -160,7 +166,8 @@ ul,ol{ padding:0; list-style:none; }
 
 /* About: Dani first, then her hello and the three things the shop is for */
 .hero--about{ display:grid; grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr); align-items:center; gap:clamp(32px,5vw,88px); }
-.hero--about .hero__pic{ object-position:50% 30%; }
+.hero--home .hero__pic{ object-position:50% 28%; }
+.hero--about .hero__pic{ object-position:50% 34%; }
 .trio{ display:flex; flex-wrap:wrap; gap:4px 1.1em; font-family:var(--head); font-weight:var(--head-w); font-size:var(--t-h3); letter-spacing:var(--head-ls); color:var(--clay-ink); }
 
 /* Shop, Gallery and the 404 page: a centred title, then a row of ways in */
@@ -504,7 +511,8 @@ html:has(.lb[open]){ overflow:hidden; }
   .hero--home, .hero--about, .hero--ws, .hero--visit__in, .pbar__grid{ grid-template-columns:1fr; }
   .hero--about .hero__pic{ order:2; }
   .hero--home .hero__pic, .hero--about .hero__pic, .pbar__pic{ min-height:0; max-height:none; aspect-ratio:4/3; }
-  .hero--home .hero__pic{ object-position:50% 22%; }
+  .hero--home .hero__pic{ object-position:50% 18%; }
+  .hero--about .hero__pic{ object-position:50% 30%; }
   .ways__head{ grid-template-columns:1fr; }
   .ways__grid{ grid-template-columns:1fr; max-width:620px; gap:64px; }
   .course__in{ grid-template-columns:1fr; }

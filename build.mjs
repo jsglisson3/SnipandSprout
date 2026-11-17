@@ -139,6 +139,7 @@ const head = (p) => `<!doctype html>
 <meta name="theme-color" content="#dde2d3">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">${(p.css || []).map((f) => `\n<link rel="stylesheet" href="${f}">`).join('')}
 <script>${JS_FLAG}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Snip & Sprout Co.","url":"${C.url}","image":"${C.url}img/share.jpg","logo":"${C.url}logo.svg","hasMap":"${C.maps}","description":"Indoor plant boutique with pottery, a Plant Bar, a Terrarium Bar and workshops.","address":{"@type":"PostalAddress","streetAddress":"413 E. Emma Ave.","addressLocality":"Springdale","addressRegion":"AR","postalCode":"72764","addressCountry":"US"},"email":"${C.email}","sameAs":["${C.ig}","${C.etsy}"],"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday"],"opens":"10:00","closes":"15:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"09:00","closes":"14:00"}]}</script>
@@ -268,7 +269,7 @@ page({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plants, po
     <div class="acts" data-in><a class="btn" href="shop.html">Shop ${I.arrow}</a>
       <a class="link" href="#visit">Plan your visit</a></div>
   </div>
-  <img class="hero__pic" src="img/dani-alocasia.webp" width="818" height="1022" alt="Dani in the shop, smiling, holding up an alocasia in a burlap pot" fetchpriority="high">
+  <img class="hero__pic" src="img/dani-overalls.webp" width="1280" height="1920" alt="Dani in overalls holding up a potted plant, surrounded by plants" fetchpriority="high">
 </section>
 
 <section class="pbar" id="plant-bar" aria-labelledby="pbar-title"><div class="wrap pbar__grid">
@@ -524,7 +525,7 @@ ${course({ key: 'hello', title: 'Say hello' }, `    <p data-in>Plant questions w
 page({ file: 'about.html', title: 'About Dani · Snip & Sprout Co.',
   desc: 'Snip & Sprout Co. is an indoor plant boutique in Northwest Arkansas, started by Dani to make plant care approachable and to give people a place to gather.' }, `<main id="main">
 <section class="hero hero--about" aria-labelledby="top-title">
-  <img class="hero__pic" src="img/dani-overalls.webp" width="1280" height="1920" alt="Dani in overalls holding up a potted plant, surrounded by plants" fetchpriority="high">
+  <img class="hero__pic" src="img/dani-monstera.webp" width="1179" height="2096" alt="Dani in her Snip &amp; Sprout Co. tee, smiling, holding a tall monstera in a stone pot" fetchpriority="high">
   <div class="hero__text">
     <p class="kicker" data-in>About Snip &amp; Sprout Co.</p>
     <h1 class="hero__title" id="top-title" data-in>Hi everyone, I’m Dani!</h1>
