@@ -34,19 +34,34 @@
   a{color:inherit}
   .wrap{max-width:900px;margin:0 auto;padding:0 20px}
 
-  /* ---------- header ---------- */
-  .sw-head{position:sticky;top:0;z-index:5;background:rgba(244,242,238,.9);-webkit-backdrop-filter:saturate(1.2) blur(10px);backdrop-filter:saturate(1.2) blur(10px);border-bottom:1px solid var(--line)}
-  .sw-head .wrap{max-width:1180px;display:flex;align-items:center;gap:16px;min-height:60px}
-  .sw-brand{display:block;line-height:0}
-  .sw-brand img{height:30px;width:auto}
+  /* ---------- header: a charcoal Stray Wolf strip (who runs the portal, private, Help, Log out), then a white row
+     with whose portal it is and a link to each part of the page. Jeremy picked this on Nov 17 2026. ---------- */
+  .sw-head{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 6px 18px -16px rgb(36 34 31 / .5)}
+  .sw-head .wrap{max-width:1440px;display:flex;align-items:center}
+  .sw-strip{background:var(--char);color:#f4f2ee}
+  .sw-strip .wrap{gap:14px;min-height:46px}
+  .sw-brand{display:block;line-height:0;border-radius:6px}
+  .sw-brand img{height:24px;width:auto}
+  .sw-brand:focus-visible,.head-acts button:focus-visible{outline:2px solid #f4f2ee;outline-offset:3px}
+  .sw-tag{display:flex;align-items:center;height:18px;padding-left:13px;border-left:1px solid rgb(255 255 255 / .22);font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:rgb(244 242 238 / .72);white-space:nowrap}
   .sw-head .gap{flex:1}
-  .sw-who{font-size:14.5px;font-weight:600;line-height:1.2;color:var(--ink);white-space:nowrap}.sw-who small{display:block;font-size:12px;font-weight:500;color:var(--muted)}
-  .secure{display:inline-flex;align-items:center;gap:7px;font:500 11px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--sage);background:var(--sage-soft);border:1px solid #d6dfcd;border-radius:999px;padding:7px 12px 7px 9px;white-space:nowrap}
-  .secure svg{width:13px;height:13px;flex:none}
-  .head-acts{display:flex;align-items:center;gap:6px}.head-acts:empty{display:none}
-  .head-acts button{display:inline-flex;align-items:center;gap:6px;font:600 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:0 13px;min-height:36px;cursor:pointer}
-  .head-acts button:hover{border-color:var(--ink)}
+  .secure{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:rgb(244 242 238 / .78);white-space:nowrap}
+  .secure svg{width:14px;height:14px;flex:none;color:#a9c39a}
+  .head-acts{display:flex;align-items:center;gap:2px;margin-left:6px}.head-acts:empty{display:none}
+  .head-acts button{display:inline-flex;align-items:center;gap:7px;font:500 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#f4f2ee;background:none;border:0;border-radius:8px;padding:0 10px;min-height:34px;cursor:pointer}
+  .head-acts button:hover{background:rgb(255 255 255 / .1)}
   .head-acts svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  /* whose portal: their logo on a small white tile and their name, then the links (site-notes.js styles those) */
+  .sw-row .wrap{min-height:58px}
+  .sw-lead{display:flex;align-items:center;gap:11px;flex:none;min-height:38px}
+  .sw-row .sw-nav:not([hidden]){flex:1;min-width:0;border:0;margin-left:16px;padding-left:6px;border-left:1px solid var(--line)}
+  /* position:relative makes the row the links measure from, so on a narrow screen the one underlined slides into view
+     from the row's own start (the logo and name sit before it here) */
+  .sw-row .sw-nav .nav-in{position:relative;max-width:none;margin:0;padding:0 0 0 4px;min-height:58px}
+  .sw-row .sw-nav a{height:58px}.sw-row .sw-nav a.nav-edit{height:38px;padding:0 16px 0 14px}
+  .sw-tile{display:grid;place-items:center;height:38px;min-width:38px;padding:5px 7px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px -4px rgb(36 34 31 / .22)}
+  .sw-tile img{display:block;height:26px;width:auto;max-width:92px;object-fit:contain}
+  .sw-who{font-size:15.5px;font-weight:650;line-height:1.2;color:var(--ink);white-space:nowrap}
 
   /* ---------- welcome ---------- */
   .hero{position:relative;display:flex;align-items:center;gap:26px;padding:40px 0 30px;isolation:isolate}
@@ -236,17 +251,17 @@
   .sw-foot .fine svg{width:12px;height:12px}
 
   @media (min-width:1800px){body{font-size:17px}.wrap{max-width:1000px}.hero{padding-top:52px}.plate{width:170px;height:170px}h1{font-size:42px}
-    .edit b{font-size:22px}.box b{font-size:17.5px}.sw-brand img{height:34px}.sec-h{font-size:27px}.facts dd,.soc li{font-size:15.5px}.logo-now{height:110px}.logo-now img{max-height:84px}}
-  @media (min-width:2400px){body{font-size:18.5px}.wrap{max-width:1120px}.sw-head .wrap,.sw-foot .wrap{max-width:1400px}.plate{width:190px;height:190px}h1{font-size:48px}.lead{font-size:18px}
+    .edit b{font-size:22px}.box b{font-size:17.5px}.sw-brand img{height:26px}.sec-h{font-size:27px}.facts dd,.soc li{font-size:15.5px}.logo-now{height:110px}.logo-now img{max-height:84px}}
+  @media (min-width:2400px){body{font-size:18.5px}.wrap{max-width:1120px}.sw-head .wrap{max-width:1640px}.sw-foot .wrap{max-width:1400px}.plate{width:190px;height:190px}h1{font-size:48px}.lead{font-size:18px}
     .trust{font-size:14.5px}.edit b{font-size:25px}.edit .t{font-size:16px}.edit .go{font-size:17px;min-height:52px}.box b{font-size:19px}.bh span{font-size:15.5px}.box .tap{font-size:15px}
     .bh .ic{width:44px;height:44px}.sec-h{font-size:30px}.sub{font-size:17px;max-width:720px}.now-k{font-size:11.5px}.facts dt,.soc li > span:first-child{font-size:14.5px}.facts dd,.soc li{font-size:17px}
-    .facts div,.soc li{grid-template-columns:110px 1fr}.logo-now{height:124px}.logo-now img{max-height:94px}.kept{font-size:15px}.sw-brand img{height:38px}}
+    .facts div,.soc li{grid-template-columns:110px 1fr}.logo-now{height:124px}.logo-now img{max-height:94px}.kept{font-size:15px}.sw-brand img{height:28px}}
   @media (min-width:561px) and (max-width:899px){.stats{grid-template-columns:1fr}}
   @media (max-width:699px){
     .pics{grid-template-columns:repeat(3,1fr)}
   }
   @media (max-width:560px){
-    .sw-head .wrap{min-height:54px}.sw-brand img{height:26px}.secure{padding:6px 9px 6px 8px;font-size:10px;letter-spacing:.08em}
+    .sw-strip .wrap{min-height:44px;gap:10px}.sw-brand img{height:22px}.sw-row .wrap{min-height:52px}
     .hero{flex-direction:column;text-align:center;gap:16px;padding:26px 0 22px}.stats{grid-template-columns:1fr;padding:16px 16px 10px}.stats-nums{grid-template-columns:1fr}.stats-nums li{display:grid;grid-template-columns:72px minmax(0,1fr);column-gap:12px;align-items:baseline;border-left:0;border-top:1px solid var(--line);padding:10px 0}.stats-nums b{grid-row:span 2;font-size:26px}.stats-nums span{margin-top:0}.stats-nums small{margin-top:2px}.stats-nums i{display:none}.plate{width:116px;height:116px;padding:14px;border-radius:18px}.plate.wide{width:min(280px,100%);height:110px;padding:12px 16px}
     .kicker{justify-content:center}.kicker::before{content:"";width:28px;height:1px;background:currentColor;opacity:.5}
     h1{font-size:27px}.lead{font-size:15.5px}.trust{justify-content:center;font-size:12.5px;gap:4px 12px}
@@ -258,8 +273,10 @@
     .soc{gap:10px}.soc li{grid-template-columns:1fr;gap:1px}.soc .off{flex-wrap:wrap;row-gap:4px}
     .kept{padding:12px 14px;justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:8px}
   }
-  @media (max-width:760px){.secure:has(~ .head-acts:not(:empty)){display:none}}
-  @media (max-width:560px){.sw-who{display:none}.head-acts button{padding:0 11px}}
+  @media (max-width:860px){.secure:has(~ .head-acts:not(:empty)){display:none}}
+  @media (max-width:720px){.sw-row .sw-nav:not([hidden]){margin-left:10px;padding-left:2px}.sw-lead:has(~ .sw-nav:not([hidden])) .sw-who{display:none}.sw-tile{height:34px;min-width:34px;padding:4px 6px}.sw-tile img{height:24px;max-width:72px}.sw-row .sw-nav .nav-in{min-height:52px}.sw-row .sw-nav a{height:52px}}
+  @media (max-width:560px){.head-acts button{padding:0 9px}}
+  @media (max-width:420px){.sw-tag{display:none}}
   @media (max-width:360px){.secure .w{display:none}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
   .flat{line-height:0}.nojs{padding:24px}
@@ -267,16 +284,24 @@
 </head>
 <body>
 <header class="sw-head" data-keep>
-  <div class="wrap">
-    <a class="sw-brand" href="https://straywolftech.com" rel="noopener"><img src="brand/stray-wolf-logo-color.svg" alt="Stray Wolf Technology" width="128" height="30"></a>
-    <span class="sw-who">Snip &amp; Sprout Co.<small>Client Portal</small></span>
-    <span class="gap"></span>
-    <span class="secure"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Private <span class="w">and secure</span></span>
-    <!-- Help and Log out go here once they're logged in (site-notes.js fills it in) -->
-    <span class="head-acts" data-portal-actions></span>
+  <!-- The Stray Wolf strip: who runs the portal, that it is private, and (once they're logged in) Help and Log out -->
+  <div class="sw-strip">
+    <div class="wrap">
+      <a class="sw-brand" href="https://straywolftech.com" rel="noopener" title="Stray Wolf Technology runs this portal for you"><img src="brand/stray-wolf-logo-reverse.svg" alt="Stray Wolf Technology" width="102" height="24"></a>
+      <span class="sw-tag">Client Portal</span>
+      <span class="gap"></span>
+      <span class="secure" title="Only you can open this page, with your password. Nothing here is public."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Private <span class="w">and secure</span></span></span>
+      <!-- Help and Log out go here (site-notes.js fills it in) -->
+      <span class="head-acts" data-portal-actions></span>
+    </div>
   </div>
-  <!-- A link to each part of the page below (each part has data-nav="its name"), filled in by site-notes.js after login -->
-  <nav class="sw-nav" data-portal-nav hidden aria-label="Parts of your portal"></nav>
+  <!-- Whose portal it is, then a link to each part of the page below (each part has data-nav="its name"), filled in by site-notes.js after login -->
+  <div class="sw-row">
+    <div class="wrap">
+      <span class="sw-lead"><span class="sw-tile"><img src="../logo.svg" alt=""></span><span class="sw-who">Snip &amp; Sprout Co.</span></span>
+      <nav class="sw-nav" data-portal-nav hidden aria-label="Parts of your portal"></nav>
+    </div>
+  </div>
 </header>
 
 <main class="wrap">
