@@ -32,7 +32,7 @@
   var MAX = { photos: 5, desc: 3000, name: 100, cat: 60, alt: 200, options: 3, choices: 20, perCall: 8 };
   var SVG = "http://www.w3.org/2000/svg";
   var P = {
-    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>', plus: '<path d="M12 5v14M5 12h14"/>', chev: '<path d="m6 9 6 6 6-6"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4.5"/><path d="M12 8h.01"/>', plus: '<path d="M12 5v14M5 12h14"/>', chev: '<path d="m6 9 6 6 6-6"/>',
     hist: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>', up: '<path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/>',
     down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>', star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
     tag: '<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/>', eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
@@ -121,7 +121,7 @@
     var acts = el("div", { class: "swm-acts" });
     var top = el("div", { class: "swm-top" }, [opts.who || null, el("div", { class: "swm-top-t" }, [sum]), coBadge, acts]);
     var banner = el("div", { class: "swm-banner", hidden: true, role: "status" });
-    var find = el("input", { type: "search", class: "swm-find-in", autocomplete: "off", "aria-label": "Search items" });
+    var find = el("input", { type: "search", class: "swm-find-in", autocomplete: "off", placeholder: "Search items", "aria-label": "Search items" });
     var catSel = el("select", { class: "swm-sel", "aria-label": "Category" });
     var sortSel = el("select", { class: "swm-sel", "aria-label": "Order" }, SORTS.map(function (s) { return el("option", { value: s[0], text: s[1] }); }));
     var tools = el("div", { class: "swm-tools" }, [el("label", { class: "swm-find" }, [ico("search", 16), find]), catSel, sortSel]);
@@ -255,7 +255,7 @@
         el("td", { class: "c-it" }, [el("div", { class: "swm-name" }, [grip, thumb(x), el("div", { class: "swm-name-t" }, [el("div", { class: "swm-name-l" }, [nameBtn, flag(x)]), metaLine(x)])])]),
         el("td", { class: "c-pr" }, [el("div", { class: "swm-pbox" }, [el("span", { "aria-hidden": "true", text: "$" }), price]),
           on ? el("small", { class: "swm-sale-w" }, [ico("tag", 12), (x.sale.pct ? x.sale.pct + "% off: " : "Sale: ") + money(shownPrice(x, today)) + (x.sale.ends ? " until " + dayWords(x.sale.ends) : "")])
-            : x.sale ? el("small", { class: "swm-muted", text: "Sale ended " + dayWords(x.sale.ends) }) : priceFrom(x) ? el("small", { class: "swm-muted", text: "Choices have their own prices" }) : null,
+            : x.sale ? el("small", { class: "swm-muted", text: "Sale ended " + dayWords(x.sale.ends) }) : priceFrom(x) ? el("small", { class: "swm-muted", text: "Prices vary by choice" }) : null,
           shop.checkout !== "generic" && x.sqPrice != null && x.sqPrice !== x.price ? el("small", { class: "swm-warn" }, ["Square charges " + money(x.sqPrice) + " ",
             el("button", { class: "swm-link-b", type: "button", text: "Use " + money(x.sqPrice), "aria-label": "Use Square's price, " + money(x.sqPrice) + ", for " + x.name,
               onclick: function () { save("/prices", { prices: [{ id: x.id, price: dollarsIn(x.sqPrice) }] }); } })]) : null]),
@@ -443,23 +443,35 @@
           el("button", { class: "swm-btn plain is-sm", type: "button", title: "A hidden copy, right after it, with the same photos", onclick: duplicate }, [ico("copy", 14), "Duplicate"]),
           el("button", { class: "swm-btn plain is-sm swm-del", type: "button", onclick: removeItem }, [ico("trash", 14), "Delete"])]),
         el("div", { class: "swm-foot-r" }, [el("button", { class: "swm-btn plain swm-cancel", type: "button", text: "Cancel", onclick: function () { closeItem(true); } }),
-          el("button", { class: "swm-btn swm-save", type: "submit", text: isNew ? "Add it" : "Save" })])]);
+          el("button", { class: "swm-btn swm-save", type: "submit", text: isNew ? "Add it" : "Save", title: "Shows on " + whose + " within a minute. Any change can be undone under Changes." })])]);
       var form = el("form", { class: "swm-form", novalidate: true, onsubmit: function (e) { e.preventDefault(); saveDraft(); } }, [
-        photosPart(), namePart(), salePart(), optionsPart(), descPart(), showPart(), linkPart(), errBox, foot,
-        el("p", { class: "swm-foot-n", text: "Saved changes show on " + whose + " within a minute. Every change can be undone under Changes." })]);
+        el("div", { class: "swm-cards" }, [photosPart(), namePart(), salePart(), optionsPart(), linkPart(), showPart(), errBox]), foot]);
       form.onkeydown = function (e) { if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) { e.preventDefault(); saveDraft(); } };
       form.addEventListener("input", function (e) { if (!e.target.closest(".swm-noedit")) changed(); });
       fill(ed, [head, form]); paintFoot();
     }
     function pill(show) { var s = SHOW.filter(function (x) { return x[0] === show; })[0]; return el("span", { class: "swm-st is-" + show }, [el("i"), s[1]]); }
     function section(kids, cls) { return el("div", { class: "swm-sec" + (cls ? " " + cls : "") }, kids); }
-    function field(label, input, help, cls) { return el("div", { class: "swm-f" + (cls ? " " + cls : "") }, [typeof label === "string" ? el("label", { for: input.id, text: label }) : label, input, help ? el("small", { text: help }) : null]); }
+    // One card of the item form: a short title (with an optional (i) or note beside it), then its fields. No title: the
+    // card starts with its own switch (Sale).
+    function card(title, kids, cls, aside) {
+      return el("section", { class: "swm-sec swm-card" + (cls ? " " + cls : ""), "aria-label": title }, [title ? el("div", { class: "swm-card-hd" }, [el("h3", { text: title }), aside || null]) : null].concat(kids));
+    }
+    // A small (i): its words show on hover, keyboard focus or a tap, so the form itself stays short. title is the
+    // fallback where the page has no tooltips of its own.
+    function tipBtn(text, about) { return el("button", { type: "button", class: "swm-i", "aria-label": (about ? about + ", more: " : "More: ") + text, title: text }, [ico("info", 14)]); }
+    // A field: its label (with the help as an (i) beside it), the input, and a line under it only when something needs
+    // attention right now (note).
+    function field(label, input, help, cls, note) {
+      var lab = typeof label === "string" ? el("label", { for: input.id || (input.querySelector && input.querySelector("input") || {}).id, text: label }) : label;
+      return el("div", { class: "swm-f" + (cls ? " " + cls : "") }, [help ? el("div", { class: "swm-lblrow is-tip" }, [lab, tipBtn(help, typeof label === "string" ? label : "")]) : lab, input, note || null]);
+    }
     function input(id, value, props) { return el("input", Object.assign({ id: id, autocomplete: "off", value: value == null ? "" : String(value) }, props || {})); }
 
     /* Photos: up to five, the first is the main one. Drag to move (or the arrow keys on a photo), x takes one off.
        On a saved item a new photo goes up at once; on a new one it waits for the first save. */
     function photosPart() {
-      var d = st.draft, wrap = el("div", { class: "swm-sec swm-photos" });
+      var d = st.draft, wrap = el("section", { class: "swm-sec swm-card swm-photos", "aria-label": "Photos" });
       var paint = function () {
         var list = d.photos.concat(st.pending), room = MAX.photos - list.length;
         var grid = el("div", { class: "swm-ph", role: "list", "aria-label": "Photos, the first is the main one" });
@@ -471,13 +483,13 @@
         var alt = sel ? input("swm-alt", sel.alt || "", { maxlength: String(MAX.alt), class: "swm-noedit-not", oninput: function () { sel.alt = alt.value; if (!sel.local && !sel.pick) changed(); auto.hidden = true; } }) : null;
         var auto = el("span", { class: "swm-auto", hidden: !(sel && (sel.from || sel.pick || sel.alt === d.name)) }, [ico("sparkle", 12), "Filled in for you"]);
         fill(wrap, [
-          el("div", { class: "swm-lbl" }, [el("b", { text: "Photos" }), el("span", { text: list.length + " of " + MAX.photos })]), grid,
-          list.length > 1 ? el("p", { class: "swm-hint", text: "Drag a photo to move it. The first one is the main photo on " + whose + "; the rest show when someone opens it." }) : null,
+          el("div", { class: "swm-card-hd" }, [el("h3", { text: "Photos" }), el("span", { class: "swm-count", text: list.length + " of " + MAX.photos }),
+            list.length > 1 ? tipBtn("Drag a photo to move it. The first one is the main photo on " + whose + "; the rest show when someone opens it.", "Photos") : null]), grid,
           el("div", { class: "swm-ph-acts" }, [
             el("button", { class: "swm-btn plain is-sm", type: "button", disabled: room <= 0, onclick: function () { openPicker(paint); } }, [ico("globe", 14), "Pick from " + whose]),
             el("button", { class: "swm-btn plain is-sm", type: "button", disabled: room <= 0, onclick: function () { pickFiles(paint); } }, [ico("up", 14), "Upload a photo"])]),
-          sel ? el("div", { class: "swm-f swm-alt" }, [el("label", { for: "swm-alt" }, [(st.sel === 0 ? "Main photo" : "Photo " + (st.sel + 1)) + " description", auto]), alt,
-            el("small", { text: "Read aloud to people who can't see the photo, and read by Google. Change it if it's not right." })]) : null]);
+          sel ? el("div", { class: "swm-f swm-alt" }, [el("div", { class: "swm-lblrow is-tip" }, [el("label", { for: "swm-alt" }, [(st.sel === 0 ? "Main photo" : "Photo " + (st.sel + 1)) + " description"]),
+            tipBtn("Read aloud to people who can't see the photo, and read by Google. Change it if it's not right.", "Photo description"), auto]), alt]) : null]);
       };
       paint(); return wrap;
     }
@@ -543,22 +555,35 @@
       (item.photos || []).forEach(function (p) { if (keys.indexOf(p.key) < 0) st.draft.photos.push(copy(p)); });
     }
 
+    /* Details: name, price and category side by side, the description, and whether it's a class (a date and seats). */
     function namePart() {
       var d = st.draft, cats = [];
       shop.items.forEach(function (x) { if (x.cat && cats.indexOf(x.cat) < 0) cats.push(x.cat); });
       var name = input("swm-name", d.name, { maxlength: String(MAX.name), placeholder: "What it's called", required: true, oninput: function () { d.name = name.value; } });
-      var price = input("swm-price", dollarsIn(d.price), { inputmode: "decimal", placeholder: "Leave empty for no price", oninput: function () { d.priceText = price.value; salePaint(); } });
+      var price = input("swm-price", dollarsIn(d.price), { inputmode: "decimal", placeholder: "0.00", oninput: function () { d.priceText = price.value; salePaint(); sqPaint(); } });
       var cat = input("swm-cat", d.cat, { maxlength: String(MAX.cat), list: "swm-cats", placeholder: cats[0] || "Planters", oninput: function () { d.cat = cat.value; } });
-      var isClass = el("input", { type: "checkbox", id: "swm-class", checked: d.kind === "class" });
+      var isClass = el("input", { type: "checkbox", role: "switch", id: "swm-class", checked: d.kind === "class" });
       var when = input("swm-when", d.when, { type: "datetime-local", oninput: function () { d.when = when.value; } }), seats = input("swm-seats", d.seats, { maxlength: "40", placeholder: "8 seats", oninput: function () { d.seats = seats.value; } });
-      var classBits = el("div", { class: "swm-grid is-span", hidden: d.kind !== "class" }, [field("Date and time", when, "When it starts, local time."), field("Seats", seats, "Words shown beside the date. The checkout keeps the real count.")]);
-      isClass.onchange = function () { d.kind = isClass.checked ? "class" : "item"; classBits.hidden = !isClass.checked; changed(); };
-      var sq = shop.checkout !== "generic" && d.sqPrice != null ? "Square charges " + money(d.sqPrice) + (d.sqPrice !== toCents(price.value) ? ". Change it in Square too, or type the same here." : ".") : "The regular price. Empty shows no price.";
-      return section([field("Name", name, null, "span"),
-        field("Price", el("div", { class: "swm-money" }, [el("span", { "aria-hidden": "true", text: "$" }), price]), sq),
-        field("Category", cat, "Groups items on " + whose + "."),
-        el("label", { class: "swm-check is-span", for: "swm-class" }, [isClass, el("span", {}, [el("b", { text: "A class or workshop" }), " It gets a date and seats, and its button says Sign up."])]), classBits,
-        cats.length ? el("datalist", { id: "swm-cats" }, cats.map(function (c) { return el("option", { value: c }); })) : null], "swm-grid");
+      var classBits = el("div", { class: "swm-grid swm-sub", hidden: d.kind !== "class" }, [field("Date and time", when, "When it starts, local time."), field("Seats", seats, "Words shown beside the date, like 8 seats. The checkout keeps the real count.")]);
+      isClass.onchange = function () { d.kind = isClass.checked ? "class" : "item"; classBits.hidden = !isClass.checked; changed(); if (isClass.checked) when.focus(); };
+      // Square keeps its own price: a line under the price only when the two differ.
+      var sqNote = el("small", { class: "swm-warn", hidden: true });
+      var sqPaint = function () {
+        var show = shop.checkout !== "generic" && d.sqPrice != null && d.sqPrice !== toCents(price.value); sqNote.hidden = !show;
+        if (show) sqNote.textContent = "Square charges " + money(d.sqPrice) + ". Change it in Square too, or type the same here.";
+      }; sqPaint();
+      var desc = el("textarea", { id: "swm-desc", rows: "5", maxlength: String(MAX.desc), placeholder: "What it is, what's included, sizes, care." }), left = el("small", { class: "swm-muted", hidden: true });
+      desc.value = d.desc || "";
+      var count = function () { var n = MAX.desc - desc.value.length; left.hidden = n > 300; left.textContent = n + " characters left."; };
+      desc.oninput = function () { d.desc = desc.value; count(); }; count();
+      return card("Details", [el("div", { class: "swm-grid" }, [
+        field("Name", name, null, "is-span"),
+        field("Price", el("div", { class: "swm-money" }, [el("span", { "aria-hidden": "true", text: "$" }), price]), shop.checkout !== "generic" && d.sqPrice != null ? "Square charges " + money(d.sqPrice) + ". Leave it empty to show no price." : "The regular price. Leave it empty to show no price.", null, sqNote),
+        field("Category", cat, "Groups items on " + whose + ". Pick one you used before, or type a new one."),
+        field("Description", desc, "Shown when someone opens the item. A blank line starts a new paragraph.", "is-span", left)]),
+        el("div", { class: "swm-swrow" }, [el("label", { class: "swm-sw", for: "swm-class" }, [isClass, el("span", { class: "swm-track", "aria-hidden": "true" }), el("b", { text: "Class or workshop" })]),
+          tipBtn("It gets a date and seats, and its button says Sign up.", "Class or workshop")]), classBits,
+        cats.length ? el("datalist", { id: "swm-cats" }, cats.map(function (c) { return el("option", { value: c }); })) : null]);
     }
     // The price as typed in the editor right now, in cents (the saved one until it's changed).
     function draftPrice() { var d = st.draft; return d.priceText != null ? toCents(d.priceText) : d.price; }
@@ -596,12 +621,13 @@
       on.onchange = function () { if (on.checked && !pct.value && mode === "pct") pct.value = "15"; sync(); changed(); if (on.checked) (mode === "pct" ? pct : fixed).focus(); };
       pct.oninput = fixed.oninput = ends.oninput = sync; ends.min = today;
       paintAmount(); sync();
-      return section([el("label", { class: "swm-sw", for: "swm-sale" }, [on, el("span", { class: "swm-track", "aria-hidden": "true" }), el("b", { text: "On sale" })]),
+      return card(null, [el("div", { class: "swm-swrow" }, [el("label", { class: "swm-sw", for: "swm-sale" }, [on, el("span", { class: "swm-track", "aria-hidden": "true" }), el("b", { text: "On sale" })]),
+          tipBtn("Shows a lower price with the regular one crossed out, until you switch it off or the last day passes.", "On sale")]),
         body, line].map(function (k) { if (k === body) fill(body, [seg, el("div", { class: "swm-row2" }, [amount, field(el("label", { for: "swm-ends" }, ["Last day ", el("em", { text: "(optional)" })]), ends)])]); return k; }), "swm-salebox");
     }
     /* Options, like sizes or colors: up to 3, each with up to 20 choices; a choice can have its own price. */
     function optionsPart() {
-      var d = st.draft, wrap = el("div", { class: "swm-sec" });
+      var d = st.draft, wrap = el("section", { class: "swm-sec swm-card", "aria-label": "Options" });
       var paint = function (focusSel) {
         var boxes = d.options.map(function (o, oi) {
           var name = el("input", { class: "swm-opt-name", value: o.name, maxlength: String(MAX.optName || 40), placeholder: "Size", "aria-label": "Option " + (oi + 1) + " name", oninput: function () { o.name = name.value; } });
@@ -614,7 +640,7 @@
           return el("div", { class: "swm-opt" }, [el("div", { class: "swm-opt-hd" }, [name, el("button", { class: "swm-link-b", type: "button", text: "Remove", "aria-label": "Remove the option " + (o.name || oi + 1), onclick: function () { d.options.splice(oi, 1); changed(); paint(); } })]),
             el("ul", {}, rows), o.choices.length < MAX.choices ? el("button", { class: "swm-link-b swm-add", type: "button", onclick: function () { o.choices.push({ name: "" }); changed(); paint(".swm-opt:nth-child(" + (oi + 1) + ") li:last-child input"); } }, [ico("plus", 13), "Add a choice"]) : null]);
         });
-        fill(wrap, [el("div", { class: "swm-lbl" }, [el("b", { text: "Options" }), el("span", { text: "Like sizes or colors. Buyers see them on " + whose + " and pick one at checkout." })]),
+        fill(wrap, [el("div", { class: "swm-card-hd" }, [el("h3", { text: "Options" }), tipBtn("Like sizes or colors. Buyers see them on " + whose + " and pick one at checkout. A choice can have its own price.", "Options")]),
           el("div", { class: "swm-opts" }, boxes),
           d.options.length < MAX.options ? el("button", { class: "swm-btn plain is-sm", type: "button", onclick: function () { d.options.push({ name: "", choices: [{ name: "" }, { name: "" }] }); changed(); paint(".swm-opt:last-child .swm-opt-name"); } },
             [ico("plus", 14), d.options.length ? "Add another option" : "Add an option, like Size"]) : null]);
@@ -622,29 +648,21 @@
       };
       paint(); return wrap;
     }
-    function descPart() {
-      var d = st.draft, n = el("small", {}), desc = el("textarea", { id: "swm-desc", rows: "5", maxlength: String(MAX.desc), placeholder: "What it is, what's included, sizes, care. As long as you like." });
-      desc.value = d.desc || "";
-      var count = function () { n.textContent = "A blank line starts a new paragraph on " + whose + "." + (desc.value.length > MAX.desc - 300 ? " " + (MAX.desc - desc.value.length) + " characters left." : ""); };
-      desc.oninput = function () { d.desc = desc.value; count(); }; count();
-      return section([el("div", { class: "swm-f" }, [el("label", { for: "swm-desc", text: "Description" }), desc, n])]);
-    }
     function segmented(id, label, list, now, help, pick) {
-      var say1 = el("small", { text: list.filter(function (x) { return x[0] === now; })[0][2] });
       var seg = el("div", { class: "swm-seg", role: "radiogroup", "aria-labelledby": id });
       list.forEach(function (o, i) {
-        seg.appendChild(el("button", { type: "button", role: "radio", "aria-checked": String(o[0] === now), tabindex: o[0] === now ? "0" : "-1", onclick: function () {
+        seg.appendChild(el("button", { type: "button", role: "radio", "aria-checked": String(o[0] === now), tabindex: o[0] === now ? "0" : "-1", title: o[2], onclick: function () {
           if (pick(o[0]) === false) return;
-          Array.prototype.forEach.call(seg.children, function (b, j) { b.setAttribute("aria-checked", String(j === i)); b.tabIndex = j === i ? 0 : -1; }); say1.textContent = o[2]; changed();
+          Array.prototype.forEach.call(seg.children, function (b, j) { b.setAttribute("aria-checked", String(j === i)); b.tabIndex = j === i ? 0 : -1; }); changed();
         } }, [id === "swm-show-l" ? el("i", { class: "swm-dot is-" + o[0] }) : o[0] === "featured" ? ico("star", 13, 2.2) : null, o[1]]));
       });
       seg.onkeydown = function (e) { var b = Array.prototype.indexOf.call(seg.children, document.activeElement), n = seg.children.length; if (b < 0) return;
         var to = e.key === "ArrowRight" || e.key === "ArrowDown" ? (b + 1) % n : e.key === "ArrowLeft" || e.key === "ArrowUp" ? (b + n - 1) % n : -1; if (to < 0) return; e.preventDefault(); seg.children[to].focus(); seg.children[to].click(); };
-      return el("div", { class: "swm-f" }, [el("span", { class: "swm-flabel", id: id, text: label }), seg, say1]);
+      return el("div", { class: "swm-f" }, [el("span", { class: "swm-flabel", id: id, text: label }), seg]);
     }
     function showPart() {
       var d = st.draft;
-      return section([segmented("swm-show-l", you ? "On your website" : "On the website", SHOW, d.show, null, function (v) {
+      return card("Visibility", [segmented("swm-show-l", you ? "On your website" : "On the website", SHOW, d.show, null, function (v) {
           if (v !== "hidden" && !(st.draft.link || "").trim()) { showErr(kind().need, ed.querySelector(".swm-link")); return false; } d.show = v; }),
         segmented("swm-tag-l", "Tag", TAGS, d.tag || "", null, function (v) { d.tag = v; })], "swm-grid is-one");
     }
@@ -653,7 +671,7 @@
       var test = el("a", { class: "swm-test", target: "_blank", rel: "noopener", hidden: true }, ["Test the link", ico("ext", 12)]);
       var testable = function () { var v = lk.value.trim(); test.hidden = !/^(https:\/\/)?[\w-]+(\.[\w-]+)+\/\S*/i.test(v); test.href = /^https:/i.test(v) ? v : "https://" + v; };
       lk.oninput = function () { d.link = lk.value; testable(); }; testable();
-      return section([el("div", { class: "swm-f" }, [el("div", { class: "swm-lblrow" }, [el("label", { for: "swm-link", text: c.label }), test]), lk, el("small", { text: c.help })])]);
+      return card("Checkout", [el("div", { class: "swm-f" }, [el("div", { class: "swm-lblrow" }, [el("span", { class: "swm-lblrow is-tip" }, [el("label", { for: "swm-link", text: c.label }), tipBtn(c.help, c.label)]), test]), lk])]);
     }
     function showErr(text, at) { errBox.textContent = text; errBox.hidden = false; if (at) at.focus(); }
 

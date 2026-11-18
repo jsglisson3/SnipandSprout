@@ -1,6 +1,7 @@
 {
-  "version": "V7.11",
+  "version": "V7.12",
   "changes": [
+    { "version": "V7.12", "date": "2026-11-17", "note": "Client Portal matches TVIS V14: easier-to-read orange and grey text, plain status tags on your requests, small help tips on the message buttons, and the latest shop manager. Pinch zoom works on phones." },
     { "version": "V7.11", "date": "2026-11-17", "note": "Shop: the DIY Terrarium Kits, Terrarium Bar and Plant Bar tabs follow her shop list. Showing fills in today's price (a sale shows the regular price crossed out) and the checkout link; Sold out puts a Sold out for now note (Fully booked for the Terrarium Bar) in place of Buy; Hidden takes the tab away and the row closes up. Needs SW Core 2.3 and the three items set to Showing." },
     { "version": "V7.10", "date": "2026-11-17", "note": "Visit Us opens on the photographer's photo of Dani at her Fifth Market booth: her face, her sign and her plant care jars, in place of the shop-window photo that cut her off." },
     { "version": "V7.9", "date": "2026-11-17", "note": "Shop and Workshops: each item from her shop can show up to 5 photos to swipe through (arrows and dots), a sale tag with the old price crossed out and the last day, From the lowest price when choices cost different amounts, each option on its own line, New and Featured tags, and Sold out fades the photo." },

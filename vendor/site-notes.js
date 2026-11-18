@@ -371,7 +371,7 @@
     ".cur svg{flex:none;width:17px;height:17px;color:var(--go)}",
     ".cur .val{flex:1;min-width:0;font-size:16.5px;line-height:1.3;overflow-wrap:break-word}",
     ".cur .chg,.ed .undo{flex:none;border:0;min-height:40px;padding:0 14px;border-radius:10px;font-size:15px;font-weight:600}",
-    ".cur .chg{background:var(--accent-soft);color:var(--accent)}.cur .chg:hover{background:#f6dccd}",
+    ".cur .chg{background:var(--accent-soft);color:var(--accent-dk,#a3441a)}.cur .chg:hover{background:#f6dccd}",
     ".ed{display:flex;align-items:center;gap:6px}.ed input{flex:1}",
     ".ed .undo{background:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:0 8px}",
     /* social pages: the site's own logo beside its name, the link on one line under them */
@@ -379,7 +379,7 @@
     ".field.brand .lb{display:flex;align-items:center;gap:10px}",
     ".field .logo{flex:none;width:24px;height:24px}.field .logo svg{display:block;width:100%;height:100%}",
     ".field.brand .cur .val{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
-    ".tip{display:flex;gap:10px;align-items:flex-start;margin:-4px 0 0;color:var(--muted);font-size:15px;line-height:1.45}.tip .ic{flex:none;width:20px;height:20px;margin-top:1px;color:var(--accent)}",
+    ".tip{display:flex;gap:10px;align-items:flex-start;margin:-4px 0 0;color:var(--muted);font-size:15px;line-height:1.45}.tip .ic{flex:none;width:20px;height:20px;margin-top:1px;color:var(--accent-dk,#a3441a)}",
     ".note.wide{width:480px}",
     /* photos: a big tap/drop area, big pictures with their words under them, idea chips */
     ".note.photos{width:600px}",
@@ -406,14 +406,14 @@
     "@media (max-width:719px){.note.photos .thumbs.capt{grid-template-columns:1fr 1fr;gap:10px}.note.photos .thumbs:not(.capt){grid-template-columns:repeat(3,minmax(0,1fr))}.add-ph.big{min-height:130px}}",
     /* files dragged over any note: the whole card says "Drop your photos here" */
     ".note .dropcover{display:none}",
-    ".note.dropping .dropcover{position:absolute;inset:8px;z-index:3;display:grid;place-content:center;justify-items:center;gap:10px;border:3px dashed var(--accent);border-radius:16px;background:rgba(251,238,230,.94);color:var(--accent);pointer-events:none}",
+    ".note.dropping .dropcover{position:absolute;inset:8px;z-index:3;display:grid;place-content:center;justify-items:center;gap:10px;border:3px dashed var(--accent);border-radius:16px;background:rgba(251,238,230,.94);color:var(--accent-dk,#a3441a);pointer-events:none}",
     ".note .dropcover .ic{width:54px;height:54px}.note .dropcover b{font-size:21px}",
     "textarea{font:inherit;font-size:18px;color:var(--ink);width:100%;min-height:120px;border:2px solid var(--line);border-radius:12px;padding:12px 14px;background:var(--soft);resize:vertical}",
     "textarea:focus{border-color:var(--accent);background:#fff;outline:none}",
     "textarea::placeholder{color:#8d877e}",
     ".add-ph{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:2px dashed #cfc7bb;background:var(--soft);border-radius:12px;padding:14px 16px;min-height:64px}",
     ".add-ph:hover,.add-ph.over{border-color:var(--accent);background:var(--accent-soft)}",
-    ".add-ph .ic{width:30px;height:30px;color:var(--accent)}",
+    ".add-ph .ic{width:30px;height:30px;color:var(--accent-dk,#a3441a)}",
     ".add-ph b{display:block;font-size:17px}",
     ".add-ph span{color:var(--muted);font-size:14px}",
     ".thumbs{display:flex;flex-wrap:wrap;gap:10px}",
@@ -429,7 +429,7 @@
     ".thumbs.capt .rm{width:26px;height:26px;top:-7px;right:-7px}",
     ".thumbs .cap{font:inherit;font-size:16px;color:var(--ink);width:100%;min-width:0;min-height:46px;border:2px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--soft)}",
     ".thumbs .cap:focus{outline:none;border-color:var(--accent);background:#fff}.thumbs .cap::placeholder{color:#8d877e}",
-    ".capts{justify-self:start;border:0;background:none;padding:6px 0;color:var(--accent);font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:3px}",
+    ".capts{justify-self:start;border:0;background:none;padding:6px 0;color:var(--accent-dk,#a3441a);font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:3px}",
     ".b{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 20px;border-radius:12px;border:2px solid transparent;font-size:17px;font-weight:600;white-space:nowrap}",
     ".b.main{background:var(--accent);color:#fff}.b.main:hover{background:var(--accent-dk)}",
     ".b.go{background:var(--go);color:#fff}.b.go:hover{background:var(--go-dk)}",
@@ -455,7 +455,7 @@
     "@media (max-width:719px){.veil{place-items:end stretch;padding:0}.veil > .card{width:100%;max-height:92vh;border-radius:20px 20px 0 0}}",
     ".steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}",
     ".steps li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px 14px 14px}",
-    ".steps .circ{width:52px;height:52px;border-radius:15px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;position:relative}",
+    ".steps .circ{width:52px;height:52px;border-radius:15px;background:var(--accent-soft);color:var(--accent-dk,#a3441a);display:grid;place-items:center;position:relative}",
     ".steps .circ .ic{width:26px;height:26px}",
     ".steps .circ i{position:absolute;right:-7px;bottom:-7px;width:24px;height:24px;border-radius:50%;border:2px solid #fff;box-sizing:content-box;background:var(--accent);color:#fff;font:700 12.5px/24px system-ui,sans-serif;text-align:center;font-style:normal}",
     ".steps b{display:block;font-size:17.5px;line-height:1.3}",
@@ -498,7 +498,7 @@
     ".tag .ic{width:15px;height:15px;stroke-width:3}",
     ".tag.on{background:#e3efe6;color:#22603a}.tag.off{background:#f0ebe4;color:#5f5a53;padding-left:10px}.tag.yes{background:#fbeee6;color:#9a4315;padding-left:10px}",
     ".pg-none{margin:0;padding:18px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;font-size:15.5px}",
-    ".pg-more{margin:0;font-size:15.5px;color:var(--muted)}.pg-more a{color:var(--accent);font-weight:600}",
+    ".pg-more{margin:0;font-size:15.5px;color:var(--muted)}.pg-more a{color:var(--accent-dk,#a3441a);font-weight:600}",
     /* "On your site now": one button per page of their site, the picked one dark */
     ".pg-pages{display:flex;flex-wrap:wrap;gap:8px}",
     ".pg-page{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-size:15px;font-weight:500}",
@@ -532,7 +532,7 @@
     ".center p{margin:0 auto;max-width:36ch;color:var(--muted);font-size:17px}",
 
     /* login */
-    ".lock{width:64px;height:64px;border-radius:50%;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin:6px auto 0}",
+    ".lock{width:64px;height:64px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dk,#a3441a);display:grid;place-items:center;margin:6px auto 0}",
     ".lock .ic{width:30px;height:30px}",
     ".veil.solid{background:transparent;top:70px;bottom:auto;min-height:calc(100vh - 70px);padding:40px 16px}@media (max-width:719px){.veil.solid{top:58px;min-height:calc(100vh - 58px);place-items:center stretch;padding:16px}.veil.solid > .card{border-radius:20px}}",
     ".veil.solid > .card{width:min(460px,100%);box-shadow:0 0 0 1px #e2dcd2,0 30px 60px -28px rgba(36,34,31,.45)}",
@@ -597,7 +597,7 @@
     ".fp-i{width:36px;height:36px;display:inline-grid;place-items:center;border:0;border-radius:9px;background:none;color:var(--soft);cursor:pointer}",
     "span.fp-i{cursor:default}a.fp-i:hover,button.fp-i:hover{background:var(--stone);color:var(--ink)}.fp-i.done{color:var(--sage)}.fp-i.done:hover{color:var(--sage)}.fp-i.del:hover{color:#b4361c;background:#fbeae5}",
     ".fp-i .ic{width:18px;height:18px}",
-    ".fp-link{background:none;border:0;padding:6px 4px;font:600 13.5px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--accent);cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
+    ".fp-link{background:none;border:0;padding:6px 4px;font:600 13.5px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--accent-dk,#a3441a);cursor:pointer;text-decoration:underline;text-underline-offset:3px}",
     // an opened row: how to reach them, every answer, the files
     ".fp-body{grid-column:2/-1;display:grid;gap:12px;padding:0 0 18px 18px;max-width:760px}",
     ".fp-reach{display:flex;flex-wrap:wrap;gap:6px 18px;margin:0;font-size:14px}",
@@ -612,7 +612,7 @@
     ".fp-when{margin:0;font-size:12.5px;color:var(--soft)}",
     ".fp-none{margin:0;padding:14px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}",
     ".fp-more{margin:0;padding:8px 22px 10px;border-top:1px solid var(--line)}",
-    ".fp-more button{font:600 13.5px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;background:none;border:0;padding:4px 0;cursor:pointer;color:var(--accent);text-decoration:underline;text-underline-offset:3px}",
+    ".fp-more button{font:600 13.5px/1.2 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;background:none;border:0;padding:4px 0;cursor:pointer;color:var(--accent-dk,#a3441a);text-decoration:underline;text-underline-offset:3px}",
     // where the emails go: one line, or the box to change it
     ".fp-to{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;padding:12px 22px;border-top:1px solid var(--line);background:#faf8f4;font-size:13.5px;color:var(--muted)}",
     ".fp-to > .ic{color:var(--soft)}.fp-to b{font-weight:600;color:var(--ink);overflow-wrap:anywhere}",
@@ -761,14 +761,14 @@
     } }, [
       h("div", { class: "bd", style: "padding-top:22px;gap:14px" }, [
         LOGO ? h("div", { class: "login-logo" }, [h("img", { src: LOGO, alt: NAME ? NAME + " logo" : "Logo" })]) : h("div", { class: "lock" }, [icon("lock")]),
-        h("div", { class: "center" }, [NAME ? h("p", { class: "kick" }, [icon("lock"), h("span", { text: IS_HUB ? "Client Portal" : "Owner login" })]) : null, h("h2", { text: NAME ? "Welcome, " + NAME : "Owner login" }), h("p", { text: "Type the password " + TO + " gave you." })]),
+        h("div", { class: "center" }, [NAME ? h("p", { class: "kick" }, [icon("lock"), h("span", { text: IS_HUB ? "Client Portal" : "Owner login" })]) : null, h("h2", { text: NAME ? "Welcome, " + NAME : "Owner login", role: IS_HUB ? "heading" : null, "aria-level": IS_HUB ? "1" : null }), h("p", { text: "Type the password " + TO + " gave you." })]),
         h("label", { class: "q", for: "swn-pw", text: "Password" }),
         h("div", { class: "pw" }, [pw, showBtn]),
         err, btn,
         h("p", { class: "center", style: "font-size:15px;color:var(--muted);margin:0", text: DEMO ? "Demo password: wolf" : "Forgot it? Just ask " + TO + "." })
       ])
     ]);
-    var veil = h("div", { class: "veil" + (IS_HUB ? " solid" : "") }, [form]);
+    var veil = h("div", { class: "veil" + (IS_HUB ? " solid" : ""), role: IS_HUB ? "main" : null }, [form]);   // the portal's login is the page: its main area and heading
     layer.appendChild(veil); pw.focus();
   }
 
@@ -2236,7 +2236,7 @@
   // own website, sales, options, many items at once, and Changes with Undo. Every Buy button opens the item's own
   // checkout link, so no payment ever comes through here. Stray Wolf starts the shop, imports into it and picks its
   // kind of checkout in the admin. No shop: no card.
-  var SHOP_FILES = "1";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
+  var SHOP_FILES = "2";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
   var spShop = null, spMgr = null, spDemo = null, spPics = {};
   function loadShop() {
     var box = document.querySelector("[data-shop-portal]"); if (!box || spMgr) return;
@@ -2621,5 +2621,48 @@
       else { lock(); mount(); showLogin(); }
     } else if (token && on) { mount(); start(); }
   }
+
+  /* Tooltips on the Client Portal page (not on the website itself). Hover (after a moment) or keyboard focus on
+     anything with a title, or a button that is only an icon, shows a short dark label under it: the browser's own
+     title box is slow and never shows for the keyboard. Esc or moving away closes it, and the pointer can rest on the
+     label (WCAG 1.4.13). A tap on an (i) (.swm-i, the shop) shows its words on a phone. Same as the admin's. */
+  function tooltips() {
+    if (window.__swTips) return; window.__swTips = 1;
+    addCss(document, ".sw-tip{position:fixed;z-index:2147483000;max-width:260px;padding:6px 9px;border-radius:7px;background:#24221f;color:#f6f5f2;" +
+      "font:400 12.5px/1.4 system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;box-shadow:0 8px 22px -8px rgb(0 0 0 / .45);opacity:0;transition:opacity .12s;overflow-wrap:anywhere}" +
+      ".sw-tip.on{opacity:1}@media (prefers-reduced-motion:reduce){.sw-tip{transition:none}}@media print{.sw-tip{display:none}}");
+    var tip = null, at = null, wait = 0, gone = 0, seq = 0;
+    function words(n) {
+      if (n.hasAttribute("title")) { var t = n.getAttribute("title"); n.removeAttribute("title"); if (t) n.setAttribute("data-tip", t); }
+      var s = n.getAttribute("data-tip") || (/^(BUTTON|A)$/.test(n.tagName) && !n.textContent.trim() ? n.getAttribute("aria-label") || "" : "");
+      return s && s.trim() !== n.textContent.trim() ? s : "";
+    }
+    function find(e) {
+      var path = e.composedPath ? e.composedPath() : [e.target];
+      for (var i = 0; i < path.length; i++) { var n = path[i]; if (!n || n.nodeType !== 1) continue; if (n.classList.contains("sw-tip")) return null;
+        if (n.hasAttribute("title") || n.hasAttribute("data-tip") || (/^(BUTTON|A)$/.test(n.tagName) && !n.textContent.trim() && n.getAttribute("aria-label"))) return n; }
+      return null;
+    }
+    function hide(soft) { if (!soft) clearTimeout(wait); clearTimeout(gone); if (tip) { tip.remove(); tip = null; } if (at) { at.removeAttribute("aria-describedby"); at = null; } }
+    function show(n) {
+      var s = words(n); hide(); if (!s || !n.isConnected) return;
+      at = n; tip = document.createElement("div"); tip.className = "sw-tip"; tip.setAttribute("role", "tooltip"); tip.id = "sw-tip-" + (++seq); tip.textContent = s;
+      document.body.appendChild(tip);
+      if (n.getAttribute("aria-label") !== s && n.getRootNode() === document) n.setAttribute("aria-describedby", tip.id);
+      var r = n.getBoundingClientRect(), w = tip.offsetWidth, ht = tip.offsetHeight, top = r.bottom + 8;
+      if (top + ht > innerHeight - 8) top = r.top - ht - 8;
+      tip.style.top = Math.max(8, top) + "px"; tip.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + "px";
+      tip.onpointerenter = function () { clearTimeout(gone); }; tip.onpointerleave = function () { gone = setTimeout(hide, 120, true); };
+      requestAnimationFrame(function () { if (tip) tip.classList.add("on"); });
+    }
+    document.addEventListener("pointerover", function (e) { if (e.pointerType === "touch") return; var n = find(e); if (!n || n === at) { if (n) clearTimeout(gone); return; } clearTimeout(wait); wait = setTimeout(function () { show(n); }, 350); });
+    document.addEventListener("pointerout", function (e) { var n = find(e); if (!n) return; var to = e.relatedTarget; if (to && (n.contains(to) || (tip && tip.contains(to)))) return; clearTimeout(wait); gone = setTimeout(hide, 120, true); });
+    document.addEventListener("focusin", function (e) { var n = find(e), t = (e.composedPath ? e.composedPath()[0] : e.target); if (n && n === t && t.matches(":focus-visible")) show(n); else if (at && at !== n) hide(); });
+    document.addEventListener("focusout", function (e) { if ((e.composedPath ? e.composedPath()[0] : e.target) === at) hide(); });
+    document.addEventListener("click", function (e) { var t = e.composedPath ? e.composedPath()[0] : e.target, i = t.closest && t.closest(".swm-i"); if (i) { if (at === i && tip) hide(); else show(i); return; } if (tip && !tip.contains(t)) hide(); }, true);
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape" && tip) { e.stopPropagation(); hide(); } }, true);   // Esc closes only the label
+    var drop = function () { hide(); }; addEventListener("scroll", drop, true); addEventListener("resize", drop);
+  }
+  if (IS_HUB) tooltips();
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();
