@@ -6,7 +6,7 @@
 //                                          in its built-in demo mode, so it can be shown without the service
 //
 // Pages are written by the functions below; styling and behaviour live in src/. Everything in vendor/ is
-// copied unchanged (Stray Wolf's Client Portal and shop list, the same files on every client site).
+// copied unchanged (Stray Wolf's Client Portal, shop list and business info, the same files on every client site).
 import { readFileSync, writeFileSync, mkdirSync, cpSync, rmSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -29,7 +29,7 @@ mkdirSync(dist + 'portal', { recursive: true });
 cpSync(here + 'img', dist + 'img', { recursive: true });
 cpSync(here + 'fonts', dist + 'fonts', { recursive: true });
 cpSync(here + 'portal-brand', dist + 'portal/brand', { recursive: true });
-for (const f of ['site-notes.js', 'shop-manager.js', 'shop-manager.css', 'html2canvas.min.js', 'shop.js', 'shop.css']) cpSync(here + 'vendor/' + f, dist + f);
+for (const f of ['site-notes.js', 'shop-manager.js', 'shop-manager.css', 'html2canvas.min.js', 'shop.js', 'shop.css', 'info.js', 'info-editor.js', 'info-editor.css']) cpSync(here + 'vendor/' + f, dist + f);
 
 const C = {
   url: 'https://snipandsprout.pages.dev/',           // the site's address: her own domain at launch (see README, Launch)
@@ -38,11 +38,46 @@ const C = {
   etsy: 'https://www.etsy.com/shop/SnipAndSproutCo',
   workshop: 'https://www.snipandsproutco.com/store/p/terrarium-workshop',
   maps: 'https://www.google.com/maps/search/?api=1&query=413+E+Emma+Ave+Springdale+AR+72764',
-  gcal: 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=November%20Terrarium%20Workshop%20at%20Snip%20%26%20Sprout%20Co.&dates=20261122T190000Z/20261122T200000Z&location=413%20E.%20Emma%20Ave.%2C%20Springdale%2C%20AR%2072764&details=Starts%20at%201%20PM.%20Seating%20is%20limited.',
   stray: 'https://straywolftech.com',
   // Stray Wolf's Site Notes service: the Client Portal and the shop list both read from it.
   site: 'snip-and-sprout',                              // her short name in Stray Wolf Admin
   api: 'https://site-notes.jsglisson.workers.dev',
+};
+
+// Her hours, email, address and social links are kept in Stray Wolf Admin and her portal (Business info), and
+// vendor/info.js puts them into every spot marked data-info. What is typed in this file is the fallback: it shows
+// until something is saved there, and whenever that service can't be reached. So a change of hours is made in
+// the portal or the admin, not here; change WEEK only if the fallback itself should move.
+// WEEK: Sunday first, 24-hour times. It must say the same as HOURS3 and the Store block's hours below.
+const WEEK = [['09:00', '14:00'], ['10:00', '15:00'], ['10:00', '15:00'], ['09:00', '18:00'], ['09:00', '18:00'], ['09:00', '18:00'], ['09:00', '14:00']];
+const INFO_FALLBACK = JSON.stringify({ tz: 'America/Chicago', hours: WEEK.map(([open, close]) => ({ open, close })) });
+
+// The next workshop, in one place. The Home band, the Workshops page, both "Add to my calendar" links and the
+// event details search engines read are all written from this.
+const WS = {
+  title: 'November Terrarium Workshop',
+  day: 'Sunday, November 22',
+  time: '1 PM',
+  start: '2026-11-22T13:00:00-06:00',   // Central time
+  end: '2026-11-22T14:00:00-06:00',     // one hour is assumed (README, "To confirm with Dani before launch")
+  from: 40,                              // the lowest ticket price, in dollars
+};
+const ADDRESS = '413 E. Emma Ave., Springdale, AR 72764';
+const utc = (iso) => new Date(iso).toISOString().replace(/[-:]|\.\d{3}/g, '');   // 20261122T190000Z, the form calendars read
+C.gcal = 'https://calendar.google.com/calendar/render?action=TEMPLATE&text=' + encodeURIComponent(WS.title + ' at Snip & Sprout Co.')
+  + `&dates=${utc(WS.start)}/${utc(WS.end)}&location=${encodeURIComponent(ADDRESS)}&details=` + encodeURIComponent(`Starts at ${WS.time}. Seating is limited.`);
+
+// The shop's name for itself in the details search engines read (the Store block in every page's head).
+const STORE_ID = C.url + '#store';
+// The next workshop for search engines: left out once the day has passed, so a finished event is never advertised.
+const workshopEvent = new Date(WS.end) < new Date() ? null : {
+  '@context': 'https://schema.org', '@type': 'Event', name: WS.title, startDate: WS.start, endDate: WS.end,
+  eventStatus: 'https://schema.org/EventScheduled', eventAttendanceMode: 'https://schema.org/OfflineEventAttendanceMode',
+  description: 'Join us for a relaxing afternoon of planting and creating!',
+  image: C.url + 'img/gal/workshop-table.webp',
+  location: { '@type': 'Place', name: 'Snip & Sprout Co.', address: { '@type': 'PostalAddress', streetAddress: '413 E. Emma Ave.', addressLocality: 'Springdale', addressRegion: 'AR', postalCode: '72764', addressCountry: 'US' } },
+  organizer: { '@id': STORE_ID },
+  offers: { '@type': 'AggregateOffer', lowPrice: String(WS.from), priceCurrency: 'USD', url: C.workshop },
 };
 
 const I = {
@@ -62,18 +97,23 @@ const I = {
   // Instagram's and Etsy's own marks (from Simple Icons, CC0), shown white on each brand's colour tile (.ic-ig, .ic-etsy)
   ig: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>',
   etsy: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M8.559 2.445c0-.325.033-.52.59-.52h7.465c1.3 0 2.02 1.11 2.54 3.193l.42 1.666h1.27c.23-4.728.43-6.784.43-6.784s-3.196.36-5.09.36H6.635L1.521.196v1.37l1.725.326c1.21.24 1.5.496 1.6 1.606 0 0 .11 3.27.11 8.64 0 5.385-.09 8.61-.09 8.61 0 .973-.39 1.333-1.59 1.573l-1.722.33V24l5.13-.165h8.55c1.935 0 6.39.165 6.39.165.105-1.17.75-6.48.855-7.064h-1.2l-1.284 2.91c-1.005 2.28-2.476 2.445-4.11 2.445h-4.906c-1.63 0-2.415-.64-2.415-2.05V12.8s3.62 0 4.79.096c.912.064 1.463.325 1.76 1.598l.39 1.695h1.41l-.09-4.278.192-4.305h-1.391l-.45 1.89c-.283 1.244-.48 1.47-1.754 1.6-1.666.17-4.815.14-4.815.14V2.45h-.05z"/></svg>',
+  // Facebook's and Google's marks, for the two footer links that only show once she saves a link for them
+  fb: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M9.101 23.691v-7.98H6.627v-3.667h2.474v-1.58c0-4.085 1.848-5.978 5.858-5.978.401 0 .955.042 1.468.103a8.68 8.68 0 0 1 1.141.195v3.325a8.623 8.623 0 0 0-.653-.036 26.805 26.805 0 0 0-.733-.009c-.707 0-1.259.096-1.675.309a1.686 1.686 0 0 0-.679.622c-.258.42-.374.995-.374 1.752v1.297h3.919l-.386 2.103-.287 1.564h-3.246v8.245C19.396 23.238 24 18.179 24 12.044c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.628 3.874 10.35 9.101 11.647Z"/></svg>',
+  google: '<svg viewBox="0 0 24 24" aria-hidden="true"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>',
   mail: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="2.8" y="4.8" width="14.4" height="10.4" rx="2.2"/><path d="m3.6 6.2 6.4 4.8 6.4-4.8"/></svg>',
   lock: '<svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><rect x="4.2" y="8.8" width="11.6" height="8" rx="2"/><path d="M7 8.8V6.6a3 3 0 0 1 6 0v2.2"/></svg>',
 };
 
-const HOURS3 = `<table class="hours3" data-hours3>
+// The hours table and, under it, holidays and special days in the next two weeks (hidden while there are none).
+const HOURS3 = `<table class="hours3" data-info="hours">
   <caption class="sr">Shop hours</caption>
   <tbody>
     <tr data-days="1,2"><th scope="row">Mon – Tue</th><td>10 AM – 3 PM</td></tr>
     <tr data-days="3,4,5"><th scope="row">Wed – Fri</th><td>9 AM – 6 PM</td></tr>
     <tr data-days="6,0"><th scope="row">Sat – Sun</th><td>9 AM – 2 PM</td></tr>
   </tbody>
-</table>`;
+</table>
+<div class="special" data-info="special" hidden><p class="sr">Coming up</p><ul></ul></div>`;
 
 const NEIGHBORS = `<div class="neighbors"><span>In Bloom Floral Company</span><span>Two Friends Community Books</span><span>KaGie's</span></div>`;
 
@@ -83,7 +123,7 @@ const nav = (file) => {
   return `<header class="nav"><nav class="nav__in" aria-label="Main">
   <div class="nav__links">${NAV.slice(0, 3).map(link).join('')}</div>
   <a class="brand" href="index.html" aria-label="Snip &amp; Sprout Co. home"><img src="logo-tag.svg" alt="" width="177" height="144"></a>
-  <div class="nav__links nav__links--end">${NAV.slice(3).map(link).join('')}<span class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></span></div>
+  <div class="nav__links nav__links--end">${NAV.slice(3).map(link).join('')}<span class="open" data-info="open"><span class="open__dot" aria-hidden="true"></span><span data-info-text>Open every day</span></span></div>
 </nav></header>`;
 };
 
@@ -132,17 +172,19 @@ const head = (p) => `<!doctype html>
 <meta property="og:image" content="${C.url}img/share.jpg">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="The Plant Bar at Snip &amp; Sprout Co.: her Plant Bar sign, a tray of plant markers and stacks of pots">
+<meta property="og:image:alt" content="The Plant Bar at Snip &amp; Sprout Co.: the Plant Bar sign, a tray of plant markers and stacks of pots">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#dde2d3">
+<link rel="icon" href="favicon.ico" sizes="32x32">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="preload" href="fonts/figtree.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/lora.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="site.css">${(p.css || []).map((f) => `\n<link rel="stylesheet" href="${f}">`).join('')}
 <script>${JS_FLAG}</script>
-<script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","name":"Snip & Sprout Co.","url":"${C.url}","image":"${C.url}img/share.jpg","logo":"${C.url}logo.svg","hasMap":"${C.maps}","description":"Indoor plant boutique with pottery, a Plant Bar, a Terrarium Bar and workshops.","address":{"@type":"PostalAddress","streetAddress":"413 E. Emma Ave.","addressLocality":"Springdale","addressRegion":"AR","postalCode":"72764","addressCountry":"US"},"email":"${C.email}","sameAs":["${C.ig}","${C.etsy}"],"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday"],"opens":"10:00","closes":"15:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"09:00","closes":"14:00"}]}</script>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"Store","@id":"${STORE_ID}","name":"Snip & Sprout Co.","url":"${C.url}","image":"${C.url}img/share.jpg","logo":"${C.url}logo.svg","hasMap":"${C.maps}","description":"Indoor plant boutique with pottery, a Plant Bar, a Terrarium Bar and workshops.","address":{"@type":"PostalAddress","streetAddress":"413 E. Emma Ave.","addressLocality":"Springdale","addressRegion":"AR","postalCode":"72764","addressCountry":"US"},"email":"${C.email}","sameAs":["${C.ig}","${C.etsy}"],"openingHoursSpecification":[{"@type":"OpeningHoursSpecification","dayOfWeek":["Monday","Tuesday"],"opens":"10:00","closes":"15:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Wednesday","Thursday","Friday"],"opens":"09:00","closes":"18:00"},{"@type":"OpeningHoursSpecification","dayOfWeek":["Saturday","Sunday"],"opens":"09:00","closes":"14:00"}]}</script>${p.ld ? `\n<script type="application/ld+json">${JSON.stringify(p.ld)}</script>` : ''}
 </head>
 <body class="${p.body || ''}">
 <a class="skip" href="#main">Skip to content</a>
@@ -151,6 +193,9 @@ const head = (p) => `<!doctype html>
 // The Client Portal's script goes on every page: it is how Dani's Edit mode works on her own site, and
 // it makes the footer badge and the header logo the hidden doors to her portal (press and hold).
 const siteNotes = `<script src="site-notes.js" data-site="${C.site}" data-api="${PREVIEW ? 'demo' : C.api}" data-login-url="${PORTAL}" data-door-logo=".brand" data-caption-example="the new terrariums" defer></script>`;
+// Her business info (vendor/info.js) fills every spot marked data-info: hours, open now, holidays, email, address
+// and social links. The line before it on each page is the typed week, for when the service can't be reached.
+const info = `<script src="info.js" data-site="${C.site}" data-api="${C.api}" defer></script>`;
 // The shop list (vendor/shop.js) fills every [data-shop] box from the items kept in Stray Wolf Admin.
 const shopList = `<script src="shop.js" data-site="${C.site}" data-api="${C.api}" data-book="Reserve your spot" defer></script>`;
 
@@ -163,8 +208,8 @@ const foot = (p) => `<footer class="foot">
   </div>
   <div class="foot__col">
     <p class="kicker">Visit</p>
-    <address>413 E. Emma Ave.<br>Springdale, AR 72764</address>
-    <a href="${C.maps}" target="_blank" rel="noopener">Get directions</a>
+    <address data-info="address" data-info-lines>413 E. Emma Ave.<br>Springdale, AR 72764</address>
+    <a href="${C.maps}" target="_blank" rel="noopener" data-info="map">Get directions</a>
   </div>
   <div class="foot__col">
     <p class="kicker">Hours</p>
@@ -173,9 +218,11 @@ const foot = (p) => `<footer class="foot">
   <div class="foot__col">
     <p class="kicker">Elsewhere</p>
     <ul class="foot__list">
-      <li><a href="${C.ig}" target="_blank" rel="noopener"><span class="foot__ic ic-ig">${I.ig}</span>Instagram<span class="sr"> (opens in a new tab)</span></a></li>
-      <li><a href="${C.etsy}" target="_blank" rel="noopener"><span class="foot__ic ic-etsy">${I.etsy}</span>Etsy shop<span class="sr"> (opens in a new tab)</span></a></li>
-      <li><a href="mailto:${C.email}"><span class="foot__ic">${I.mail}</span>Email Dani</a></li>
+      <li><a href="${C.ig}" target="_blank" rel="noopener" data-info="social:instagram"><span class="foot__ic ic-ig">${I.ig}</span>Instagram<span class="sr"> (opens in a new tab)</span></a></li>
+      <li><a href="${C.etsy}" target="_blank" rel="noopener" data-info="social:etsy"><span class="foot__ic ic-etsy">${I.etsy}</span>Etsy shop<span class="sr"> (opens in a new tab)</span></a></li>
+      <li hidden><a target="_blank" rel="noopener" data-info="social:facebook"><span class="foot__ic ic-fb">${I.fb}</span>Facebook<span class="sr"> (opens in a new tab)</span></a></li>
+      <li hidden><a target="_blank" rel="noopener" data-info="social:google"><span class="foot__ic ic-google">${I.google}</span>Google<span class="sr"> (opens in a new tab)</span></a></li>
+      <li><a href="mailto:${C.email}" data-info="email" data-info-keep><span class="foot__ic">${I.mail}</span>Email Dani</a></li>
       <li><a href="${PORTAL}"><span class="foot__ic">${I.lock}</span>Owner portal</a></li>
     </ul>
   </div>
@@ -188,6 +235,8 @@ const foot = (p) => `<footer class="foot">
 <nav class="tabbar" aria-label="Quick links">
   ${[['index.html', 'Home', I.home], ['shop.html', 'Shop', I.bag], ['workshops.html', 'Workshops', I.cal], ['gallery.html', 'Gallery', I.pics], ['visit.html', 'Visit', I.pin], ['about.html', 'About', I.leaf]].map(([h, t, ic]) => `<a href="${h}"${h === p.file ? ' aria-current="page"' : ''}>${ic}<span>${t}</span></a>`).join('\n  ')}
 </nav>
+<script type="application/json" data-info-fallback>${INFO_FALLBACK}</script>
+${info}
 <script src="site.js" defer></script>
 ${siteNotes}${p.shop ? '\n' + shopList : ''}
 </body>
@@ -195,16 +244,20 @@ ${siteNotes}${p.shop ? '\n' + shopList : ''}
 `;
 
 const written = new Map();   // file -> its HTML, kept so the portal can list the photos on each page
+// Cloudflare Pages serves shop.html at /shop and redirects the longer address there, so the published pages link
+// straight to the short one. A preview has no server and keeps the file names.
+const short = (html) => (PREVIEW ? html : html.replace(/href="(index|shop|workshops|gallery|visit|about)\.html(#[^"]*)?"/g,
+  (m, name, hash = '') => `href="${name === 'index' ? './' : name}${hash}"`));
 const page = (p, body) => {
-  const html = secure(head(p) + nav(p.file) + body + foot(p));
+  const html = secure(short(head(p) + nav(p.file) + body + foot(p)));
   written.set(p.file, html);
   writeFileSync(dist + p.file, html);
 };
 
 /* ---------------- shared pieces ---------------- */
 const slip = `<div class="slip" data-in>
-      <h3>Sunday, November 22</h3>
-      <div class="slip__row"><span>Starts</span><span>1 PM</span></div>
+      <h3>${WS.day}</h3>
+      <div class="slip__row"><span>Starts</span><span>${WS.time}</span></div>
       <div class="slip__row"><span>Where</span><span>413 E. Emma Ave.</span></div>
       <h3>Choose your terrarium</h3>
       <p>Open, Closed, Skull, Teardrop Glass or Pumpkin</p>
@@ -212,7 +265,7 @@ const slip = `<div class="slip" data-in>
       <div class="slip__row"><span>Your vessel</span><span>included</span></div>
       <div class="slip__row"><span>Plants and all building materials</span><span>included</span></div>
       <div class="slip__row"><span>Hands-on guidance and care tips</span><span>included</span></div>
-      <div class="slip__total"><span>Your spot</span><span>from $40</span></div>
+      <div class="slip__total"><span>Your spot</span><span>from $${WS.from}</span></div>
     </div>`;
 
 const calendar = `<div class="cal" data-cal>
@@ -259,7 +312,7 @@ const invite = (v) => `<section class="band" aria-labelledby="${v.key}-title"><d
 
 
 /* ---------------- Home ---------------- */
-page({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Plants, pottery and workshops in Springdale, AR',
+page({ file: 'index.html', body: 'home', title: 'Snip & Sprout Co. · Indoor plant boutique in Springdale, AR',
   desc: 'An indoor plant boutique at 413 E. Emma Ave. in downtown Springdale. Plants, pottery, a walk-in Plant Bar, a Terrarium Bar, take-home kits and workshops.' }, `<main id="main">
 <section class="hero hero--home" aria-labelledby="top-title">
   <div class="hero__text">
@@ -346,8 +399,8 @@ ${course({ key: 'faq', title: 'A few questions we get all the time…',
 <section class="band" id="workshop" aria-labelledby="ws-title"><div class="wrap band__grid">
   <div class="band__text">
     <p class="kicker" data-in>The next workshop</p>
-    <h2 class="display" id="ws-title" data-in>November Terrarium Workshop</h2>
-    <p data-in>Join us for a relaxing afternoon of planting and creating! Sunday, November 22 at 1 PM. Seats are limited, reserve yours today!</p>
+    <h2 class="display" id="ws-title" data-in>${WS.title}</h2>
+    <p data-in>Join us for a relaxing afternoon of planting and creating! ${WS.day} at ${WS.time}. Seats are limited, reserve yours today!</p>
     <div data-in>${workshopActsHome}</div>
   </div>
   ${slip}
@@ -368,21 +421,21 @@ ${course({ key: 'faq', title: 'A few questions we get all the time…',
 
 <section class="reel" aria-labelledby="reel-title"><div class="wrap reel__grid">
   <div data-in>
-    <button class="frame" type="button" data-frame aria-label="Next photograph">
+    <div class="frame-box"><button class="frame" type="button" data-frame aria-label="Next photograph">
       <img class="is-on" src="img/ig-globe.webp" width="1100" height="1375" alt="A glass terrarium with succulents, moss and tiny pumpkins" data-cap="A spooky-season terrarium" loading="lazy">
       <img src="img/ig-skull.webp" width="1100" height="1375" alt="A stone skull planter holding an alocasia, among pumpkins and autumn leaves" data-cap="The skull planter" loading="lazy">
       <img src="img/ig-pumpkin.webp" width="1100" height="1375" alt="An alocasia potted in a pumpkin-shaped pot" data-cap="Fall at the Plant Bar" loading="lazy">
       <img src="img/ig-props.webp" width="1100" height="1375" alt="Plant cuttings rooting in glass jars of water" data-cap="Cuttings, rooting in water" loading="lazy">
       <img src="img/ig-spider.webp" width="1100" height="1375" alt="A spider plant cutting with new roots, in a glass bulb on a gold stand" data-cap="A new propagation, ready for its pot" loading="lazy">
-    </button>
-    <p class="frame__cap" data-frame-cap aria-live="polite">A spooky-season terrarium</p>
+    </button></div>
+    <p class="frame__cap" data-frame-cap>A spooky-season terrarium</p>
   </div>
   <div class="reel__text">
     <p class="kicker" data-in>From the shop</p>
     <h2 class="display" id="reel-title" data-in>A few of our favorites</h2>
     <p data-in>Each one tells its own little story. Tap the picture to see the next.</p>
-    <p data-in>Not everyone has time to build their own terrarium… and that’s okay! I’d be happy (literally overjoyed) to make you a custom one. <a class="link" href="mailto:${C.email}?subject=Custom%20terrarium">Ask about a custom terrarium</a></p>
-    <div class="acts" data-in><a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a>
+    <p data-in>Not everyone has time to build their own terrarium… and that’s okay! I’d be happy (literally overjoyed) to make you a custom one. <a class="link" href="mailto:${C.email}?subject=Custom%20terrarium" data-info="email" data-info-keep>Ask about a custom terrarium</a></p>
+    <div class="acts" data-in><a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener" data-info="social:instagram"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a>
       <a class="link" href="gallery.html">See the gallery</a></div>
   </div>
 </div></section>
@@ -392,12 +445,12 @@ ${course({ key: 'faq', title: 'A few questions we get all the time…',
   <div class="visit__card" data-in>
     <div class="visit__pad">
       <h2 class="h1" id="visit-title">Come see us!</h2>
-      <address>413 E. Emma Ave.<br>Springdale, AR 72764<br><button class="textbtn small" type="button" data-copy="413 E. Emma Ave., Springdale, AR 72764">Copy the address</button></address>
-      <p class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></p>
+      <address><span data-info="address" data-info-lines>413 E. Emma Ave.<br>Springdale, AR 72764</span><br><button class="textbtn small" type="button" data-copy="413 E. Emma Ave., Springdale, AR 72764" data-info="address" data-info-attr="data-copy">Copy the address</button></address>
+      <p class="open" data-info="open"><span class="open__dot" aria-hidden="true"></span><span data-info-text>Open every day</span></p>
       ${HOURS3}
       <p class="small">Street parking out front, and a bench for waiting friends. Flowers, cards, books, candles, and more, all under one roof with In Bloom Floral Company, Two Friends Community Books and KaGie's.</p>
     </div>
-    <a class="btn btn--wide" href="${C.maps}" target="_blank" rel="noopener">Get directions ${I.out}</a>
+    <a class="btn btn--wide" href="${C.maps}" target="_blank" rel="noopener" data-info="map">Get directions ${I.out}</a>
   </div>
 </div>
 </section>
@@ -411,7 +464,7 @@ ${course({ key: 'faq', title: 'A few questions we get all the time…',
 const shopSection = read('src/shop-section.html')
   .replace(/  <div class="sns-head">[\s\S]*?\n  <\/div>\n/, '')
   .replace('aria-labelledby="sns-shop-title"', 'aria-label="DIY Terrarium Kits, Terrarium Bar and Plant Bar"');
-page({ file: 'shop.html', body: 'shop-page', shop: true, css: ['shop-section.css', 'shop.css'], title: 'Shop · DIY Terrarium Kits, Terrarium Bar and Plant Bar · Snip & Sprout Co.',
+page({ file: 'shop.html', body: 'shop-page', shop: true, css: ['shop-section.css', 'shop.css'], title: 'Terrarium Kits, Terrarium Bar & Plant Bar · Snip & Sprout Co.',
   desc: 'Take-home DIY terrarium kits, the in-shop Terrarium Bar and the walk-in Plant Bar at Snip & Sprout Co. in Springdale. Secure checkout through Square.' }, `<main id="main">
 <section class="hero hero--center" aria-labelledby="top-title">
   <h1 class="hero__title" id="top-title" data-in>The Shop</h1>
@@ -427,7 +480,7 @@ ${shopSection}</main>
 `);
 
 /* ---------------- Workshops ---------------- */
-page({ file: 'workshops.html', shop: true, css: ['shop.css'], title: 'Workshops · Snip & Sprout Co., Springdale',
+page({ file: 'workshops.html', shop: true, css: ['shop.css'], ld: workshopEvent, title: 'Workshops · Snip & Sprout Co., Springdale',
   desc: 'Hands-on terrarium workshops at 413 E. Emma Ave. in Springdale. All supplies included, take home what you make. Private events too.' }, `<main id="main">
 <section class="hero hero--ws" aria-labelledby="top-title">
   <div class="hero__text">
@@ -435,8 +488,8 @@ page({ file: 'workshops.html', shop: true, css: ['shop.css'], title: 'Workshops 
     <h1 class="hero__title" id="top-title" data-in>Gather. Create. Grow.</h1>
     <p class="hero__lede" data-in>Slow down, get your hands dirty, and create something beautiful. Bring a friend or come solo and enjoy a little creative time surrounded by plants.</p>
     <a class="next" href="#next" data-in>
-      <span class="next__when"><b>Sunday, November 22</b>1 PM at 413 E. Emma Ave.</span>
-      <span class="next__price">from $40</span>
+      <span class="next__when"><b>${WS.day}</b>${WS.time} at 413 E. Emma Ave.</span>
+      <span class="next__price">from $${WS.from}</span>
       <span class="next__go">The next workshop ${I.arrow}</span>
     </a>
     <p data-in><a class="link" href="#private">Private events</a></p>
@@ -447,7 +500,7 @@ page({ file: 'workshops.html', shop: true, css: ['shop.css'], title: 'Workshops 
   </div>
 </section>
 <div class="courses">
-${course({ key: 'next', id: 'next', title: 'November Terrarium Workshop',
+${course({ key: 'next', id: 'next', title: WS.title,
   pic: { src: 'ig-teardrop.webp', w: 1100, h: 1375, alt: 'A glass teardrop terrarium with an air plant, white sand and tiny decor', pos: '50% 75%' } }, `    ${slip}
     <div data-in>${workshopActs}</div>`)}
 ${course({ key: 'incl', title: 'What every workshop includes',
@@ -462,7 +515,7 @@ ${course({ key: 'past', title: 'Earlier this fall' }, `    <ul class="past" data
       <li><span>Fall at the Shop, with In Bloom and KaGie's</span><span>Oct 16 – 18</span></li>
       <li><span>Emma After Dark</span><span>Oct 30</span></li>
     </ul>
-    <p data-in>Missed one? Keep an eye on our <a class="link" href="${C.ig}" target="_blank" rel="noopener">Instagram</a> for the next dates!</p>`)}
+    <p data-in>Missed one? Keep an eye on our <a class="link" href="${C.ig}" target="_blank" rel="noopener" data-info="social:instagram">Instagram</a> for the next dates!</p>`)}
 ${course({ key: 'priv', id: 'private', title: 'Gather your favorite people',
   pic: { src: 'ig-group.webp', w: 1100, h: 1952, alt: 'A private workshop group around the table, holding their terrariums', pos: '50% 46%' } }, `    <p data-in>We host private workshops for birthdays, bridal showers, team building, client appreciation gatherings, and more. We’ll bring the plants, supplies, and instructions. You simply gather your guests!</p>
     <div class="panel" data-in>
@@ -471,8 +524,8 @@ ${course({ key: 'priv', id: 'private', title: 'Gather your favorite people',
         <label>Email<input name="email" type="email" autocomplete="email" required></label>
         <label>What's the occasion?<select name="occasion"><option>Birthday</option><option>Bridal shower</option><option>Team building</option><option>Client gathering</option><option>Something else</option></select></label>
         <label>How many guests?<span class="stepper" data-stepper><button type="button" aria-label="One fewer guest">−</button><input name="guests" type="number" min="1" value="8" inputmode="numeric"><button type="button" aria-label="One more guest">+</button></span></label>
-        <label class="full">Dates you have in mind<input name="dates" placeholder="A Saturday in December, for example"></label>
-        <label class="full">Anything else we should know?<textarea name="notes"></textarea></label>
+        <label class="full"><span>Dates you have in mind <small>(optional)</small></span><input name="dates" placeholder="A Saturday in December, for example"></label>
+        <label class="full"><span>Anything else we should know? <small>(optional)</small></span><textarea name="notes"></textarea></label>
         <button class="btn" type="submit">Send the inquiry ${I.arrow}</button>
       </form>
       <p class="small">Opens an email to Dani with your details filled in.</p>
@@ -490,12 +543,12 @@ page({ file: 'visit.html', title: 'Visit · 413 E. Emma Ave., Springdale · Snip
   desc: 'Hours, parking and directions for Snip & Sprout Co. at 413 E. Emma Ave. in downtown Springdale, AR. Open every day.' }, `<main id="main">
 <section class="hero hero--visit" aria-labelledby="top-title"><div class="hero--visit__in">
   <div class="place" data-in>
-    <p class="open" data-open><span class="open__dot" aria-hidden="true"></span><span data-open-text>Open every day</span></p>
+    <p class="open" data-info="open"><span class="open__dot" aria-hidden="true"></span><span data-info-text>Open every day</span></p>
     <h1 class="hero__title" id="top-title">Come see us!</h1>
-    <address>413 E. Emma Ave.<br>Springdale, AR 72764</address>
+    <address data-info="address" data-info-lines>413 E. Emma Ave.<br>Springdale, AR 72764</address>
     <div id="hours">${HOURS3}</div>
-    <div class="acts"><a class="btn" href="${C.maps}" target="_blank" rel="noopener">Get directions ${I.out}</a>
-      <button class="textbtn" type="button" data-copy="413 E. Emma Ave., Springdale, AR 72764">Copy the address</button></div>
+    <div class="acts"><a class="btn" href="${C.maps}" target="_blank" rel="noopener" data-info="map">Get directions ${I.out}</a>
+      <button class="textbtn" type="button" data-copy="413 E. Emma Ave., Springdale, AR 72764" data-info="address" data-info-attr="data-copy">Copy the address</button></div>
   </div>
   <div class="hero--visit__side">
     <img class="hero__pic" src="img/dani-market.webp" width="1440" height="1527" alt="Dani at the Snip &amp; Sprout Co. booth at the Fifth Market, smiling beside a table of plants and plant care jars" fetchpriority="high">
@@ -516,7 +569,7 @@ ${course({ key: 'nb', title: 'Under the same roof',
     <div data-in>${NEIGHBORS}</div>
     <p data-in>Street parking out front, and a bench for waiting friends.</p>`)}
 ${course({ key: 'hello', title: 'Say hello' }, `    <p data-in>Plant questions welcome, always. Email Dani about a plant, a workshop or a private event.</p>
-    <p data-in><a class="btn" href="mailto:${C.email}">Email Dani ${I.arrow}</a></p>`)}
+    <p data-in><a class="btn" href="mailto:${C.email}" data-info="email" data-info-keep>Email Dani ${I.arrow}</a></p>`)}
 </div>
 </main>
 `);
@@ -603,7 +656,7 @@ const GALLERY = [
 ];
 let galCount = 0;
 const galTotal = GALLERY.reduce((n, g) => n + g.photos.length, 0);
-page({ file: 'gallery.html', title: 'Gallery · Terrariums, the Plant Bar and workshops · Snip & Sprout Co.',
+page({ file: 'gallery.html', title: 'Gallery · Terrariums and workshops · Snip & Sprout Co.',
   desc: 'Photos from Snip & Sprout Co. in downtown Springdale: terrariums, the Plant Bar, workshops and plants.' }, `<main id="main">
 <section class="hero hero--center hero--gal" aria-labelledby="top-title">
   <h1 class="hero__title" id="top-title" data-in>Gallery</h1>
@@ -611,7 +664,7 @@ page({ file: 'gallery.html', title: 'Gallery · Terrariums, the Plant Bar and wo
   <ul class="groups" role="list">
     ${GALLERY.map((g) => `<li data-in><a href="#${g.key}"><img src="img/gal/${g.cover}.webp" width="720" height="900" alt=""><span>${g.title}</span></a></li>`).join('\n    ')}
   </ul>
-  <div class="acts" data-in><a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a></div>
+  <div class="acts" data-in><a class="btn btn--ig" href="${C.ig}" target="_blank" rel="noopener" data-info="social:instagram"><span class="ic-ig">${I.ig}</span>Follow @snipandsprout.co<span class="sr"> on Instagram (opens in a new tab)</span></a></div>
 </section>
 <div class="courses">
 ${GALLERY.map((g) => course({ key: g.key, id: g.key, title: g.title, cls: 'course--gal',
@@ -623,7 +676,7 @@ ${g.photos.map(([tile, full, alt, cap]) => `      <li data-in><a class="gal__ite
 <dialog class="lb" data-lb aria-label="Photo viewer">
   <figure class="lb__fig">
     <img class="lb__img" src="data:," alt="" data-lb-img>
-    <figcaption class="lb__cap"><span data-lb-cap></span><span class="lb__n" data-lb-n></span></figcaption>
+    <figcaption class="lb__cap" aria-live="polite"><span data-lb-cap></span><span class="lb__n" data-lb-n></span></figcaption>
   </figure>
   <button class="lb__btn lb__btn--prev" type="button" data-lb-step="-1" aria-label="Previous photo">${I.prev}</button>
   <button class="lb__btn lb__btn--next" type="button" data-lb-step="1" aria-label="Next photo">${I.next}</button>
@@ -669,17 +722,20 @@ writeFileSync(dist + 'portal/index.html', secure(read('src/portal.html')
   .replaceAll('{{site}}', C.site)
   .replaceAll('{{api}}', PREVIEW ? 'demo' : C.api)
   .replaceAll('{{home}}', PORTAL_HOME)
+  .replace('{{week}}', WEEK.map(([open, close]) => open + '-' + close).join(','))
   .replace('{{photos}}', photoList)));
 
 /* ---------------- static files ---------------- */
 writeFileSync(dist + 'workshop.ics', ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//Snip & Sprout Co.//Workshops//EN', 'BEGIN:VEVENT',
-  'UID:nov-2026-terrarium-workshop@snipandsproutco.com', 'DTSTAMP:20261115T000000Z', 'DTSTART:20261122T190000Z', 'DTEND:20261122T200000Z',
-  'SUMMARY:November Terrarium Workshop at Snip & Sprout Co.', 'LOCATION:413 E. Emma Ave.\\, Springdale\\, AR 72764',
-  'DESCRIPTION:Starts at 1 PM. Seating is limited.', 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n'));
-for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-tag.svg', 'shop-scene.svg', 'leaves.svg', '_headers']) cpSync(here + 'src/' + f, dist + f);
+  `UID:workshop-${utc(WS.start)}@snipandsproutco.com`, `DTSTAMP:${utc(WS.start)}`, `DTSTART:${utc(WS.start)}`, `DTEND:${utc(WS.end)}`,
+  `SUMMARY:${WS.title} at Snip & Sprout Co.`, `LOCATION:${ADDRESS.replace(/,/g, '\\,')}`,
+  `DESCRIPTION:Starts at ${WS.time}. Seating is limited.`, 'END:VEVENT', 'END:VCALENDAR', ''].join('\r\n'));
+for (const f of ['site.css', 'site.js', 'shop-section.css', 'favicon.svg', 'logo.svg', 'logo-tag.svg', 'shop-scene.svg', 'leaves.svg', 'favicon.ico', 'apple-touch-icon.png', '_headers']) cpSync(here + 'src/' + f, dist + f);
 // The list of pages for search engines (not the 404 page or the portal), named at the end of robots.txt.
+// Each carries the date of the site's latest version (the top entry in version.json).
+const changed = JSON.parse(read('version.json')).changes[0].date;
 writeFileSync(dist + 'sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${
-  [...written.keys()].filter((f) => f !== '404.html').map((f) => `  <url><loc>${url(f)}</loc></url>`).join('\n')}\n</urlset>\n`);
+  [...written.keys()].filter((f) => f !== '404.html').map((f) => `  <url><loc>${url(f)}</loc><lastmod>${changed}</lastmod></url>`).join('\n')}\n</urlset>\n`);
 writeFileSync(dist + 'robots.txt', read('src/robots.txt') + `Sitemap: ${C.url}sitemap.xml\n`);
 cpSync(here + 'version.json', dist + 'version.json');   // the Stray Wolf admin reads the site's version from here
 console.log(`built ${written.size} pages (the 404 page among them) and the Client Portal${PREVIEW ? ' (preview)' : ''}`);

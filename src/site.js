@@ -4,34 +4,23 @@
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const framed = window.self !== window.top;           // true inside a preview frame
   const calm = matchMedia('(prefers-reduced-motion: reduce)').matches;
-  const MAIL = 'snipandsproutco@gmail.com';
+  let MAIL = 'snipandsproutco@gmail.com';              // her saved email takes its place when info.js has it
+  document.addEventListener('sw-info', (e) => { const saved = e.detail && e.detail.contact && e.detail.contact.email; if (saved) MAIL = saved; });
   const mail = (subject, body) => 'mailto:' + MAIL + '?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
   const go = (href) => { if (framed) window.open(href, '_blank', 'noopener'); else location.href = href; };
+  // A round pause and play button for something that moves by itself; change(held) is told each time it is pressed.
+  const pauseButton = (cls, what, change) => {
+    const btn = document.createElement('button'); let held = false;
+    btn.type = 'button';
+    btn.className = cls;
+    btn.innerHTML = '<svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><path fill="currentColor" d="M3 2h3v10H3zM8 2h3v10H8z"/></svg>'
+      + '<svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path fill="currentColor" d="M4 2l8 5-8 5z"/></svg>';
+    const label = () => { btn.setAttribute('aria-label', (held ? 'Play ' : 'Pause ') + what); btn.classList.toggle('is-held', held); };
+    btn.addEventListener('click', () => { held = !held; label(); change(held); });
+    label();
+    return btn;
+  };
 
-  /* ---------- hours, in Springdale time ---------- */
-  const H = { 0: [9, 14], 1: [10, 15], 2: [10, 15], 3: [9, 18], 4: [9, 18], 5: [9, 18], 6: [9, 14] };
-  const fmt = (h) => (h > 12 ? h - 12 : h) + (h >= 12 ? ' PM' : ' AM');
-  const now = () => {
-    try {
-      const parts = new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', weekday: 'short', hour: 'numeric', minute: 'numeric', hourCycle: 'h23' }).formatToParts(new Date());
-      const get = (t) => parts.find((p) => p.type === t).value;
-      return { day: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].indexOf(get('weekday')), mins: (+get('hour')) * 60 + (+get('minute')) };
-    } catch (e) { const d = new Date(); return { day: d.getDay(), mins: d.getHours() * 60 + d.getMinutes() }; }
-  };
-  const state = () => {
-    const { day, mins } = now(); const [o, c] = H[day];
-    if (mins >= o * 60 && mins < c * 60) return { open: true, day, short: 'Open now until ' + fmt(c), long: 'We’re open until ' + fmt(c) + ' today.' };
-    if (mins < o * 60) return { open: false, day, short: 'Closed now · opens today at ' + fmt(o), long: 'We open today at ' + fmt(o) + '.' };
-    const n = (day + 1) % 7;
-    return { open: false, day, short: 'Closed now · opens tomorrow at ' + fmt(H[n][0]), long: 'We open tomorrow at ' + fmt(H[n][0]) + '.' };
-  };
-  const paintHours = () => {
-    const s = state();
-    $$('[data-open]').forEach((el) => { el.classList.toggle('is-open', s.open); el.classList.toggle('is-closed', !s.open); const t = $('[data-open-text]', el); if (t) t.textContent = s.short; });
-    $$('[data-open-long]').forEach((el) => { el.textContent = s.long; });
-    $$('[data-hours3] [data-days]').forEach((row) => row.classList.toggle('is-today', row.dataset.days.split(',').includes(String(s.day))));
-    return s;
-  };
   $$('[data-year]').forEach((el) => { el.textContent = new Date().getFullYear(); });
 
   /* ---------- entrances ---------- */
@@ -117,22 +106,12 @@
       sync();
     };
 
-    const btn = document.createElement('button');
-    btn.type = 'button';
-    btn.className = 'shop-scene__toggle';
-    btn.innerHTML = '<svg class="i-pause" viewBox="0 0 14 14" aria-hidden="true"><path fill="currentColor" d="M3 2h3v10H3zM8 2h3v10H8z"/></svg>'
-      + '<svg class="i-play" viewBox="0 0 14 14" aria-hidden="true"><path fill="currentColor" d="M4 2l8 5-8 5z"/></svg>';
-    const label = () => { btn.setAttribute('aria-label', held ? 'Play the shop animation' : 'Pause the shop animation'); btn.classList.toggle('is-held', held); };
-    btn.addEventListener('click', () => { held = !held; label(); sync(); });
-    label();
-    box.append(btn);
+    box.append(pauseButton('shop-scene__toggle', 'the shop animation', (h) => { held = h; sync(); }));
 
     round();
     new IntersectionObserver(([e]) => { onScreen = e.isIntersecting; sync(); }, { threshold: 0.35 }).observe(box);
   }
 
-  paintHours();
-  setInterval(paintHours, 30000);
 
   /* ---------- add to my calendar ---------- */
   $$('[data-cal]').forEach((cal) => {
@@ -143,14 +122,25 @@
     document.addEventListener('keydown', (e) => { if (e.key === 'Escape') { cal.classList.remove('is-open'); b.setAttribute('aria-expanded', 'false'); } });
   });
 
-  /* ---------- one frame, contents change ---------- */
+  /* ---------- one frame, contents change ----------
+     The photo changes by itself every few seconds while the frame is on screen, and its round button pauses
+     that. A tap on the photo shows the next one. The caption is read out only when a visitor changes the
+     photo, never on the timer. Anyone who asked for less motion gets no timer, so no button either. */
   const frame = $('[data-frame]');
   if (frame) {
-    const pics = $$('img', frame), cap = $('[data-frame-cap]'); let i = 0, timer;
-    const next = () => { i = (i + 1) % pics.length; pics.forEach((p, k) => p.classList.toggle('is-on', k === i)); cap.textContent = pics[i].dataset.cap; };
-    const play = () => { clearInterval(timer); if (!calm) timer = setInterval(() => { if (!document.hidden) next(); }, 3200); };
-    frame.addEventListener('click', () => { next(); play(); });
-    if ('IntersectionObserver' in window) new IntersectionObserver((es) => es.forEach((e) => { if (e.isIntersecting) play(); else clearInterval(timer); })).observe(frame);
+    const pics = $$('img', frame), cap = $('[data-frame-cap]'); let i = 0, timer, held = calm, seen = false;
+    const next = (byHand) => {
+      i = (i + 1) % pics.length;
+      pics.forEach((p, k) => p.classList.toggle('is-on', k === i));
+      cap.setAttribute('aria-live', byHand ? 'polite' : 'off');
+      cap.textContent = pics[i].dataset.cap;
+    };
+    const play = () => { clearInterval(timer); if (seen && !held) timer = setInterval(() => { if (!document.hidden) next(false); }, 3200); };
+    frame.addEventListener('click', () => { next(true); play(); });
+    if (!calm && 'IntersectionObserver' in window) {
+      frame.after(pauseButton('frame__toggle', 'the changing photos', (h) => { held = h; play(); }));
+      new IntersectionObserver(([e]) => { seen = e.isIntersecting; play(); }).observe(frame);
+    }
   }
 
   /* ---------- the Gallery's photo viewer ----------

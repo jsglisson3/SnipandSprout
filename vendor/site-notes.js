@@ -69,6 +69,13 @@
  *   the shop manager, the same screen as Stray Wolf's admin: shop-manager.js and shop-manager.css, copied next to
  *   this file and fetched only when they have a shop (POST /api/my-shop and its calls; SW Core 2.2 or newer).
  *   Stray Wolf starts the shop and sets its kind of checkout. No shop = the card stays hidden.
+ * Business info (their own page only): a box with data-info="hours", "contact" or "social" opens the business info
+ *   editor as a page over the portal (kit/info: info.js, info-editor.js and info-editor.css, copied next to this
+ *   file). What they save there goes live on their website (POST /api/my-info and its calls; SW Core 2.5 or newer),
+ *   and the box's "On your site now" list follows it. On an older service the box stays a note box.
+ *   The box says what the website has today, so the editor starts from it:
+ *     data-info-typed="09:00-14:00,10:00-15:00,...,closed"   the hours box: the week typed into the website, Sunday first
+ *     data-note-fields / data-note-now (as for a note)       the contact lines and the social pages the site has a spot for
  * Messages from your website (their own page only): for a client whose website form sends to the notes service.
  *   A page places its own empty <section data-form-portal hidden> where it wants it; otherwise this script adds
  *   one under the boxes of what's on their site (or under the shop or Your requests on an older page). It's a
@@ -2230,6 +2237,59 @@
     return { ok: false, status: 404, error: "Not found." };
   }
 
+  // Business info on their page: the boxes marked data-info ("hours", "contact", "social") open the business info
+  // editor (kit/info/editor.js, the same screen as Stray Wolf's admin) as a page over the portal. What is saved there
+  // is what their website shows, within a minute; nothing goes to Stray Wolf as a request. info.js (the hours logic
+  // the website itself uses), info-editor.js and info-editor.css sit next to this file. Until they have loaded, and
+  // on SW Core before 2.5, the boxes stay note boxes.
+  var INFO_FILES = "1";   // bump with every change to info.js, info-editor.js or info-editor.css
+  var infoNow = null, infoDemo = null;
+  function infoBox(part) { return MODE === "hub" ? document.querySelector('[data-info="' + part + '"]') : null; }
+  // "Email=a@b.com|Phone=555" (data-note-now) or "Email|Phone=For example..." (data-note-fields) as {Email: "a@b.com"}.
+  function infoPairs(box, name) {
+    var out = {};
+    ((box && box.getAttribute(name)) || "").split("|").forEach(function (p) { var k = p.indexOf("="); if (p) out[k < 0 ? p : p.slice(0, k)] = k < 0 ? "" : p.slice(k + 1); });
+    return out;
+  }
+  // What is typed into the website today, read from the boxes: the editor shows it until something is saved in its place.
+  function infoTyped() {
+    var typed = { contact: {}, social: infoPairs(infoBox("social"), "data-note-now") }, was = infoPairs(infoBox("contact"), "data-note-now");
+    Object.keys(was).forEach(function (k) { typed.contact[k.toLowerCase()] = was[k]; });
+    var week = ((infoBox("hours") && infoBox("hours").getAttribute("data-info-typed")) || "").split(",");
+    if (week.length === 7) typed.hours = week.map(function (d) { var m = /^(\d\d:\d\d)-(\d\d:\d\d)$/.exec(d.trim()); return m ? { open: m[1], close: m[2] } : null; });
+    return typed;
+  }
+  function loadInfo() {
+    if (!document.querySelector("[data-info]")) return;
+    var typed = infoTyped();
+    var got = DEMO ? Promise.resolve({ ok: true, info: { tz: "America/Chicago", hours: typed.hours || null, special: [], contact: {}, social: [], history: [] } }) : api("/api/my-info", { token: getToken() });
+    got.then(function (d) {
+      if (!d || !d.ok || !d.info) return;
+      infoFiles().then(function (ok) {
+        if (!ok) return;
+        infoNow = d.info; if (DEMO) infoDemo = SWInfoEditor.demo(d.info);
+        SWInfoEditor.fill(document, infoNow);
+      });
+    });
+  }
+  // The editor's files, from the folder this file came from: info.js first, the editor needs it.
+  function infoFiles() {
+    if (window.SWInfoEditor) return Promise.resolve(true);
+    var at = function (f) { return new URL(f + "?v=" + INFO_FILES, S.src).href; };
+    var add = function (el) { return new Promise(function (done) { el.onload = function () { done(true); }; el.onerror = function () { done(false); }; document.head.appendChild(el); }); };
+    return Promise.all([add(h("link", { rel: "stylesheet", href: at("info-editor.css") })), add(h("script", { src: at("info.js") }))])
+      .then(function (r) { return r[0] && r[1] && add(h("script", { src: at("info-editor.js") })); })
+      .then(function (ok) { return !!ok && !!window.SWInfoEditor; });
+  }
+  function openInfo(box) {
+    var names = function (part) { return Object.keys(infoPairs(infoBox(part), "data-note-fields")); };
+    SWInfoEditor.open(box.getAttribute("data-info"), { info: infoNow, mode: "portal", name: NAME, typed: infoTyped(),
+      title: (infoBox("hours") && infoBox("hours").getAttribute("data-area")) || "", socials: names("social"),
+      fields: names("contact").map(function (k) { return k.toLowerCase(); }).filter(function (k) { return /^(phone|email|address|area)$/.test(k); }),
+      call: function (path, body) { return infoDemo ? infoDemo.call(path, body) : api("/api/my-info" + path, { token: getToken(), body: body }); },
+      onChange: function (info) { infoNow = info; SWInfoEditor.fill(document, info); } });
+  }
+
   // "Your shop" on their page ([data-shop-portal]): what their website sells (kit/shop draws it there). It is the shop
   // manager, the same screen Stray Wolf uses in the admin; shop-manager.js and .css sit next to this file and are
   // fetched only for a client who has a shop. Search, prices typed in the row, up to 5 photos an item found on their
@@ -2407,6 +2467,9 @@
       // A photo with data-big (the Photos box on their page) opens bigger instead of starting a note.
       var big = MODE === "hub" && !picking && !els.note && !els.veil && e.target.closest && e.target.closest("[data-big]");
       if (big) { e.preventDefault(); e.stopPropagation(); showPhoto(big); return; }
+      // A business info box (hours, contact info, social pages) opens its editor, once that has loaded.
+      var ib = MODE === "hub" && infoNow && !els.note && !els.veil && e.target.closest && e.target.closest("[data-info]");
+      if (ib) { e.preventDefault(); openInfo(ib); return; }
       // Boxes made for notes (like on the welcome page) open a note with one tap, no "Add a note" first.
       var box = !picking && !st.sent && !els.note && !els.veil && e.target.closest && e.target.closest("[data-note-box]");
       // A booking page set on the box (Let's talk, later a Google Calendar schedule) opens that instead of a note.
@@ -2441,7 +2504,7 @@
     if (MODE === "hub" && st.sent) newList(true);   // sent last time: their page starts fresh, no leftover "Sent" bar
     render();
     if (MODE === "hub") {
-      addCss(document, PAGE_CSS); paintBrands(); loadStats(); loadRequests(); loadShop(); loadForm(); dropOnBoxes(); drawNav();
+      addCss(document, PAGE_CSS); paintBrands(); loadStats(); loadRequests(); loadShop(); loadInfo(); loadForm(); dropOnBoxes(); drawNav();
       var spyTick = false; window.addEventListener("scroll", function () { if (spyTick) return; spyTick = true; requestAnimationFrame(function () { spyTick = false; spy(); }); }, { passive: true });
       window.addEventListener("resize", function () { headRoom(); spy(true); });
     }
