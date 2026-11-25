@@ -814,7 +814,7 @@
     clearToast(); opts = opts || {};
     toastUndo = opts.undo || null; toastAfter = opts.after || null;
     toastEl = h("div", { class: "toast" }, [icon("check"), h("span", { text: text }),
-      toastUndo ? h("button", { class: "undo-t", type: "button", text: "Undo", onclick: function () { var u = toastUndo; toastUndo = toastAfter = null; clearToast(); if (u) u(); } }) : null]);
+      toastUndo ? h("button", { class: "undo-t", type: "button", title: "Put it back the way it was", text: "Undo", onclick: function () { var u = toastUndo; toastUndo = toastAfter = null; clearToast(); if (u) u(); } }) : null]);
     layer.appendChild(toastEl);
     if (els.live) { els.live.textContent = ""; setTimeout(function () { els.live.textContent = text; }, 40); }
     toastTimer = setTimeout(clearToast, toastUndo ? 7000 : Math.min(8000, Math.max(3800, text.length * 65)));
@@ -844,13 +844,13 @@
   function lock() { addCss(document, "html.swn-locked body>*:not([data-site-notes]):not([data-keep]){visibility:hidden!important}"); document.documentElement.classList.add("swn-locked"); }
   function unlock() { document.documentElement.classList.remove("swn-locked"); }
   function showLogin() {
-    var pw = h("input", { type: "password", id: "swn-pw", autocapitalize: "off", autocomplete: "current-password", "aria-label": "Password" });
-    var showBtn = h("button", { type: "button", onclick: function () {
+    var pw = h("input", { type: "password", title: "Your Client Portal password", id: "swn-pw", autocapitalize: "off", autocomplete: "current-password", "aria-label": "Password" });
+    var showBtn = h("button", { type: "button", title: "Show or hide what you typed", onclick: function () {
       var on = pw.type === "password"; pw.type = on ? "text" : "password";
       showBtn.lastChild.textContent = on ? "Hide" : "Show"; pw.focus();
     } }, [icon("eye"), h("span", { text: "Show" })]);
     var err = h("p", { class: "err", hidden: true, role: "alert" });
-    var btn = h("button", { class: "b main wide", type: "submit", text: "Log in" });
+    var btn = h("button", { class: "b main wide", type: "submit", title: "Open your Client Portal", text: "Log in" });
     var form = h("form", { class: "card" + (LOGO ? " has-logo" : ""), onsubmit: function (e) {
       e.preventDefault(); err.hidden = true;
       if (!pw.value.trim()) { err.textContent = "Type your password first."; err.hidden = false; pw.focus(); return; }
@@ -985,28 +985,28 @@
     els.say.textContent = "";
     if (st.sent) {
       els.say.append(h("b", { text: "Sent to " + TO + ". Thank you!" }), h("span", { text: "Nothing on your site changes until " + TO + " makes the update." }));
-      els.btns.append(dockBtn("plus", "Start new notes", "main", function () { newList(); }));
+      els.btns.append(dockBtn("plus", "Start new notes", "Start a fresh list of changes for your website", "main", function () { newList(); }));
     } else if (picking) {
       els.say.append(h("b", { text: canHover ? "Click exactly where the note should go." : "Now tap exactly where the note should go." }),
         h("span", { text: canHover ? "On a word, a picture, a price, anything. You can scroll first. Esc cancels." : "On a word, a picture, a price, anything. You can scroll first." }));
       els.btns.append(
-        dockBtn("pencil", "Write it without tapping", "second", function () { stopPicking(); addNote(null, "Something else"); }),
-        dockBtn("x", "Cancel", "second", function () { stopPicking(); }));
+        dockBtn("pencil", "Write it without tapping", "Type a note that isn't about one spot on the page", "second", function () { stopPicking(); addNote(null, "Something else"); }),
+        dockBtn("x", "Cancel", "Stop without adding a note", "second", function () { stopPicking(); }));
     } else if (MODE === "hub") {
       els.say.append(h("b", { text: plural(left, "note") + " not sent yet" }), h("span", { text: "Check " + (left === 1 ? "it" : "them") + " over, then send to " + TO + "." }));
-      els.btns.append(dockBtn("send", "Send to " + TO, "go", function () { openReview(); }, left));
+      els.btns.append(dockBtn("send", "Send to " + TO, "Look over your notes, then send them", "go", function () { openReview(); }, left));
     } else if (els.note && st.notes[active]) {
       // one thing at a time: while a note is open, the bar only points at it
       els.say.append(h("b", { text: "You're writing note " + (active + 1) + "." }), h("span", { text: "Type what you'd like, then tap Save note." }));
-      els.btns.append(dockBtn("check", "Save note", "main", saveNote));
+      els.btns.append(dockBtn("check", "Save note", "Keep this note and go back to the page", "main", saveNote));
     } else {
       els.say.append(
         h("b", { text: n ? plural(n, "note") + " ready" : "Want something changed?" }),
         h("span", { text: n ? "Add more, or send them to " + TO + " when you're done." : "Tap Add a note, then tap the part of the page." }));
       els.btns.append(
-        dockBtn("note", "Add a note", "main", startPicking),
-        dockBtn("photo", "Add photos", "second", function () { addNote(null, "Photos for the site", null, true); }),
-        dockBtn("send", "Send to " + TO, n ? "go" : "go off", function () { if (st.notes.length) openReview(); else toast("Add a note first. Then you can send it."); }, n));
+        dockBtn("note", "Add a note", "Click this, then point at the part of the page to change", "main", startPicking),
+        dockBtn("photo", "Add photos", "Send photos to use on your website", "second", function () { addNote(null, "Photos for the site", null, true); }),
+        dockBtn("send", "Send to " + TO, "Look over your notes, then send them", n ? "go" : "go off", function () { if (st.notes.length) openReview(); else toast("Add a note first. Then you can send it."); }, n));
     }
     els.btns.className = "btns n" + els.btns.children.length;
     placePins();
@@ -1019,8 +1019,8 @@
     list.forEach(function (x) { x.pics.forEach(picDel); if (x.shot) picDel(x.shot); });
     st.notes = st.notes.filter(function (x) { return list.indexOf(x) < 0; }); save();
   }
-  function dockBtn(ic, text, kind, fn, count) {
-    var b = h("button", { class: "db " + kind, type: "button", onclick: fn }, [icon(ic), h("span", { text: text })]);
+  function dockBtn(ic, text, tip, kind, fn, count) {
+    var b = h("button", { class: "db " + kind, type: "button", title: tip, onclick: fn }, [icon(ic), h("span", { text: text })]);
     if (count) b.appendChild(h("span", { class: "badge", text: String(count), "aria-label": plural(count, "note") }));
     return b;
   }
@@ -1034,7 +1034,7 @@
       if (MODE === "hub" || !n.path || n.page !== location.pathname) return;   // pins are for Edit mode on the website; their own page has none
       var node = nodeAt(n.path); if (!node) return;
       var r = node.getBoundingClientRect(); if (!r.width && !r.height) return;
-      var pin = h("button", { class: "pin" + (i === active ? " on" : "") + (n.id === lastPin ? " drop" : ""), type: "button", "aria-label": "Note " + (i + 1) + ". Tap to open it.", text: String(i + 1),
+      var pin = h("button", { class: "pin" + (i === active ? " on" : "") + (n.id === lastPin ? " drop" : ""), type: "button", title: "Open note " + (i + 1), "aria-label": "Note " + (i + 1) + ". Tap to open it.", text: String(i + 1),
         style: "left:" + (r.left - base.left + r.width * n.fx) + "px;top:" + (r.top - base.top + r.height * n.fy) + "px",
         onclick: function (e) { e.stopPropagation(); if (!picking) openNote(i); } });
       els.pins.appendChild(pin);
@@ -1096,7 +1096,7 @@
     if (st.notes[i] && st.notes[i].pg && photosBox()) return openPhotos();   // the Photos box's note lives on the Photos page
     remember(); closePanels();
     var note = st.notes[i], phone = isPhone(), hub = MODE === "hub", typed = note.typed || {};
-    var text = h("textarea", { id: "swn-text", placeholder: hub ? !note.fields && note.hint || null
+    var text = h("textarea", { id: "swn-text", title: "Type it in your own words", placeholder: hub ? !note.fields && note.hint || null
       : note.photos ? "Anything else about these photos? (optional)" : note.fields ? "Anything else? (You can leave this empty.)" : note.hint || "For example: Change the price to $32." });
     text.value = note.fields ? note.extra || "" : note.text;
     if (!hub) { text.addEventListener("keydown", function (e) { if (e.key === "Escape") saveNote(); }); if (note.fields || note.photos) text.style.minHeight = "70px"; }
@@ -1108,7 +1108,7 @@
     var fieldEls = (note.fields || []).map(function (raw, k) {
       var f = raw.split("=")[0], ex = raw.split("=")[1], now = (note.now && note.now[f]) || "";
       var b = !ex && brandOf(f), kind = !ex && !social && FIELD_KINDS[f.toLowerCase()];
-      var inp = h("input", { type: "text", id: "swn-f" + k, inputmode: social ? "url" : kind ? kind.mode : "text", autocapitalize: social || (kind && kind.mode !== "text") ? "off" : null, autocomplete: "off",
+      var inp = h("input", { type: "text", title: "Change it here, or leave it as it is", id: "swn-f" + k, inputmode: social ? "url" : kind ? kind.mode : "text", autocapitalize: social || (kind && kind.mode !== "text") ? "off" : null, autocomplete: "off",
         placeholder: ex || (social ? (b ? b.ph : "Paste the link") : kind ? kind.ph : "Type it here") });
       inp.value = f in typed ? typed[f] : now;
       return { name: f, input: inp, now: now, row: h("div", { class: "field" }, [
@@ -1117,7 +1117,7 @@
     var fields = note.fields ? h("div", { class: "fields" }, fieldEls.map(function (f) { return f.row; })) : null;
     var tip = social ? h("p", { class: "tip" }, [icon("help"), h("span", { text: "Not sure where to find it? Open your page, then copy the address from the top of the screen." })]) : null;
     var thumbs = h("div", { class: "thumbs" });
-    var drop = h("button", { class: "add-ph" + (note.photos ? " big" : ""), type: "button", onclick: function () { els.file.click(); } }, [
+    var drop = h("button", { class: "add-ph" + (note.photos ? " big" : ""), type: "button", title: "Choose photos from this device", onclick: function () { els.file.click(); } }, [
       icon(hub ? "upload" : "photo"), h("div", {}, [h("b", { text: dropTitle(note, phone) }),
         h("span", { text: phone ? "From your photos, or take a new one" : hub ? "or drag it here from your computer" : "Click to choose, or drag them here from your computer" })]),
       hub ? h("span", { class: "pick", text: "Choose" }) : null]);
@@ -1125,7 +1125,7 @@
     var ideas = note.photos && note.ideas && note.ideas.length ? h("div", { class: "ideas" }, [
       h("p", {}, [h("b", { text: "Need ideas?" }), " These would help most. Tap one to label a photo with it."]),
       h("div", { class: "chips" }, note.ideas.map(function (idea) {
-        return h("button", { class: "chip", type: "button", text: idea, onclick: function () { useIdea(note, idea); } });
+        return h("button", { class: "chip", type: "button", title: "Use these words for your photos", text: idea, onclick: function () { useIdea(note, idea); } });
       }))]) : null;
     // the same parts either way: the lines, the photos (first for a box that is about photos), the words
     var body = function (words) { return [tip, fields, note.photos ? drop : null, note.photos ? thumbs : null, ideas, words, note.photos ? null : thumbs, note.photos || note.fields ? null : drop]; };
@@ -1133,17 +1133,17 @@
     if (hub) {
       var title = note.name || note.on, optional = h("em", { text: "You can leave this empty" });
       var progress = h("div", { class: "bar", hidden: true }, [h("i")]), err = h("p", { class: "err", hidden: true, role: "alert" });
-      var sendBtn = h("button", { class: "b main", type: "button", onclick: function () { sendNote(sendBtn, progress, err); } }, [h("span", { text: "Send to " + TO })]);
+      var sendBtn = h("button", { class: "b main", type: "button", title: "Send this to " + TO + " now", onclick: function () { sendNote(sendBtn, progress, err); } }, [h("span", { text: "Send to " + TO })]);
       card = h("div", { class: "card note ask" + (note.photos ? " photos" : ""), role: "dialog", "aria-label": title }, [
         h("div", { class: "dropcover", "aria-hidden": "true" }, [icon("upload"), h("b", { text: "Drop it here" })]),
         h("div", { class: "hd" }, [
           h("div", { class: "grow" }, [h("h2", { text: title }), note.ask ? h("p", { text: note.ask }) : null]),
-          h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { cancelNote(); } }, [icon("x")])]),
+          h("button", { class: "xbtn", type: "button", title: "Close without sending", "aria-label": "Close", onclick: function () { cancelNote(); } }, [icon("x")])]),
         h("div", { class: "bd" }, body(h("div", { class: "field" }, [
           h("label", { class: "lb", for: "swn-text" }, note.fields ? ["Anything else?", optional] : note.photos ? ["Anything " + TO + " should know?", optional] : ["What would you like?"]), text]))),
         h("div", { class: "ft" }, [progress, err,
           document.querySelector("[data-requests]") ? h("span", { class: "say", text: "Track it under Requests." }) : null,
-          h("button", { class: "b plain", type: "button", text: "Cancel", onclick: function () { cancelNote(); } }), sendBtn])
+          h("button", { class: "b plain", type: "button", title: "Close without sending", text: "Cancel", onclick: function () { cancelNote(); } }), sendBtn])
       ]);
     } else {
       card = h("div", { class: "card note" + (social || note.now || note.photos ? " wide" : "") + (note.photos ? " photos" : "") + (phone ? " sheet" : ""), role: "dialog", tabindex: "-1", "aria-label": "Note " + (i + 1) + ", about " + short(note.on, 60) }, [
@@ -1151,13 +1151,13 @@
         h("div", { class: "hd" }, [
           h("span", { class: "num", text: String(i + 1) }),
           h("div", { class: "grow" }, [h("h2", { text: note.text || note.pics.length ? "Your note" : "New note" })]),
-          h("button", { class: "xbtn", type: "button", "aria-label": "Close and keep this note", onclick: saveNote }, [icon("x")])]),
+          h("button", { class: "xbtn", type: "button", title: "Close and keep this note", "aria-label": "Close and keep this note", onclick: saveNote }, [icon("x")])]),
         h("div", { class: "bd" }, [
           h("div", { class: "where" }, [h("span", { text: "About:" }), h("b", { text: note.on })]),
           h("label", { class: "q", for: note.fields ? "swn-f0" : "swn-text", text: note.ask || "What would you like changed?" })].concat(body(text))),
         h("div", { class: "ft" }, [
-          h("button", { class: "b danger", type: "button", onclick: function () { removeNote(active); } }, [icon("trash"), h("span", { text: "Delete" })]),
-          h("button", { class: "b main push", type: "button", onclick: saveNote }, [icon("check"), h("span", { text: note.photos ? "Save photos" : "Save note" })])])
+          h("button", { class: "b danger", type: "button", title: "Delete this note (you can undo)", onclick: function () { removeNote(active); } }, [icon("trash"), h("span", { text: "Delete" })]),
+          h("button", { class: "b main push", type: "button", title: "Keep this and go back to the page", onclick: saveNote }, [icon("check"), h("span", { text: note.photos ? "Save photos" : "Save note" })])])
       ]);
     }
     // Files dragged anywhere over the note: the whole card lights up and takes them.
@@ -1217,7 +1217,7 @@
     note.pics.forEach(function (id, k) {
       var img = h("img", { alt: note.caps[id] || "Photo " + (k + 1), title: note.caps[id] || "" });
       picUrl(id).then(function (u) { if (u) img.src = u; });
-      var ph = h("span", { class: "ph" }, [img, editable ? h("button", { class: "rm", type: "button", "aria-label": "Take out photo " + (k + 1), onclick: function () {
+      var ph = h("span", { class: "ph" }, [img, editable ? h("button", { class: "rm", type: "button", title: "Take this photo out", "aria-label": "Take out photo " + (k + 1), onclick: function () {
         note.pics.splice(note.pics.indexOf(id), 1); delete note.caps[id]; picDel(id); save(); drawThumbs(note, box, true); refreshDrop(note);
       } }, [icon("x")]) : null]);
       var cap = withCaps ? h(note.photos ? "textarea" : "input", { class: "cap", rows: note.photos ? "2" : null, type: note.photos ? null : "text", maxlength: "140", autocomplete: "off", "aria-label": "What is photo " + (k + 1) + "? (optional)",
@@ -1227,7 +1227,7 @@
       box.appendChild(h("span", { class: "t", "data-id": id }, [ph, cap]));
     });
     if (editable && note.pics.length > CAPS_AT && !note.showCaps)
-      box.appendChild(h("button", { class: "capts", type: "button", text: "Say what these are (optional)",
+      box.appendChild(h("button", { class: "capts", type: "button", title: "Add a few words under each photo", text: "Say what these are (optional)",
         onclick: function () { note.showCaps = true; save(); drawThumbs(note, box, true); var f = box.querySelector(".cap"); if (f) f.focus(); } }));
   }
   function dropTitle(note, phone) {
@@ -1466,10 +1466,10 @@
           h("div", { class: "s" + (note.text ? "" : " empty"), text: note.text || "(photos only)" }),
           note.pics.length ? th : null,
           h("div", { class: "acts" }, [
-            !here ? h("button", { class: "b quiet", type: "button", onclick: function () { if (!note.hub) lsSet("on", "1"); location.href = note.page; } }, [icon("arrow"), h("span", { text: note.hub ? "Go to your portal" : "Go to that page" })])
+            !here ? h("button", { class: "b quiet", type: "button", title: note.hub ? "Open your Client Portal" : "Open the page this note is about", onclick: function () { if (!note.hub) lsSet("on", "1"); location.href = note.page; } }, [icon("arrow"), h("span", { text: note.hub ? "Go to your portal" : "Go to that page" })])
               : MODE === "hub" ? null   // on their own page a box sends or cancels, so a note left over is only sent or deleted
-              : h("button", { class: "b quiet", type: "button", onclick: function () { openNote(i); } }, [icon("pencil"), h("span", { text: "Change" })]),
-            h("button", { class: "b danger", type: "button", onclick: function () { removeNote(i, true); } }, [icon("trash"), h("span", { text: "Delete" })])
+              : h("button", { class: "b quiet", type: "button", title: "Change what this note says", onclick: function () { openNote(i); } }, [icon("pencil"), h("span", { text: "Change" })]),
+            h("button", { class: "b danger", type: "button", title: "Delete this note (you can undo)", onclick: function () { removeNote(i, true); } }, [icon("trash"), h("span", { text: "Delete" })])
           ])
         ])
       ]));
@@ -1477,16 +1477,16 @@
     var progress = h("div", { class: "bar", hidden: true }, [h("i")]);
     var err = h("p", { class: "err", hidden: !errText, role: "alert" });
     if (errText) err.append.apply(err, [].concat(errText));
-    var sendBtn = h("button", { class: "b go", type: "button", onclick: function () { send(sendBtn, progress, err); } }, [icon("send"), h("span", { text: "Send to " + TO })]);
+    var sendBtn = h("button", { class: "b go", type: "button", title: "Send everything in this list to " + TO, onclick: function () { send(sendBtn, progress, err); } }, [icon("send"), h("span", { text: "Send to " + TO })]);
     veil(h("div", { class: "card", role: "dialog", "aria-label": "Ready to send" }, [
       h("div", { class: "hd" }, [
         h("div", { class: "grow" }, [h("h2", { text: "Ready to send?" }), h("p", { text: plural(n, "note") + (pics ? " and " + plural(pics, "photo") : "") + ". Check them over, then tap Send." })]),
-        h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { if (!busy) els.veilClose(); } }, [icon("x")])
+        h("button", { class: "xbtn", type: "button", title: "Close. Your notes are kept.", "aria-label": "Close", onclick: function () { if (!busy) els.veilClose(); } }, [icon("x")])
       ]),
       h("div", { class: "bd" }, [list, h("div", { class: "calm" }, [icon("check"), h("span", { text: "Your website stays exactly as it is until " + TO + " makes the change." })])]),
       h("div", { class: "ft", style: "flex-direction:column;align-items:stretch" }, [progress, err,
         h("div", { style: "display:flex;gap:10px;flex-wrap:wrap" }, [
-          h("button", { class: "b plain", type: "button", text: MODE === "hub" ? "Not now" : "Keep adding notes", onclick: function () { if (!busy) els.veilClose(); } }),
+          h("button", { class: "b plain", type: "button", title: "Close. Your notes are kept.", text: MODE === "hub" ? "Not now" : "Keep adding notes", onclick: function () { if (!busy) els.veilClose(); } }),
           h("span", { class: "push" }), sendBtn])])
     ]));
     els.dock.hidden = isPhone();
@@ -1505,7 +1505,7 @@
       err.textContent = "";
       if (d.status === 401) {
         setToken(null);
-        err.append("Your login timed out. " + safe, h("a", { href: LOGIN_URL, text: "Log in again" }), " and then tap Send.");
+        err.append("Your login timed out. " + safe, h("a", { title: "Open the login page", href: LOGIN_URL, text: "Log in again" }), " and then tap Send.");
       } else err.textContent = (d.status === 0 ? "Your internet seems to be off. " : "That didn't go through. ") + safe + "Tap Try again in a minute.";
       err.hidden = false;
     };
@@ -1574,7 +1574,7 @@
   function showSent() {
     panel = "sent";
     var done = function () { closePanels(); render(); };
-    var doneBtn = h("button", { class: "b main wide", type: "button", text: "Done", onclick: done });
+    var doneBtn = h("button", { class: "b main wide", type: "button", title: "Close this", text: "Done", onclick: done });
     veil(h("div", { class: "card", role: "dialog", "aria-label": "Sent" }, [
       h("div", { class: "bd center", style: "padding-top:26px;gap:8px" }, [
         h("div", { class: "done-ic" }, [icon("check")]),
@@ -1612,12 +1612,12 @@
   /* ----- help, and turning notes off ----- */
   function showHelp(first) {
     panel = "help";
-    var gotIt = h("button", { class: "b main wide", type: "button", text: first ? "Got it. Let's start." : "Got it", onclick: function () { els.veilClose(); } });
+    var gotIt = h("button", { class: "b main wide", type: "button", title: "Close the help", text: first ? "Got it. Let's start." : "Got it", onclick: function () { els.veilClose(); } });
     var step = function (n, ic, title, text) { return h("li", {}, [h("div", { class: "circ" }, [icon(ic), n ? h("i", { text: String(n) }) : null]), h("div", {}, [h("b", { text: title }), h("span", { text: text })])]); };
     veil(h("div", { class: "card help", role: "dialog", "aria-label": "How this works" }, [
       h("div", { class: "hd" }, [
         h("div", { class: "grow" }, [h("h2", { text: first ? (MODE === "edit" ? "You're in Edit mode. Here's how it works." : "Welcome! Here's how your portal works.") : "How this works" }), h("p", { text: MODE === "edit" ? "Leave notes for " + TO + " right on your own website." : "Everything for your website, in one place." })]),
-        h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { els.veilClose(); } }, [icon("x")])
+        h("button", { class: "xbtn", type: "button", title: "Close the help", "aria-label": "Close", onclick: function () { els.veilClose(); } }, [icon("x")])
       ]),
       h("div", { class: "bd", tabindex: "0" }, [
         MODE === "edit" ? h("ol", { class: "steps" }, [
@@ -1711,7 +1711,7 @@
     closeLb(true); els.lbFrom = from;
     if (!items.length) return;
     var pic = h("img", { alt: "" }), cap = h("p", { class: "cap" }), title = h("h2", {});
-    var dl = h("a", { class: "b plain", href: "" }, [icon("download"), h("span", { text: "Download" })]);
+    var dl = h("a", { class: "b plain", title: "Save this photo to your device", href: "" }, [icon("download"), h("span", { text: "Download" })]);
     var show = function (i) {
       at = (i + items.length) % items.length; var it = items[at];
       pic.src = it.src; pic.alt = it.title || "";
@@ -1720,15 +1720,15 @@
       title.textContent = it.title || "Photo";
       cap.textContent = (items.length > 1 ? "Photo " + (at + 1) + " of " + items.length + (it.cap ? " · " : "") : "") + (it.cap || "");
     };
-    var nav = items.length > 1 ? [h("button", { class: "nav l", type: "button", "aria-label": "Previous photo", onclick: function () { show(at - 1); } }, [icon("arrow")]),
-                                  h("button", { class: "nav r", type: "button", "aria-label": "Next photo", onclick: function () { show(at + 1); } }, [icon("arrow")])] : [];
+    var nav = items.length > 1 ? [h("button", { class: "nav l", type: "button", title: "Previous photo", "aria-label": "Previous photo", onclick: function () { show(at - 1); } }, [icon("arrow")]),
+                                  h("button", { class: "nav r", type: "button", title: "Next photo", "aria-label": "Next photo", onclick: function () { show(at + 1); } }, [icon("arrow")])] : [];
     var card = h("div", { class: "card photo", role: "dialog", "aria-modal": "true", "aria-label": "Photo" }, [
       h("div", { class: "hd" }, [h("div", { class: "grow" }, [title]), h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: closeLb }, [icon("x")])]),
       h("div", { class: "bd" }, [h("div", { class: "shot" }, [pic].concat(nav)), cap]),
       h("div", { class: "ft" }, [
-        swap ? h("button", { class: "b plain", type: "button", onclick: function () { var it = items[at]; closeLb(); swap(it); } }, [icon("photo"), h("span", { text: "Swap this one" })]) : null,
+        swap ? h("button", { class: "b plain", type: "button", title: "Send a new photo to take this one's place", onclick: function () { var it = items[at]; closeLb(); swap(it); } }, [icon("photo"), h("span", { text: "Swap this one" })]) : null,
         dl,
-        h("button", { class: "b main push", type: "button", text: "Close", onclick: closeLb })
+        h("button", { class: "b main push", type: "button", title: "Back to your photos", text: "Close", onclick: closeLb })
       ])
     ]);
     card.addEventListener("keydown", function (e) { if (e.key === "ArrowLeft") show(at - 1); if (e.key === "ArrowRight") show(at + 1); });
@@ -1791,12 +1791,12 @@
 
     // 1. new photos
     var thumbs = h("div", { class: "thumbs" });
-    var drop = h("button", { class: "add-ph big", type: "button", onclick: function () { els.file.click(); } }, [
+    var drop = h("button", { class: "add-ph big", type: "button", title: "Choose photos from this device", onclick: function () { els.file.click(); } }, [
       icon("photo"), h("div", {}, [h("b"), h("span", { text: phone ? "From your photos, or take a new one" : "Click to choose, or drag them here from your computer" })])]);
-    var text = h("textarea", { id: "swn-text", placeholder: box.getAttribute("data-note-hint") || "", oninput: function () { note.text = this.value.trim(); save(); } });
+    var text = h("textarea", { id: "swn-text", title: "Add a few words about these photos", placeholder: box.getAttribute("data-note-hint") || "", oninput: function () { note.text = this.value.trim(); save(); } });
     text.addEventListener("paste", function (e) { var f = e.clipboardData && e.clipboardData.files; if (f && f.length) { e.preventDefault(); addPictures(f); } });
     var progress = h("div", { class: "bar", hidden: true }, [h("i")]), err = h("p", { class: "err", hidden: true, role: "alert" });
-    var sendBtn = h("button", { class: "b main", type: "button", onclick: function () {
+    var sendBtn = h("button", { class: "b main", type: "button", title: "Send these to " + TO, onclick: function () {
       note.text = text.value.trim(); save();
       if (!note.pics.length && !note.text) { toast("Add a photo first. Then you can send it."); return; }
       send(sendBtn, progress, err, [note]);
@@ -1860,13 +1860,13 @@
         h("div", { class: "pg-hd" }, [h("div", { class: "grow" }, [h("h2", { text: "On your site now" }), siteSub]), siteDl]),
         pageBtns.length ? h("div", { class: "pg-pages", role: "group", "aria-label": "Show the photos on one page" }, pageBtns) : null,
         siteGrid,
-        site.more ? h("p", { class: "pg-more" }, [site.more + " ", site.moreUrl ? h("a", { href: site.moreUrl, target: "_blank", rel: "noopener", text: "See them" }) : null]) : null]);
+        site.more ? h("p", { class: "pg-more" }, [site.more + " ", site.moreUrl ? h("a", { title: "Opens in a new tab", href: site.moreUrl, target: "_blank", rel: "noopener", text: "See them" }) : null]) : null]);
     }
 
     var page = h("div", { class: "pg note photos", role: "dialog", "aria-modal": "true", "aria-label": "Your photos" }, [
       h("div", { class: "dropcover", "aria-hidden": "true" }, [icon("photo"), h("b", { text: "Drop your photos here" })]),
       h("div", { class: "pg-top" }, [
-        h("button", { class: "pg-back", type: "button", onclick: backFromPhotos }, [icon("back"), h("span", { text: pageOn ? pageName(pageOn) : "Back" })]),
+        h("button", { class: "pg-back", type: "button", title: "Go back", onclick: backFromPhotos }, [icon("back"), h("span", { text: pageOn ? pageName(pageOn) : "Back" })]),
         h("h1", { text: "Your photos" }), h("p", { text: "Send " + TO + " new photos, and see the ones on your website." })]),
       h("div", { class: "pg-in" }, [addSec, sentSec, siteSec])
     ]);
@@ -1935,7 +1935,7 @@
       grid.hidden = false; grid.textContent = "";
       list.forEach(function (p, k) {
         var img = h("img", { alt: "", decoding: "async" }), im = h("span", { class: "im" }, [img]), s = picStatus(p);
-        grid.appendChild(h("button", { class: "pg-ph", type: "button", "aria-label": (p.caption || "Photo " + (k + 1)) + ". " + items[k].cap + ". See it bigger.", onclick: function () {
+        grid.appendChild(h("button", { class: "pg-ph", type: "button", title: "See it bigger", "aria-label": (p.caption || "Photo " + (k + 1)) + ". " + items[k].cap + ". See it bigger.", onclick: function () {
           sentImg(items[k].key).then(function (u) {
             items[k].src = u;
             var shown = items.filter(function (it) { return it.src; });
@@ -2161,7 +2161,7 @@
     pageTitle = document.title;
     document.documentElement.classList.add("pp-on");
     pageAll.slice(1).forEach(function (page) {
-      page.insertBefore(h("a", { class: "pp-back", href: "#" + pageAll[0].id }, [icon("back"), h("span", { text: pageName(pageAll[0]) })]), page.firstChild);
+      page.insertBefore(h("a", { class: "pp-back", title: "Back to " + pageName(pageAll[0]), href: "#" + pageAll[0].id }, [icon("back"), h("span", { text: pageName(pageAll[0]) })]), page.firstChild);
     });
     document.body.appendChild(pageTabs = h("nav", { class: "pp-tabs", "aria-label": "Portal pages" }));
     // Any link on their page to one of the pages, or to something on one, goes there without loading anything.
@@ -2189,7 +2189,7 @@
     return n ? h("span", { class: "pp-n" + (hot ? " hot" : ""), title: n + words }, [h("span", { class: "pp-vh", text: ", " }), String(n), h("span", { class: "pp-vh", text: words })]) : null;
   }
   function pageLink(page, cls, name, withIcon) {
-    var a = h("a", { class: cls, href: "#" + page.id }, [withIcon ? icon(PAGE_ICON[pageKind(page)] || "list") : null, h("span", { text: name }), pageCount(page)]);
+    var a = h("a", { class: cls, title: "Open " + name, href: "#" + page.id }, [withIcon ? icon(PAGE_ICON[pageKind(page)] || "list") : null, h("span", { text: name }), pageCount(page)]);
     if (page === pageOn) a.setAttribute("aria-current", "page");
     return a;
   }
@@ -2257,19 +2257,19 @@
     var rows = [], inbox = pageOfKind("messages");
     reqs.filter(function (r) { return r.status === "question"; }).forEach(function (r) {
       var q = r.msgs && r.msgs.length ? r.msgs[r.msgs.length - 1] : null;
-      rows.push({ ic: "help", b: TO + " has a question", t: short(q && q.by === "sw" ? q.text : r.text, 140), go: "Answer", main: true, fn: function () { answerRequest(r); } });
+      rows.push({ ic: "help", b: TO + " has a question", t: short(q && q.by === "sw" ? q.text : r.text, 140), go: "Answer", tip: "Write back to " + TO, main: true, fn: function () { answerRequest(r); } });
     });
     var fresh = fpForm && fpForm.state === "on" ? fpList().filter(function (l) { return l.status !== "replied"; }) : [];
     if (fresh.length && inbox && pageHas(inbox)) {
       var who = fresh.slice(0, 2).map(fpWho), rest = fresh.length - who.length;
       rows.push({ ic: "mail", tone: "sage", b: plural(fresh.length, "new message") + " from your website",
-        t: rest ? who.join(", ") + " and " + rest + " more" : who.join(" and "), go: "Read", fn: function () { goPage(inbox); } });
+        t: rest ? who.join(", ") + " and " + rest + " more" : who.join(" and "), go: "Read", tip: "Open your messages", fn: function () { goPage(inbox); } });
     }
     var left = waiting();
     if (left.length) {
       var pics = left.reduce(function (n, x) { return n + x.pics.length; }, 0), onlyPics = left.every(function (x) { return !x.text; }), one = (onlyPics ? pics : left.length) === 1;
       rows.push({ ic: "send", tone: "stone", b: (onlyPics ? plural(pics, "photo") : plural(left.length, "note")) + " not sent yet",
-        t: "Saved on this device. Check " + (one ? "it" : "them") + " over, then send " + (one ? "it" : "them") + " to " + TO + ".", go: "Review", fn: function () { openReview(); } });
+        t: "Saved on this device. Check " + (one ? "it" : "them") + " over, then send " + (one ? "it" : "them") + " to " + TO + ".", go: "Review", tip: "Look them over before sending", fn: function () { openReview(); } });
     }
     return rows;
   }
@@ -2288,7 +2288,7 @@
     var row = function (ic, tone, b, t, end) { return [h("span", { class: "pp-ic" + (tone ? " " + tone : "") }, [icon(ic)]), h("span", { class: "pp-t" }, [h("b", { text: b }), t ? h("span", { text: t }) : null])].concat(end); };
     if (needs) {
       needs.replaceChildren.apply(needs, rows.length ? rows.map(function (r) {
-        return h("li", { class: "pp-row" }, row(r.ic, r.tone, r.b, r.t, [h("button", { class: "pp-btn" + (r.main ? "" : " plain"), type: "button", text: r.go, onclick: r.fn })]));
+        return h("li", { class: "pp-row" }, row(r.ic, r.tone, r.b, r.t, [h("button", { class: "pp-btn" + (r.main ? "" : " plain"), type: "button", title: r.tip, text: r.go, onclick: r.fn })]));
       }) : [h("li", { class: "pp-row" }, down ? row("help", "stone", "This didn't load.", "Check your internet, then reload this page.", [])
         : known ? row("check", "sage", "Nothing needs you right now.", "", []) : row("check", "stone", "Checking what's new…", "", []))]);
       var n = document.querySelector("[data-needs-n]");
@@ -2296,7 +2296,7 @@
     }
     if (glance) glance.replaceChildren.apply(glance, others.map(function (page) {
       var kind = pageKind(page), stands = pageStands(page);
-      return h("li", {}, [h("a", { class: "pp-row", href: "#" + page.id }, row(PAGE_ICON[kind] || "list", kind === "messages" ? "sage" : "stone", pageName(page), page.getAttribute("data-page-about"),
+      return h("li", {}, [h("a", { class: "pp-row", title: "Open " + pageName(page), href: "#" + page.id }, row(PAGE_ICON[kind] || "list", kind === "messages" ? "sage" : "stone", pageName(page), page.getAttribute("data-page-about"),
         [stands ? h("span", { class: "pp-v", text: stands }) : null, icon("chev")]))]);
     }));
   }
@@ -2336,7 +2336,7 @@
     var few = Math.max(REQ_SHOWN, sorted.filter(function (r) { return r.status === "question"; }).length);
     var more = document.querySelector("[data-requests-all]");
     if (more) {
-      more.hidden = sorted.length <= few; more.textContent = reqAll ? "Show fewer" : "See all " + sorted.length;
+      more.hidden = sorted.length <= few; more.textContent = reqAll ? "Show fewer" : "See all " + sorted.length; more.setAttribute("data-tip", reqAll ? "Show only the newest requests" : "Show every request");
       more.onclick = function () { reqAll = !reqAll; drawRequests(); };
     }
     list.textContent = "";
@@ -2359,16 +2359,16 @@
   function questionBox(r, q) {
     var key = r.batch + ":" + r.n, box = h("div", { class: "rq-q" }, [h("p", {}, [h("b", { text: TO + " asked: " }), q.text])]);
     if (reqOpen !== key) {
-      box.appendChild(h("button", { class: "rq-go", type: "button", text: "Answer", onclick: function () {
+      box.appendChild(h("button", { class: "rq-go", type: "button", title: "Write back to " + TO, text: "Answer", onclick: function () {
         reqOpen = key; reqDraft = ""; drawRequests();
         var f = document.querySelector("[data-requests-list] textarea"); if (f) f.focus();
       } }));
       return box;
     }
-    var field = h("textarea", { rows: "2", maxlength: "600", "aria-label": "Your answer", placeholder: "Type your answer", oninput: function () { reqDraft = field.value; } });
+    var field = h("textarea", { title: "Type your answer", rows: "2", maxlength: "600", "aria-label": "Your answer", placeholder: "Type your answer", oninput: function () { reqDraft = field.value; } });
     field.value = reqDraft;
     var err = h("p", { class: "rq-err", role: "alert", hidden: true });
-    var send = h("button", { class: "rq-go", type: "button", text: "Send answer", onclick: function () {
+    var send = h("button", { class: "rq-go", type: "button", title: "Send your answer to " + TO, text: "Send answer", onclick: function () {
       var text = field.value.trim(); if (!text) { field.focus(); return; }
       send.disabled = true; err.hidden = true;
       (DEMO ? Promise.resolve({ ok: true }) : api("/api/my-request/answer", { token: getToken(), body: { batch: r.batch, n: r.n, text: text } })).then(function (d) {
@@ -2384,7 +2384,7 @@
       });
     } });
     box.classList.add("open");
-    box.append(field, err, send, h("button", { class: "rq-no", type: "button", text: "Cancel", onclick: function () { reqOpen = null; reqDraft = ""; drawRequests(); } }));
+    box.append(field, err, send, h("button", { class: "rq-no", type: "button", title: "Close without answering", text: "Cancel", onclick: function () { reqOpen = null; reqDraft = ""; drawRequests(); } }));
     return box;
   }
   // Demo only: a few made-up requests, one of them waiting on an answer.
@@ -2448,7 +2448,7 @@
       var list = h("ul", { class: "fp-list", "aria-label": "Messages, newest first" });
       (fpAll ? all : all.slice(0, FP_SHOWN)).forEach(function (l) { list.appendChild(fpRow(l)); });
       box.appendChild(list);
-      if (all.length > FP_SHOWN) box.appendChild(h("p", { class: "fp-more" }, [h("button", { type: "button", text: fpAll ? "Show fewer" : "See all " + all.length + " messages", onclick: function () { fpAll = !fpAll; drawForm(); } })]));
+      if (all.length > FP_SHOWN) box.appendChild(h("p", { class: "fp-more" }, [h("button", { type: "button", title: fpAll ? "Show only the newest messages" : "Show every message", text: fpAll ? "Show fewer" : "See all " + all.length + " messages", onclick: function () { fpAll = !fpAll; drawForm(); } })]));
     }
     box.appendChild(fpToBox());
     box.hidden = false;
@@ -2457,14 +2457,14 @@
   // Above the list: Select all, and once rows are ticked, what to do with them.
   function fpBar(all) {
     var ids = Object.keys(fpPick), every = ids.length === all.length;
-    var tick = h("input", { type: "checkbox", id: "fp-all", onchange: function () { fpPick = {}; if (tick.checked) all.forEach(function (l) { fpPick[l.id] = true; }); drawForm(); } });
+    var tick = h("input", { type: "checkbox", title: "Select every message", id: "fp-all", onchange: function () { fpPick = {}; if (tick.checked) all.forEach(function (l) { fpPick[l.id] = true; }); drawForm(); } });
     tick.checked = every; tick.indeterminate = ids.length > 0 && !every;
     var bar = h("div", { class: "fp-bar" + (ids.length ? " on" : "") }, [h("label", { class: "fp-sel", for: "fp-all" }, [tick, h("span", { text: ids.length ? ids.length + " selected" : "Select all" })])]);
     if (ids.length) {
       var picked = all.filter(function (l) { return fpPick[l.id]; }), fresh = picked.some(function (l) { return l.status !== "replied"; });
-      bar.append(h("button", { class: "fp-b", type: "button", onclick: function () { fpMark(picked, fresh ? "replied" : "new"); } }, [icon(fresh ? "check" : "mail"), h("span", { text: fresh ? "Mark replied" : "Mark as new" })]),
-        h("button", { class: "fp-b del", type: "button", onclick: function () { fpDelete(ids); } }, [icon("trash"), h("span", { text: every && all.length > 1 ? "Delete all " + all.length : "Delete" })]),
-        h("button", { class: "fp-link", type: "button", text: "Cancel", onclick: function () { fpPick = {}; drawForm(); } }));
+      bar.append(h("button", { class: "fp-b", type: "button", title: fresh ? "Mark the selected messages as replied" : "Mark the selected messages as new again", onclick: function () { fpMark(picked, fresh ? "replied" : "new"); } }, [icon(fresh ? "check" : "mail"), h("span", { text: fresh ? "Mark replied" : "Mark as new" })]),
+        h("button", { class: "fp-b del", type: "button", title: "Delete the selected messages (you can undo)", onclick: function () { fpDelete(ids); } }, [icon("trash"), h("span", { text: every && all.length > 1 ? "Delete all " + all.length : "Delete" })]),
+        h("button", { class: "fp-link", type: "button", title: "Clear the selection", text: "Cancel", onclick: function () { fpPick = {}; drawForm(); } }));
     }
     return bar;
   }
@@ -2472,7 +2472,7 @@
     var open = !!fpOpen[l.id], fresh = l.status !== "replied", files = Array.isArray(l.files) ? l.files : [];
     var details = fpDetails(l), want = fpWant(details), rest = details.filter(function (f) { return f[1] !== want; }).map(function (f) { return f[1]; }).join(" · ");
     var kind = l.title ? l.title.charAt(0).toUpperCase() + l.title.slice(1) : "Message", tel = l.phone ? String(l.phone).replace(/[^\d+]/g, "") : "";
-    var pick = h("input", { type: "checkbox", class: "fp-pick", "aria-label": "Select the message from " + fpWho(l), onchange: function () { if (pick.checked) fpPick[l.id] = true; else delete fpPick[l.id]; drawForm(); } });
+    var pick = h("input", { type: "checkbox", title: "Select this message", class: "fp-pick", "aria-label": "Select the message from " + fpWho(l), onchange: function () { if (pick.checked) fpPick[l.id] = true; else delete fpPick[l.id]; drawForm(); } });
     pick.checked = !!fpPick[l.id];
     var main = h("button", { class: "fp-main", type: "button", "aria-expanded": open ? "true" : "false", title: open ? "Close this message" : "Open this message to see every answer and file", onclick: function () { fpOpen[l.id] = !open; drawForm(); } }, [
       h("span", { class: "fp-l1" }, [
@@ -2492,7 +2492,7 @@
     var row = h("li", { class: "fp-row" + (fresh ? " fresh" : "") + (open ? " open" : "") + (fpPick[l.id] ? " picked" : "") }, [pick, main, acts]);
     if (open) {
       var body = h("div", { class: "fp-body" });
-      var reach = [l.email ? h("a", { href: "mailto:" + l.email }, [icon("mail"), l.email]) : null, tel ? h("a", { href: "tel:" + tel }, [icon("phone"), l.phone]) : null].filter(Boolean);
+      var reach = [l.email ? h("a", { title: "Write to " + l.email, href: "mailto:" + l.email }, [icon("mail"), l.email]) : null, tel ? h("a", { title: "Call " + l.phone, href: "tel:" + tel }, [icon("phone"), l.phone]) : null].filter(Boolean);
       if (reach.length) body.appendChild(h("p", { class: "fp-reach" }, reach));
       var dl = h("dl", { class: "fp-ans" });
       details.forEach(function (f) { dl.append(h("dt", { text: f[0] }), h("dd", { text: f[1] })); });
@@ -2535,11 +2535,11 @@
     var to = (fpForm.to || []).join(", ");
     if (!fpEditTo && to) return h("div", { class: "fp-to" }, [icon("mail"), h("span", { class: "fp-to-k", text: "Emails go to" }), h("b", { text: to }),
       h("button", { class: "fp-link", type: "button", text: "Change", title: "Change where your website's form emails go", onclick: function () { fpEditTo = true; drawForm(); var i = document.getElementById("fp-to"); if (i) i.focus(); } })]);
-    var input = h("input", { id: "fp-to", type: "text", autocomplete: "off", spellcheck: "false", "aria-describedby": "fp-to-help", placeholder: "you@yourbusiness.com",
+    var input = h("input", { id: "fp-to", title: "The email address your website's form sends to", type: "text", autocomplete: "off", spellcheck: "false", "aria-describedby": "fp-to-help", placeholder: "you@yourbusiness.com",
       oninput: function () { fpTyped = input.value; } });
     input.value = fpTyped != null ? fpTyped : to;
     var err = h("p", { class: "err", role: "alert", hidden: true });
-    var save = h("button", { class: "fp-b main", type: "button", text: "Save", onclick: function () {
+    var save = h("button", { class: "fp-b main", type: "button", title: "Save this email address", text: "Save", onclick: function () {
       save.disabled = true; err.hidden = true;
       formCall("/to", { to: input.value }).then(function (d) {
         save.disabled = false;
@@ -2550,7 +2550,7 @@
     } });
     input.addEventListener("keydown", function (e) { if (e.key === "Enter") save.click(); });
     return h("div", { class: "fp-to edit" }, [h("label", { for: "fp-to", text: "Form emails go to" }),
-      h("div", { class: "row" }, [input, save, to ? h("button", { class: "fp-link", type: "button", text: "Cancel", onclick: function () { fpEditTo = false; fpTyped = null; drawForm(); } }) : null]), err,
+      h("div", { class: "row" }, [input, save, to ? h("button", { class: "fp-link", type: "button", title: "Keep the address as it was", text: "Cancel", onclick: function () { fpEditTo = false; fpTyped = null; drawForm(); } }) : null]), err,
       h("small", { id: "fp-to-help", text: "One or more addresses, separated by commas, for example you@yourbusiness.com, office@yourbusiness.com. A newly added address gets a short email right away, so you'll know it works." })]);
   }
   // Demo only: a form that is on, with three made-up messages.
@@ -2632,7 +2632,7 @@
   // own website, sales, options, many items at once, and Changes with Undo. Every Buy button opens the item's own
   // checkout link, so no payment ever comes through here. Stray Wolf starts the shop, imports into it and picks its
   // kind of checkout in the admin. No shop: no Shop page.
-  var SHOP_FILES = "5";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
+  var SHOP_FILES = "7";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
   var spShop = null, spMgr = null, spDemo = null, spPics = {};
   function loadShop() {
     var box = document.querySelector("[data-shop-portal]"); if (!box || spMgr) return;
@@ -2722,13 +2722,13 @@
   function askLogOut() {
     panel = "off";
     var n = st.sent ? 0 : st.notes.length;
-    var stay = h("button", { class: "b plain", type: "button", text: "Stay logged in", onclick: function () { closePanels(); render(); } });
+    var stay = h("button", { class: "b plain", type: "button", title: "Close this and keep working", text: "Stay logged in", onclick: function () { closePanels(); render(); } });
     veil(h("div", { class: "card", role: "dialog", "aria-label": "Log out" }, [
       h("div", { class: "hd" }, [h("div", { class: "grow" }, [h("h2", { text: "Log out?" }),
         h("p", { text: (n ? "Your " + plural(n, "note") + " will stay saved on this device. " : "") + "To come back, open this page again and type your password." })])]),
       h("div", { class: "ft" }, [
         stay,
-        h("button", { class: "b main push", type: "button", onclick: function () { endSession(); location.reload(); } }, [icon("power"), h("span", { text: "Log out" })])
+        h("button", { class: "b main push", type: "button", title: "Log out on this device", onclick: function () { endSession(); location.reload(); } }, [icon("power"), h("span", { text: "Log out" })])
       ])
     ]), { focus: stay });
   }
@@ -2740,19 +2740,19 @@
     els.pins = h("div");
     els.ghost = h("div", { class: "ghost", hidden: true, "aria-hidden": "true" }, [h("span", { class: "pin", text: "+" }), h("span", { class: "tip" }, [h("span", { text: "Click to place your note" }), h("small", { text: "Esc cancels" })])]);
     els.frame = h("div", { class: "frame", "aria-hidden": "true", hidden: MODE !== "edit" });
-    var helpBtn = h("button", { type: "button", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]);
+    var helpBtn = h("button", { type: "button", title: "See how this works", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]);
     var strip = MODE === "edit"
       ? h("div", { class: "strip" }, [h("div", { class: "strip-in" }, [
           h("span", { class: "lbl" }, [h("span", { class: "dot" }), h("span", { text: "Edit mode is on" })]),
           h("span", { class: "sub", text: "· Your website isn't changing" }),
           h("span", { class: "gap" }), helpBtn,
-          h("button", { type: "button", onclick: exitEdit }, [icon("power"), h("span", { class: "lg", text: "Exit edit mode" }), h("span", { class: "sm", text: "Exit" })])
+          h("button", { type: "button", title: "Leave Edit mode. Your notes are kept.", onclick: exitEdit }, [icon("power"), h("span", { class: "lg", text: "Exit edit mode" }), h("span", { class: "sm", text: "Exit" })])
         ])])
       : h("div", { class: "strip hub" }, [h("div", { class: "strip-in" }, [
           h("span", { class: "lbl" }, [icon("lock"), h("span", { class: "lg", text: "You're logged in" }), h("span", { class: "sm", text: "Logged in" })]),
           h("span", { class: "sub", text: "· Only you can see this page" }),
           h("span", { class: "gap" }), helpBtn,
-          h("button", { type: "button", onclick: askLogOut }, [icon("power"), h("span", { text: "Log out" })])
+          h("button", { type: "button", title: "Log out of your Client Portal", onclick: askLogOut }, [icon("power"), h("span", { text: "Log out" })])
         ])]);
     els.say = h("div", { class: "say", "aria-live": "polite" });
     els.btns = h("div", { class: "btns" });
@@ -2763,8 +2763,8 @@
       els.bare = true;
       slot.textContent = "";
       if (bookingUrl()) slot.appendChild(h("button", { class: "talk", type: "button", "data-talk": "", title: "Pick a time to talk with " + TO + " about your website" }, [icon("calendar"), h("span", { text: "Let's talk" })]));
-      slot.append(h("button", { type: "button", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]),
-                  h("button", { type: "button", onclick: askLogOut }, [icon("power"), h("span", { text: "Log out" })]));
+      slot.append(h("button", { type: "button", title: "See how this works", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]),
+                  h("button", { type: "button", title: "Log out of your Client Portal", onclick: askLogOut }, [icon("power"), h("span", { text: "Log out" })]));
     }
     els.dock = h("div", { class: "dock " + MODE }, [strip, h("div", { class: "dock-main" }, [h("div", { class: "dock-in" }, [els.say, els.btns])])]);
     [els.pins, els.ghost, els.frame, els.dock, els.file].forEach(function (e) { layer.appendChild(e); });
@@ -3047,6 +3047,17 @@
     document.addEventListener("keydown", function (e) { if (e.key === "Escape" && tip) { e.stopPropagation(); hide(); } }, true);   // Esc closes only the label
     var drop = function () { hide(); }; addEventListener("scroll", drop, true); addEventListener("resize", drop);
   }
-  if (IS_HUB) tooltips();
+  /* The page's own buttons get a hover description too, the same on every site: each box's button says what a tap
+     does, from what the box is for. A button the page already describes (title) keeps its own words. */
+  function pageTips() {
+    var EDIT = "Open your website to point at what you'd like changed";
+    [].forEach.call(document.querySelectorAll("[data-note-box] button, a[data-edit-mode]"), function (b) {
+      if (b.title || b.hasAttribute("data-tip")) return;
+      var box = b.closest("[data-note-box]");
+      b.title = !box ? EDIT : box.hasAttribute("data-photos-page") ? "See your photos and send new ones"
+        : box.hasAttribute("data-note-photos") ? "Choose a file and send it to " + TO : "Change what your website says here";
+    });
+  }
+  if (IS_HUB) { pageTips(); tooltips(); }
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", boot); else boot();
 })();

@@ -64,7 +64,7 @@
   }
   var SHOW = [["live", "Showing", "On the website with its Buy button."], ["sold", "Sold out", "On the website, marked Sold out, with no Buy button."],
     ["hidden", "Hidden", "Not on the website. Everything stays saved here."]];
-  var TAGS = [["", "None", "No tag."], ["new", "New", "Shows a New badge, near the top of the shop."], ["featured", "Featured", "Shows first on the website, with a Featured badge."]];
+  var TAGS = [["", "None", "No label."], ["new", "New", "Shows a New label, near the top of the shop."], ["featured", "Featured", "Shows first on the website, with a Featured label."]];
   var SORTS = [["order", "Your order"], ["name", "Name, A to Z"], ["low", "Price, low to high"], ["high", "Price, high to low"]];
 
   /* ---------- small helpers ---------- */
@@ -132,29 +132,35 @@
     var top = el("div", { class: "swm-top" }, [opts.who || null, el("div", { class: "swm-top-t" }, [sum, saved,
       el("p", { class: "swm-live" }, [el("i", { "aria-hidden": "true" }), "Changes you save here go live on " + whose + " within a minute."])]), coBadge, acts]);
     var banner = el("div", { class: "swm-banner", hidden: true, role: "status" });
-    var find = el("input", { type: "search", class: "swm-find-in", autocomplete: "off", placeholder: "Search items", "aria-label": "Search items" });
-    var catSel = el("select", { class: "swm-sel", "aria-label": "Category" });
-    var sortSel = el("select", { class: "swm-sel", "aria-label": "Order" }, SORTS.map(function (s) { return el("option", { value: s[0], text: s[1] }); }));
+    var find = el("input", { type: "search", class: "swm-find-in", autocomplete: "off", placeholder: "Search items", "aria-label": "Search items", title: "Type part of a name, category or description" });
+    var catSel = el("select", { class: "swm-sel", "aria-label": "Category", title: "Show one category only" });
+    var sortSel = el("select", { class: "swm-sel", "aria-label": "Order", title: "The order of this list. Your order is the order " + whose + " shows; drag a row to change it." }, SORTS.map(function (s) { return el("option", { value: s[0], text: s[1] }); }));
     var tools = el("div", { class: "swm-tools" }, [el("label", { class: "swm-find" }, [ico("search", 16), find]), catSel, sortSel]);
     var chips = el("div", { class: "swm-chips", role: "group", "aria-label": "Which items" });
     var table = el("table", { class: "swm-t" }), tbody = el("tbody"), none = el("p", { class: "swm-none", hidden: true });
-    var headCk = el("input", { type: "checkbox", class: "swm-ck", "aria-label": "Select every item shown" });
+    var headCk = el("input", { type: "checkbox", class: "swm-ck", "aria-label": "Select every item shown", title: "Tick every item in the list, to change them all at once" });
     table.appendChild(el("thead", {}, [el("tr", {}, [el("th", { class: "c-ck", scope: "col" }, [headCk]), el("th", { scope: "col", text: "Item" }), el("th", { scope: "col", class: "c-pr", text: "Price" }),
       el("th", { scope: "col", class: "c-st", text: "Status", title: "Showing: on " + whose + " with its Buy button. Sold out: on " + whose + ", no Buy button. Hidden: not on " + whose + "." })])]));
     table.appendChild(tbody);
-    var left = el("div", { class: "swm-left" }, [table, none]);
-    var ed = el("section", { class: "swm-ed", hidden: true, "aria-label": "Item" });
-    var split = el("div", { class: "swm-split" }, [left, ed]);
     var bulk = el("div", { class: "swm-bulk", hidden: true, role: "region", "aria-label": "Change the selected items" });
     var toastBox = el("div", { class: "swm-toast", role: "status", "aria-live": "polite", hidden: true });
+    // Two docks stay at the bottom while the shop scrolls: the list's own holds the bar for the ticked items, so the
+    // bar is never over the open item; the shop's holds a message when there is no bar to put it above (placeToast).
+    var listDock = el("div", { class: "swm-dock" }), dock = el("div", { class: "swm-dock" });
+    var left = el("div", { class: "swm-left" }, [table, none, listDock]);
+    listDock.appendChild(bulk); dock.appendChild(toastBox);
+    // A message goes just above the bar when the bar is in view, else at the bottom of the shop.
+    function placeToast() { var to = !bulk.hidden && left.offsetWidth ? listDock : dock; if (toastBox.parentNode !== to) to.insertBefore(toastBox, to.firstChild); }
+    var ed = el("section", { class: "swm-ed", hidden: true, "aria-label": "Item" });
+    var split = el("div", { class: "swm-split" }, [left, ed]);
     var live = el("div", { class: "swm-sr", "aria-live": "assertive" });
-    root.appendChild(top); root.appendChild(banner); root.appendChild(tools); root.appendChild(chips); root.appendChild(split); root.appendChild(bulk); root.appendChild(toastBox); root.appendChild(live);
+    root.appendChild(top); root.appendChild(banner); root.appendChild(tools); root.appendChild(chips); root.appendChild(split); root.appendChild(dock); root.appendChild(live);
     box.appendChild(root);
 
     // The top buttons: Changes, (Import), Export, Add an item.
-    var changesBtn = el("button", { class: "swm-btn plain", type: "button", onclick: showChanges }, [ico("hist", 15), "Changes"]);
+    var changesBtn = el("button", { class: "swm-btn plain", type: "button", title: "Everything changed in the last 30 days, each with Undo", onclick: showChanges }, [ico("hist", 15), "Changes"]);
     var exportBtn = el("button", { class: "swm-btn plain", type: "button", title: "A spreadsheet (CSV) of every item, for Excel, Google Sheets or Numbers", onclick: exportCsv }, [ico("down", 15), "Export"]);
-    var addBtn = el("button", { class: "swm-btn", type: "button", onclick: function () { openItem(null); } }, [ico("plus", 15), "Add an item"]);
+    var addBtn = el("button", { class: "swm-btn", type: "button", title: "A new item. It stays hidden until you set it to Showing.", onclick: function () { openItem(null); } }, [ico("plus", 15), "Add an item"]);
     [changesBtn].concat(opts.extra || [], [exportBtn, addBtn]).forEach(function (b) { acts.appendChild(b); });
 
     find.oninput = function () { st.q = find.value; paintList(); };
@@ -168,8 +174,8 @@
       shop.items.forEach(function (x) { n[x.show]++; if (saleOn(x, today)) n.sale++; if (x.tag) n.tagged++; if ((x.photos || []).length < 2) n.nophoto++; if (!x.link) n.nolink++; });
       return n;
     }
-    var CHIPS = [["all", "All"], ["live", "Showing"], ["sold", "Sold out"], ["hidden", "Hidden"], ["sale", "On sale"],
-      ["tagged", "New or Featured"], ["nophoto", "Needs photos"], ["nolink", "No checkout link"]];
+    var CHIPS = [["all", "All", "Every item"], ["live", "Showing", "On " + whose + " with a Buy button"], ["sold", "Sold out", "On " + whose + ", marked Sold out"], ["hidden", "Hidden", "Not on " + whose],
+      ["sale", "On sale", "Showing a sale price"], ["tagged", "New or Featured", "Carrying a New or Featured label"], ["nophoto", "Needs photos", "Fewer than 2 photos"], ["nolink", "No Buy link", "No Buy link yet, so they can't be shown"]];
     function fits(x, chip) {
       return chip === "all" || (chip === "sale" ? saleOn(x, today) : chip === "tagged" ? !!x.tag : chip === "nophoto" ? (x.photos || []).length < 2 : chip === "nolink" ? !x.link : x.show === chip);
     }
@@ -207,7 +213,7 @@
       var n = counts();
       if (st.chip !== "all" && !n[st.chip]) st.chip = "all";
       fill(chips, CHIPS.filter(function (c) { return c[0] === "all" || n[c[0]]; }).map(function (c) {
-        return el("button", { class: "swm-chip", type: "button", "aria-pressed": String(st.chip === c[0]), onclick: function () { st.chip = c[0]; paintChips(); paintList(); } }, [c[1] + " ", el("b", { text: String(n[c[0]]) })]);
+        return el("button", { class: "swm-chip", type: "button", "aria-pressed": String(st.chip === c[0]), title: c[2], onclick: function () { st.chip = c[0]; paintChips(); paintList(); } }, [c[1] + " ", el("b", { text: String(n[c[0]]) })]);
       }));
       var cats = []; shop.items.forEach(function (x) { if (x.cat && cats.indexOf(x.cat) < 0) cats.push(x.cat); });
       if (st.cat && st.cat !== "\u0000" && cats.indexOf(st.cat) < 0) st.cat = "";
@@ -241,7 +247,7 @@
       if (bits.filter(Boolean).length) out.appendChild(document.createTextNode(" · "));
       out.appendChild(n > 1 ? document.createTextNode(n + " photos")
         : el("span", { class: "swm-warn", title: n ? "Items with two or more photos sell better. Open it to add more." : "It shows on " + whose + " with no picture. Open it to add photos." }, [ico("alert", 13), n ? "Only 1 photo" : "No photos"]));
-      if (!x.link) { out.appendChild(document.createTextNode(" · ")); out.appendChild(el("span", { class: "swm-warn" }, [ico("alert", 13), "No checkout link"])); }
+      if (!x.link) { out.appendChild(document.createTextNode(" · ")); out.appendChild(el("span", { class: "swm-warn", title: "It can't be shown until it has a Buy link. Open it to add one." }, [ico("alert", 13), "No Buy link"])); }
       return out;
     }
     function whenWords(s) {
@@ -251,7 +257,7 @@
     }
     function row(x, drag) {
       var picked = st.picked.indexOf(x.id) >= 0, on = saleOn(x, today);
-      var ck = el("input", { type: "checkbox", class: "swm-ck", checked: picked, "aria-label": "Select " + x.name, onchange: function () {
+      var ck = el("input", { type: "checkbox", class: "swm-ck", checked: picked, "aria-label": "Select " + x.name, title: "Tick to change several items at once", onchange: function () {
         st.picked = ck.checked ? st.picked.concat(x.id) : st.picked.filter(function (id) { return id !== x.id; }); tr.classList.toggle("is-picked", ck.checked); paintBulk(); paintHeadCk();
       } });
       // The price, typed right in the row: Enter or leaving the box saves it, Esc puts it back.
@@ -280,7 +286,7 @@
               x.sale.pct || x.sale.ends ? el("span", { text: [x.sale.pct ? x.sale.pct + "% off" : "", x.sale.ends ? "ends " + dayWords(x.sale.ends) : ""].filter(Boolean).join(" · ") }) : null])
             : x.sale ? el("small", { class: "swm-muted", text: "Sale ended " + dayWords(x.sale.ends) }) : priceFrom(x) ? el("small", { class: "swm-muted", text: "Prices vary by choice" }) : null,
           shop.checkout !== "generic" && x.sqPrice != null && x.sqPrice !== x.price ? el("small", { class: "swm-warn" }, ["Square charges " + money(x.sqPrice) + " ",
-            el("button", { class: "swm-link-b", type: "button", text: "Use " + money(x.sqPrice), "aria-label": "Use Square's price, " + money(x.sqPrice) + ", for " + x.name,
+            el("button", { class: "swm-link-b", type: "button", text: "Use " + money(x.sqPrice), "aria-label": "Use Square's price, " + money(x.sqPrice) + ", for " + x.name, title: "Change this item's price here to match Square",
               onclick: function () { save("/prices", { prices: [{ id: x.id, price: dollarsIn(x.sqPrice) }] }); } })]) : null]),
         el("td", { class: "c-st" }, [el("span", { class: "swm-state-w is-" + x.show }, [stSel])])]);
       if (grip) rowDrag(tr, grip, x);
@@ -329,7 +335,7 @@
     function toast(text, line) {
       clearTimeout(toastTimer);
       fill(toastBox, [el("span", { text: text }), line ? el("button", { type: "button", class: "swm-undo", onclick: function () { undo(line); } }, [ico("undo", 14), "Undo"]) : null]);
-      toastBox.hidden = false; toastTimer = setTimeout(function () { toastBox.hidden = true; }, line ? 9000 : 5000);
+      placeToast(); toastBox.hidden = false; toastTimer = setTimeout(function () { toastBox.hidden = true; }, line ? 9000 : 5000);
     }
     function say(text) { live.textContent = ""; setTimeout(function () { live.textContent = text; }, 30); }
     function undo(line) {
@@ -344,7 +350,7 @@
     /* ---------- many at once ---------- */
     var pop = null;
     function paintBulk() {
-      var n = st.picked.length; bulk.hidden = !n; closePop();
+      var n = st.picked.length; bulk.hidden = !n; closePop(); placeToast();
       if (!n) { bulk.replaceChildren(); return; }
       var items = st.picked.map(byId).filter(Boolean), anySale = items.some(function (x) { return !!x.sale; });
       var b = function (icon, text, fn, title) { return el("button", { type: "button", title: title || null, onclick: fn }, [ico(icon, 15), text]); };
@@ -352,16 +358,16 @@
         b("eye", "Show", function () { save("/bulk", { ids: st.picked, do: "live" }).then(skippedNote); }, "Show them on " + whose + " with their Buy buttons"),
         b("eyeoff", "Hide", function () { save("/bulk", { ids: st.picked, do: "hidden" }); }, "Take them off " + whose + "; they stay saved here"),
         b("ban", "Sold out", function () { save("/bulk", { ids: st.picked, do: "sold" }).then(skippedNote); }, "Keep them on " + whose + ", marked Sold out, with no Buy button"),
-        b("tag", "Put on sale", function (e) { salePop(e.currentTarget, items); }),
-        anySale ? b("x", "End sale", function () { save("/bulk", { ids: st.picked, do: "unsale" }); }) : null,
-        b("dollar", "Change price", function (e) { pricePop(e.currentTarget, items); }),
-        b("folder", "Category", function (e) { catPop(e.currentTarget); }),
-        b("star", "Tag", function (e) { tagPop(e.currentTarget); }),
+        b("tag", "Put on sale", function (e) { salePop(e.currentTarget, items); }, "A percent off, or a sale price, with the regular price crossed out"),
+        anySale ? b("x", "End sale", function () { save("/bulk", { ids: st.picked, do: "unsale" }); }, "Back to the regular price") : null,
+        b("dollar", "Change price", function (e) { pricePop(e.currentTarget, items); }, "One price for all of them, or a percent up or down"),
+        b("folder", "Category", function (e) { catPop(e.currentTarget); }, "Move them to a category, like Gifts"),
+        b("star", "Label", function (e) { tagPop(e.currentTarget); }, "Mark them New or Featured. Those show first on " + whose),
         b("copy", "Duplicate", function () { save("/bulk", { ids: st.picked, do: "duplicate" }); }, "A hidden copy of each, right after it"),
-        b("trash", "Delete", function () { var ids = st.picked; st.picked = []; save("/bulk", { ids: ids, do: "delete" }); if (ids.indexOf(st.open) >= 0) closeItem(true); }),
-        el("span", { class: "swm-sep" }), el("button", { type: "button", class: "swm-clear", text: "Clear", onclick: function () { st.picked = []; paintList(); paintBulk(); } })]);
+        b("trash", "Delete", function () { var ids = st.picked; st.picked = []; save("/bulk", { ids: ids, do: "delete" }); if (ids.indexOf(st.open) >= 0) closeItem(true); }, "Takes them off " + whose + ". Undo brings them back"),
+        el("span", { class: "swm-sep" }), el("button", { type: "button", class: "swm-clear", text: "Clear", title: "Untick them all", onclick: function () { st.picked = []; paintList(); paintBulk(); } })]);
     }
-    function skippedNote(d) { if (d && d.skipped) toast(plural(d.skipped, "item has", "items have") + " no checkout link yet, so " + (d.skipped === 1 ? "it stays" : "they stay") + " hidden. Add the link, then show it.", (shop.history || [])[0]); }
+    function skippedNote(d) { if (d && d.skipped) toast(plural(d.skipped, "item has", "items have") + " no Buy link yet, so " + (d.skipped === 1 ? "it stays" : "they stay") + " hidden. Add the link, then show it.", (shop.history || [])[0]); }
     function closePop() { if (pop) { pop.remove(); pop = null; } }
     // A small panel above the bar, beside the button that opened it. Esc or Cancel closes it.
     function popover(btn, title, body, go, goText) {
@@ -417,9 +423,9 @@
         el("datalist", { id: "swm-cats-b" }, cats.map(function (c) { return el("option", { value: c }); }))], function () { save("/bulk", { ids: st.picked, do: "cat", cat: inp.value.trim() }); return ""; }, "Move");
     }
     function tagPop(btn) {
-      var pickTag = "", seg = el("div", { class: "swm-seg", role: "group", "aria-label": "Tag" }), help = el("small", { text: TAGS[0][2] });
+      var pickTag = "", seg = el("div", { class: "swm-seg", role: "group", "aria-label": "Label" }), help = el("small", { text: TAGS[0][2] });
       TAGS.forEach(function (t, i) { seg.appendChild(el("button", { type: "button", "aria-pressed": String(i === 0), text: t[1], onclick: function () { pickTag = t[0]; help.textContent = t[2]; Array.prototype.forEach.call(seg.children, function (b, j) { b.setAttribute("aria-pressed", String(j === i)); }); } })); });
-      popover(btn, "Tag", [seg, help], function () { save("/bulk", { ids: st.picked, do: "tag", tag: pickTag }); return ""; }, "Apply");
+      popover(btn, "Label", [seg, help], function () { save("/bulk", { ids: st.picked, do: "tag", tag: pickTag }); return ""; }, "Apply");
     }
 
     /* ---------- the item, opened beside the list ---------- */
@@ -471,7 +477,7 @@
       errBox = el("p", { class: "swm-err", role: "alert", hidden: true });
       foot = el("div", { class: "swm-foot" }, [
         el("div", { class: "swm-foot-l" }, [el("button", { class: "swm-btn swm-save", type: "submit", text: isNew ? "Add it" : "Save", title: "Shows on " + whose + " within a minute. Any change can be undone under Changes." }),
-          el("button", { class: "swm-btn plain swm-cancel", type: "button", text: "Cancel", onclick: function () { closeItem(true); } })]),
+          el("button", { class: "swm-btn plain swm-cancel", type: "button", text: "Cancel", title: "Back to the list. Changes you haven't saved are dropped.", onclick: function () { closeItem(true); } })]),
         isNew ? null : moreMenu()]);
       var form = el("form", { class: "swm-form", novalidate: true, onsubmit: function (e) { e.preventDefault(); saveDraft(); } }, [
         el("div", { class: "swm-cards" }, [photosPart(), basicsPart(), extrasPart(), errBox]), foot]);
@@ -511,7 +517,7 @@
         var list = d.photos.concat(st.pending), room = MAX.photos - list.length;
         var grid = el("div", { class: "swm-ph", role: "list", "aria-label": "Photos, the first is the main one" });
         list.forEach(function (p, i) { grid.appendChild(tile(p, i, list.length, paint)); });
-        if (room > 0) grid.appendChild(el("div", { class: "swm-ph-slot", role: "listitem" }, [el("button", { type: "button", class: "swm-ph-add" + (list.length ? "" : " is-first"), onclick: function () { pickFiles(paint); } },
+        if (room > 0) grid.appendChild(el("div", { class: "swm-ph-slot", role: "listitem" }, [el("button", { type: "button", class: "swm-ph-add" + (list.length ? "" : " is-first"), title: "Upload a JPG, PNG or WebP photo from this device (3 MB at most)", onclick: function () { pickFiles(paint); } },
           [ico("photo", list.length ? 18 : 24), el("span", { text: list.length ? "Add" : "Add photos" }), list.length ? null : el("small", { text: "Upload, or drag photos here. Up to 5." })])]));
         dropFiles(grid, paint);
         var sel = list[Math.min(st.sel, list.length - 1)];
@@ -521,7 +527,7 @@
           el("div", { class: "swm-card-hd" }, [el("h3", { text: "Photos" }), el("span", { class: "swm-count", text: list.length + " of " + MAX.photos }),
             list.length > 1 ? tipBtn("Drag a photo to move it. The first one is the main photo on " + whose + "; the rest show when someone opens it.", "Photos") : null]), grid,
           el("div", { class: "swm-ph-acts" }, [
-            el("button", { class: "swm-btn plain is-sm", type: "button", disabled: room <= 0, onclick: function () { openPicker(paint); } }, [ico("globe", 14), "Pick from " + whose]),]),
+            el("button", { class: "swm-btn plain is-sm", type: "button", disabled: room <= 0, title: "Choose from the photos already on " + whose, onclick: function () { openPicker(paint); } }, [ico("globe", 14), "Pick from " + whose])]),
           sel ? el("div", { class: "swm-f swm-alt" }, [el("div", { class: "swm-lblrow is-tip" }, [el("label", { for: "swm-alt" }, [(st.sel === 0 ? "Main photo" : "Photo " + (st.sel + 1)) + " description"]),
             tipBtn("Read aloud to people who can't see the photo, and read by Google. Change it if it's not right.", "Photo description"), auto]), alt]) : null]);
       };
@@ -595,7 +601,7 @@
     function basicsPart() {
       var d = st.draft, c = kind(), cats = [];
       shop.items.forEach(function (x) { if (x.cat && cats.indexOf(x.cat) < 0) cats.push(x.cat); });
-      var name = input("swm-name", d.name, { maxlength: String(MAX.name), placeholder: "What it's called", required: true, oninput: function () { d.name = name.value; } });
+      var name = input("swm-name", d.name, { maxlength: String(MAX.name), placeholder: "What it's called", required: true, title: "The item's name, as buyers see it", oninput: function () { d.name = name.value; } });
       var price = input("swm-price", dollarsIn(d.price), { inputmode: "decimal", placeholder: "0.00", title: "The regular price. Leave it empty to show no price.", oninput: function () { d.priceText = price.value; salePaint(); sqPaint(); choicePaint(); } });
       var cat = input("swm-cat", d.cat, { maxlength: String(MAX.cat), list: "swm-cats", placeholder: cats[0] || "Gifts", title: "Groups items on " + whose + ". Pick one you used before, or type a new one.", oninput: function () { d.cat = cat.value; } });
       // Square keeps its own price: a line under the price only when the two differ.
@@ -608,8 +614,8 @@
       desc.value = d.desc || "";
       var count = function () { var n = MAX.desc - desc.value.length; left.hidden = n > 300; left.textContent = n + " characters left."; };
       desc.oninput = function () { d.desc = desc.value; count(); }; count();
-      var lk = input("swm-link", d.link, { class: "swm-link", inputmode: "url", autocapitalize: "off", spellcheck: "false", placeholder: c.ph, "aria-describedby": "swm-link-h" });
-      var test = el("a", { class: "swm-test", target: "_blank", rel: "noopener", hidden: true }, ["Test it", ico("ext", 12)]);
+      var lk = input("swm-link", d.link, { class: "swm-link", inputmode: "url", autocapitalize: "off", spellcheck: "false", placeholder: c.ph, "aria-describedby": "swm-link-h", title: "Paste the address of this item's checkout page" });
+      var test = el("a", { class: "swm-test", target: "_blank", rel: "noopener", title: "Opens the link in a new tab, to check it goes to the right place", hidden: true }, ["Test it", ico("ext", 12)]);
       var testable = function () { var v = lk.value.trim(); test.hidden = !/^(https:\/\/)?[\w-]+(\.[\w-]+)+\/\S*/i.test(v); test.href = /^https:/i.test(v) ? v : "https://" + v; };
       lk.oninput = function () { d.link = lk.value; testable(); }; testable();
       var optional = function (text, id) { return el("label", { for: id }, [text + " ", el("em", { text: "(optional)" })]); };
@@ -626,14 +632,14 @@
     var salePaint = function () {};
 
     /* What only some items need, each added with one button and taken off with Remove: a sale price, choices (up to
-       3 sets), a date and time, a badge. A box that isn't added takes no room. */
+       3 sets), a date and time, a label. A box that isn't added takes no room. */
     function extrasPart() {
       var d = st.draft, wrap = el("section", { class: "swm-sec swm-card swm-extras", "aria-label": "Extras" });
       var adds = el("div", { class: "swm-adds" }), head = el("h3", { text: "Add if it applies" });
       // One box: its name, Remove, its fields. key names its add button, so Remove can hand the cursor back to it.
       var box = function (key, title, removeWords, kids, off) {
         return el("div", { class: "swm-box", role: "group", "aria-label": title }, [el("div", { class: "swm-box-hd" }, [el("b", { text: title }),
-          el("button", { class: "swm-link-b swm-unadd", type: "button", text: "Remove", "aria-label": removeWords, onclick: function () { off(); changed(); paintAdds(key); } })])].concat(kids));
+          el("button", { class: "swm-link-b swm-unadd", type: "button", text: "Remove", "aria-label": removeWords, title: "Takes this off the item when you save", onclick: function () { off(); changed(); paintAdds(key); } })])].concat(kids));
       };
       var sale = saleBox(box), when = whenBox(box), badge = badgeBox(box), choices = el("div", { class: "swm-boxes" });
       var paintChoices = function (focusSel) {
@@ -646,7 +652,7 @@
         ["choices", function () { return d.options.length ? "More choices" : "Choices"; }, "Like size, color or flavor. Each can have its own price.", function () { return d.options.length < MAX.options; },
           function () { d.options.push({ name: "", choices: [{ name: "" }, { name: "" }] }); paintChoices(".swm-box:last-child .swm-opt-name"); }],
         ["when", "Date and time", "For a class, event, tour or appointment. Its button says Sign up.", function () { return d.kind !== "class"; }, function () { when.on(); }],
-        ["badge", "Badge", "New or Featured. Shows first on " + whose + ".", function () { return !d.tag; }, function () { badge.on(); }]];
+        ["badge", "Label", "A New or Featured label. Shows first on " + whose + ".", function () { return !d.tag; }, function () { badge.on(); }]];
       // The add buttons for what isn't on yet. focusKey: the button to put the cursor on (after a Remove).
       var paintAdds = function (focusKey) {
         var open = ADDS.filter(function (a) { return a[3](); });
@@ -663,8 +669,8 @@
     // Sale price: a percent off or a set price, with an optional last day, and one line saying what the website shows.
     function saleBox(box) {
       var d = st.draft, s = d.sale || {}, mode = s.price != null && !s.pct ? "price" : "pct", on = !!d.sale;
-      var pct = input("swm-pct", s.pct || "", { inputmode: "numeric", placeholder: "15" }), fixed = input("swm-sp", dollarsIn(s.price), { inputmode: "decimal", placeholder: "40.00" });
-      var ends = input("swm-ends", s.ends || "", { type: "date" });
+      var pct = input("swm-pct", s.pct || "", { inputmode: "numeric", placeholder: "15", title: "A whole number from 1 to 95" }), fixed = input("swm-sp", dollarsIn(s.price), { inputmode: "decimal", placeholder: "40.00", title: "The lower price to show, under the regular price" });
+      var ends = input("swm-ends", s.ends || "", { type: "date", title: "The sale ends by itself after this day. Leave it empty to end it yourself." });
       var amount = el("div", { class: "swm-f" }), seg = el("div", { class: "swm-seg is-sm", role: "group", "aria-label": "Sale by" });
       var line = el("p", { class: "swm-preview" });
       var sync = function () {
@@ -672,8 +678,8 @@
         if (d.sale && ends.value) d.sale.ends = ends.value;
         me.hidden = !on; salePaint();
       };
-      [["pct", "Percent off"], ["price", "Sale price"]].forEach(function (o, i) {
-        seg.appendChild(el("button", { type: "button", "aria-pressed": String(mode === o[0]), text: o[1], onclick: function () {
+      [["pct", "Percent off", "Take a percent off the regular price"], ["price", "Sale price", "Type the sale price yourself"]].forEach(function (o, i) {
+        seg.appendChild(el("button", { type: "button", "aria-pressed": String(mode === o[0]), text: o[1], title: o[2], onclick: function () {
           mode = o[0]; Array.prototype.forEach.call(seg.children, function (b, j) { b.setAttribute("aria-pressed", String(j === i)); }); paintAmount(); sync(); changed(); } }));
       });
       var paintAmount = function () {
@@ -699,22 +705,22 @@
     // Date and time: for anything that happens at a set time. Its button on the website says Sign up.
     function whenBox(box) {
       var d = st.draft;
-      var when = input("swm-when", d.when, { type: "datetime-local", oninput: function () { d.when = when.value; } });
+      var when = input("swm-when", d.when, { type: "datetime-local", title: "The day and time it starts, in your local time", oninput: function () { d.when = when.value; } });
       var seats = input("swm-seats", d.seats, { maxlength: "40", placeholder: "8 seats", title: "Words shown beside the date, like 8 seats. The checkout keeps the real count.", oninput: function () { d.seats = seats.value; } });
       var me = box("when", "Date and time", "Remove the date and time", [el("div", { class: "swm-grid" }, [field("Starts", when),
         field(el("label", { for: "swm-seats" }, ["Spots ", el("em", { text: "(optional)" })]), seats)])], function () { d.kind = "item"; me.hidden = true; });
       me.hidden = d.kind !== "class";
       return { el: me, on: function () { d.kind = "class"; me.hidden = false; when.focus(); } };
     }
-    // Badge: New or Featured, shown on the item and putting it first on the website.
+    // Label: New or Featured, shown on the item and putting it first on the website.
     function badgeBox(box) {
-      var d = st.draft, seg = el("div", { class: "swm-seg", role: "radiogroup", "aria-label": "Badge" });
+      var d = st.draft, seg = el("div", { class: "swm-seg", role: "radiogroup", "aria-label": "Label" });
       var paint = function () { Array.prototype.forEach.call(seg.children, function (b) { var on = b.value === d.tag; b.setAttribute("aria-checked", String(on)); b.tabIndex = on || (!d.tag && b === seg.firstChild) ? 0 : -1; }); };
       TAGS.filter(function (t) { return t[0]; }).forEach(function (t) {
         seg.appendChild(el("button", { type: "button", role: "radio", value: t[0], title: t[2], onclick: function () { d.tag = t[0]; paint(); changed(); } }, [t[0] === "featured" ? ico("star", 13, 2.2) : null, t[1]]));
       });
       seg.onkeydown = function (e) { if (!/^Arrow/.test(e.key)) return; e.preventDefault(); var next = d.tag === "new" ? seg.lastChild : seg.firstChild; next.focus(); next.click(); };
-      var me = box("badge", "Badge", "Remove the badge", [seg], function () { d.tag = ""; me.hidden = true; });
+      var me = box("badge", "Label", "Remove the label", [seg], function () { d.tag = ""; me.hidden = true; });
       me.hidden = !d.tag; paint();
       return { el: me, on: function () { d.tag = "new"; me.hidden = false; paint(); seg.firstChild.focus(); } };
     }
@@ -722,18 +728,18 @@
        price, and an empty price means the regular one (shown in grey). */
     function choiceBox(box, o, oi, paint) {
       var d = st.draft, at = ".swm-box:nth-child(" + (oi + 1) + ") ", title = d.options.length > 1 ? "Choices " + (oi + 1) : "Choices";
-      var name = el("input", { id: "swm-opt-" + oi, class: "swm-opt-name", value: o.name, maxlength: "40", placeholder: "Size, color, flavor…", oninput: function () { o.name = name.value; me.querySelector(".swm-unadd").setAttribute("aria-label", removeWords()); } });
+      var name = el("input", { id: "swm-opt-" + oi, class: "swm-opt-name", value: o.name, maxlength: "40", placeholder: "Size, color, flavor…", title: "What the choice is about, like Size", oninput: function () { o.name = name.value; me.querySelector(".swm-unadd").setAttribute("aria-label", removeWords()); } });
       var removeWords = function () { return "Remove " + (o.name ? "the choices for " + o.name : "these choices"); };
       var rows = o.choices.map(function (c, ci) {
-        var cn = el("input", { value: c.name, maxlength: "60", placeholder: ci === 0 ? "Small" : ci === 1 ? "Large" : "", "aria-label": (o.name || "Choice") + " " + (ci + 1), oninput: function () { c.name = cn.value; } });
-        var cp = el("input", { class: "swm-ch-price", value: c.priceText != null ? c.priceText : dollarsIn(c.price), inputmode: "decimal", "aria-label": "Price for " + (c.name || "choice " + (ci + 1)) + ", empty for the regular price", oninput: function () { c.priceText = cp.value; } });
+        var cn = el("input", { value: c.name, maxlength: "60", placeholder: ci === 0 ? "Small" : ci === 1 ? "Large" : "", "aria-label": (o.name || "Choice") + " " + (ci + 1), title: "One thing the buyer can pick, like Small", oninput: function () { c.name = cn.value; } });
+        var cp = el("input", { class: "swm-ch-price", value: c.priceText != null ? c.priceText : dollarsIn(c.price), inputmode: "decimal", "aria-label": "Price for " + (c.name || "choice " + (ci + 1)) + ", empty for the regular price", title: "This choice's own price. Leave it empty for the regular price.", oninput: function () { c.priceText = cp.value; } });
         return el("li", {}, [cn, el("div", { class: "swm-money is-sm" }, [el("span", { "aria-hidden": "true", text: "$" }), cp]),
           el("button", { class: "swm-x", type: "button", "aria-label": "Take off " + (c.name || "this choice"), title: "Take off", onclick: function () { o.choices.splice(ci, 1); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("x", 12, 2.4)])]);
       });
       var me = box("choices", title, removeWords(), [
         el("div", { class: "swm-f" }, [el("label", { for: "swm-opt-" + oi, text: "What the buyer picks" }), name]),
         el("ul", { class: "swm-opt" }, rows),
-        el("div", { class: "swm-ch-foot" }, [o.choices.length < MAX.choices ? el("button", { class: "swm-link-b swm-add", type: "button", onclick: function () { o.choices.push({ name: "" }); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("plus", 13), "Add a choice"]) : null,
+        el("div", { class: "swm-ch-foot" }, [o.choices.length < MAX.choices ? el("button", { class: "swm-link-b swm-add", type: "button", title: "One more thing to pick from, up to " + MAX.choices, onclick: function () { o.choices.push({ name: "" }); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("plus", 13), "Add a choice"]) : null,
           el("small", { class: "swm-muted", text: "An empty price means the regular price." })])],
         function () { d.options.splice(oi, 1); paint(); });
       return me;
@@ -985,7 +991,7 @@
         var i = b.item, old = i.id ? find(i.id) : null, price = cents(i.price);
         if (!String(i.name || "").trim()) return no("Please name the item.");
         if (price === undefined) return no("That price doesn't look right. Type it like 12.50.");
-        if (i.show !== "hidden" && !String(i.link || "").trim()) return no("Add the checkout link before putting it on the site.");
+        if (i.show !== "hidden" && !String(i.link || "").trim()) return no("Add the Buy link before putting it on the site.");
         var sale = i.sale ? (i.sale.pct ? { pct: Number(i.sale.pct) } : { price: cents(i.sale.price) }) : null; if (sale && i.sale.ends) sale.ends = i.sale.ends;
         if (sale && (price == null || (sale.price != null && sale.price >= price))) return no("The sale price should be lower than the regular price.");
         var keys = (old && old.photos || []).map(function (p) { return p.key; });
@@ -1009,7 +1015,7 @@
         else if (b.do === "tag") { items.forEach(function (x) { if (b.tag) x.tag = b.tag; else delete x.tag; }); what = plural(items.length, "item", "items") + (b.tag ? " tagged " + b.tag : ": tag taken off"); }
         else if (b.do === "duplicate") { items.forEach(function (x) { var c = copy(x); c.id = id(); c.name += " (copy)"; c.show = "hidden"; shop.items.splice(shop.items.indexOf(x) + 1, 0, c); }); what = "Copied " + plural(items.length, "item", "items"); }
         else if (b.do === "delete") { shop.items = shop.items.filter(function (x) { return items.indexOf(x) < 0; }); what = items.length === 1 ? "Deleted " + items[0].name : "Deleted " + plural(items.length, "item", "items"); }
-        if (skipped === items.length && skipped) return no("None of those have a checkout link yet. Add the links first.");
+        if (skipped === items.length && skipped) return no("None of those have a Buy link yet. Add the links first.");
         keep(what, before); return answer({ skipped: skipped });
       }
       if (path === "/undo") { var h = shop.history.filter(function (x) { return x.id === b.id; })[0]; if (!h || !snaps[h.id]) return no("That change is too old to undo."); shop.items = copy(snaps[h.id]); keep("Undid: " + h.what, before); return answer(); }

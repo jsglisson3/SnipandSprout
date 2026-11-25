@@ -140,6 +140,14 @@ ul,ol{ padding:0; list-style:none; }
 .nav__links a.nav__shop::after{ display:none; }
 .nav__links a.nav__shop:hover, .nav__links a.nav__shop[aria-current="page"]{ background:#20241d; }
 /* the open-now line, as a pill */
+/* her social pages: small round badges in each brand's own colours (.ic-ig and the rest, with the footer's), the shape of the header's pills */
+.nav__social{ display:flex; align-items:center; gap:7px; }
+.nav__links a.nav__soc{ display:grid; place-items:center; width:24px; height:24px; padding:0; border-radius:50%; box-shadow:0 1px 2px rgb(52 44 30 / .16); transition:transform .2s var(--ease), box-shadow .2s var(--ease); }
+.nav__links a.nav__soc::after{ display:none; }
+.nav__links a.nav__soc:hover{ transform:translateY(-1px); box-shadow:0 6px 12px -6px rgb(52 44 30 / .5); }
+.nav__soc svg{ width:12px; height:12px; }
+.nav__soc.ic-google svg{ width:14px; height:14px; }
+.nav__links a{ white-space:nowrap; }
 .nav__links .open{ padding:7px 14px 7px 12px; border-radius:999px; background:rgb(255 253 249 / .6); border:1px solid rgb(44 48 39 / .1); font-size:.875rem; font-weight:500; line-height:1.2; white-space:nowrap; }
 
 /* open now: a green dot that breathes while the shop is open, a red one while it's closed (grey until the script knows) */
@@ -177,7 +185,39 @@ main{ background:radial-gradient(1100px 560px at 78% -80px, rgb(214 222 200 / .5
 .hero--about .hero__pic{ object-position:50% 34%; }
 .trio{ display:flex; flex-wrap:wrap; gap:4px 1.1em; font-family:var(--head); font-weight:var(--head-w); font-size:var(--t-h3); letter-spacing:var(--head-ls); color:var(--clay-ink); }
 
-/* Shop, Gallery and the 404 page: a centred title, then a row of ways in */
+/* Shop: her shelf. The three things to buy stand in three little windows on one wooden shelf, each with one of
+   her plant markers behind it for the name and price; a window opens its tab below. The drawings come from
+   tools/make-shop-picks.py and share the footer scene's hand. */
+.hero--shop{ --gap:clamp(12px,1.6vw,26px); --end:14px; --wood-l:#c2a88c; --wood:#a68a70; --wood-d:#8c6f57; --sns-moss:#6f8456; --sns-ease:cubic-bezier(.2,.7,.2,1);
+  display:grid; grid-template-columns:minmax(0,9fr) minmax(0,13fr); align-items:center; gap:clamp(32px,4.5vw,72px); padding-top:clamp(64px,5.5vw,92px); padding-bottom:8px; }
+.picks{ display:flex; justify-content:center; gap:var(--gap); width:100%; max-width:860px; justify-self:end; padding:0 var(--end); container-type:inline-size; }
+.picks li{ flex:0 1 calc((100% - 2 * var(--gap)) / 3); min-width:0; }   /* a window whose item is Hidden leaves the shelf; the others keep their size */
+.pick{ display:flex; flex-direction:column; align-items:center; text-align:center; text-decoration:none; border-radius:12px; }
+.pick__stage{ position:relative; display:block; width:100%; margin-bottom:30px; }
+.pick__win{ position:relative; display:block; width:100%; aspect-ratio:200/216; border-radius:999px 999px 0 0; overflow:hidden; background:var(--sage); box-shadow:inset 0 0 0 1px var(--line), inset 0 18px 26px -20px rgb(52 44 30 / .22); }
+.pick--tbar .pick__win{ background:var(--rose-soft); }
+.pick--pbar .pick__win{ background:var(--cream); }
+/* daylight from the upper left, a little brighter under the pointer */
+.pick__win::before{ content:""; position:absolute; inset:0; background:radial-gradient(95% 80% at 20% 6%, rgb(255 255 255 / .8), rgb(255 255 255 / 0) 62%); opacity:.55; transition:opacity .4s var(--ease); }
+.pick:hover .pick__win::before, .pick:focus-visible .pick__win::before{ opacity:1; }
+.pk__art{ position:absolute; left:0; bottom:0; width:100%; height:auto; display:block; }
+/* one shelf: each window carries its length of it, reaching half way across the gap to the next */
+.pick__shelf{ position:absolute; z-index:1; left:calc(var(--gap) / -2 - 1px); right:calc(var(--gap) / -2 - 1px); top:100%; height:12px; background:linear-gradient(var(--wood-l) 0 3px, var(--wood) 3px 9px, var(--wood-d) 9px); box-shadow:0 12px 16px -9px rgb(52 44 30 / .4); }
+.picks li:nth-child(1 of :not([data-shop-state="hidden"])) .pick__shelf{ left:calc(var(--end) * -1); border-radius:3px 0 0 3px; }
+.picks li:nth-last-child(1 of :not([data-shop-state="hidden"])) .pick__shelf{ right:calc(var(--end) * -1); border-radius:0 3px 3px 0; }
+/* the marker: a sign on a stick, standing on the shelf behind the things */
+.pick__marker{ position:absolute; left:0; right:0; top:14.5%; bottom:0; display:flex; flex-direction:column; align-items:center; transform-origin:50% 100%; transform:rotate(-1.6deg); transition:transform .45s var(--ease); }
+.picks li:nth-child(2) .pick__marker{ transform:rotate(1.4deg); }
+.picks li:nth-child(3) .pick__marker{ transform:rotate(-.9deg); }
+.pick__marker::after{ content:""; flex:1; width:5px; background:linear-gradient(90deg, var(--wood) 55%, var(--wood-d) 55%); }
+.pick__sign{ display:flex; flex-direction:column; align-items:center; gap:2px; max-width:88%; padding:9px 13px 8px; background:var(--card); border-radius:10px; box-shadow:inset 0 0 0 1px rgb(135 89 63 / .32), inset 0 0 0 4px var(--card), inset 0 0 0 5px rgb(135 89 63 / .2), 0 8px 14px -8px rgb(52 44 30 / .5); line-height:1.15; }
+.pick__name{ font-family:var(--head); font-weight:var(--head-w); font-size:clamp(.8125rem,2.15cqw,1.0625rem); letter-spacing:var(--head-ls); white-space:nowrap; }
+.pick__price{ color:var(--clay-ink); font-weight:650; font-size:clamp(.8125rem,2cqw,.9375rem); }
+.pick:hover .pick__marker, .picks li .pick:focus-visible .pick__marker{ transform:translateY(-5px) rotate(0deg); }
+.pick__where{ max-width:13em; font-size:var(--t-small); line-height:1.35; color:var(--muted); }
+.pk__grow{ transform-box:fill-box; transform-origin:50% 100%; }
+
+/* Gallery and the 404 page: a centred title, then a row of ways in */
 .hero--center{ display:flex; flex-direction:column; align-items:center; text-align:center; gap:20px; padding-bottom:clamp(24px,3vw,40px); }
 .hero--center .hero__lede{ max-width:40em; }
 .jump{ display:flex; flex-wrap:wrap; justify-content:center; gap:10px; }
@@ -330,6 +370,18 @@ html:has(.lb[open]){ overflow:hidden; }
 .slips{ background:var(--rose-soft); padding:var(--section) 0; }
 .slips__fan{ display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:clamp(16px,2vw,28px); align-items:stretch; }
 .slipq{ background:var(--card); border-radius:var(--r); box-shadow:var(--sh-1); padding:clamp(24px,2.2vw,34px); display:flex; flex-direction:column; justify-content:space-between; gap:32px; margin:0; transition:transform .3s var(--ease), box-shadow .3s var(--ease); }
+/* her Google rating: shown by site.js once SW Core has it; the gold row is cut to the rating */
+.grate{ display:flex; flex-wrap:wrap; align-items:center; gap:6px 10px; color:var(--muted); }
+.grate b{ color:var(--ink); font-size:1.125rem; }
+.grate__g{ display:inline-flex; width:22px; height:22px; }
+.grate__g svg{ width:100%; height:100%; }
+.gstars{ position:relative; display:inline-flex; width:100px; height:20px; }
+.gstars svg{ display:block; width:100px; height:20px; fill:rgb(44 48 39 / .16); }
+.gstars__on{ position:absolute; inset:0 auto 0 0; width:var(--fill, 0%); overflow:hidden; }
+.gstars__on svg{ fill:#d99a2b; }
+.slips__more{ display:flex; flex-wrap:wrap; justify-content:center; gap:12px; margin-top:clamp(24px,2.6vw,40px); }
+.slips__g{ display:inline-flex; width:20px; height:20px; }
+.slips__g svg{ width:100%; height:100%; }
 .slipq:hover{ transform:translateY(-4px); box-shadow:var(--sh-2); }
 .slipq blockquote{ margin:0; font-family:var(--head); font-size:clamp(1.375rem,1.45vw,1.625rem); line-height:1.18; letter-spacing:-.01em; }
 .slipq blockquote::before{ content:"\201C"; display:block; font-size:4.5rem; line-height:.7; height:.42em; color:var(--clay); }
@@ -511,6 +563,12 @@ html:has(.lb[open]){ overflow:hidden; }
 @media (prefers-reduced-motion: no-preference){
   .js [data-in]{ opacity:0; transform:translateY(22px); transition:opacity .8s var(--ease) var(--d,0s), transform .8s var(--ease) var(--d,0s); }
   .js [data-in].in{ opacity:1; transform:none; }
+  /* Shop: the plants on her shelf grow in as each window arrives, and perk up under the pointer */
+  .js .picks li:not(.in) .pk__grow{ transform:scale(.2,.08); }
+  .picks li.in .pk__grow{ animation:pk-grow 1.3s cubic-bezier(.3,.7,.3,1) calc(var(--d, 0s) + .35s) both; }
+  .picks li.in .pick:hover .pk__grow{ animation:pk-perk .8s cubic-bezier(.3,.7,.3,1); }
+  @keyframes pk-grow{ 0%{ transform:scale(.2,.08); } 70%{ transform:scale(1.03,1.06); } 100%{ transform:none; } }
+  @keyframes pk-perk{ 0%{ transform:none; } 40%{ transform:scale(1.03,1.07); } 100%{ transform:none; } }
   @keyframes drift{ from{ transform:scale(1.06); } to{ transform:scale(1); } }
   @view-transition{ navigation:auto; }
   ::view-transition-old(root), ::view-transition-new(root){ animation-duration:.35s; }
@@ -526,13 +584,15 @@ html:has(.lb[open]){ overflow:hidden; }
 }
 @media (max-width: 1100px){
   .nav__links{ gap:22px; }
+  .nav__social{ gap:6px; }
   .foot__grid{ grid-template-columns:repeat(2,minmax(0,1fr)); }
   .ways__grid{ gap:20px; }
 }
 
 /* ---------- tablet and phone: each top stacks, text first then its photograph, and courses stack ---------- */
 @media (max-width: 959px), (max-width: 1100px) and (orientation: portrait){
-  .hero--home, .hero--about, .hero--ws, .hero--visit__in, .pbar__grid{ grid-template-columns:1fr; }
+  .hero--home, .hero--about, .hero--shop, .hero--ws, .hero--visit__in, .pbar__grid{ grid-template-columns:1fr; }
+  .picks{ justify-self:start; }
   .hero--about .hero__pic{ order:2; }
   .hero--home .hero__pic, .hero--about .hero__pic, .pbar__pic{ min-height:0; max-height:none; aspect-ratio:4/3; }
   .hero--home{ padding-top:clamp(72px,6.5vw,104px); }   /* stacked, the words start under her logo tag */
@@ -558,10 +618,21 @@ html:has(.lb[open]){ overflow:hidden; }
 @media (max-width: 700px){
   :root{ --navh:64px; }
   html{ scroll-padding-bottom:calc(84px + env(safe-area-inset-bottom, 0px)); }   /* keyboard focus stops clear of the bottom bar */
-  .nav__links a{ display:none; }   /* the bottom bar takes over */
+  .nav__links a, .nav__links a.nav__soc{ display:none; }   /* the bottom bar takes over, and her social pages are in the footer */
   .brand img{ height:calc(var(--navh) + 30px); border-radius:0 0 10px 10px; }
   .nav__links .open{ display:inline-flex; white-space:normal; text-wrap:balance; max-width:15em; border-radius:14px; font-size:.8125rem; }   /* the open-now line may take two lines beside the logo */
   .hero{ padding-top:56px; }
+  /* Shop: on a phone the windows are too small for signs, so the names and prices are plain words under the shelf */
+  .hero--shop{ --end:8px; }
+  .pick__win{ overflow:visible; }
+  .pick__win::before{ border-radius:inherit; }
+  .picks li .pick__marker, .picks li .pick:hover .pick__marker, .picks li .pick:focus-visible .pick__marker{ top:calc(100% + 32px); bottom:auto; transform:none; }
+  .pick__marker::after{ content:none; }
+  .pick__sign{ max-width:none; padding:0; background:none; box-shadow:none; border-radius:0; }
+  .pick__name{ font-size:1rem; white-space:normal; text-wrap:balance; }
+  .pick__price{ font-size:.9375rem; }
+  .pick__stage{ margin-bottom:94px; }
+  .pick__where{ display:none; }
   .steps{ grid-template-columns:1fr; }
   .groups{ grid-template-columns:1fr 1fr; }
   .tabbar{ display:flex; position:fixed; left:0; right:0; bottom:0; z-index:40; background:rgb(247 244 238 / .9); -webkit-backdrop-filter:saturate(1.2) blur(14px); backdrop-filter:saturate(1.2) blur(14px); border-top:1px solid var(--line); padding:6px 6px calc(6px + env(safe-area-inset-bottom)); }

@@ -54,3 +54,5 @@
 [data-shop-state="sold"] [data-shop-buy]{display:none!important}
 [data-shop-sold]{display:none}
 [data-shop-state="sold"] [data-shop-sold]{display:revert}
+/* The one line shown when nothing on the page is for sale. */
+.sw-shop-none{margin:1.5rem auto;max-width:36rem;text-align:center;color:inherit;opacity:.75;font-size:1rem}

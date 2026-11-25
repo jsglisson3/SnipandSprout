@@ -266,8 +266,13 @@
 .swm-ph-acts .swm-btn{flex:1 1 0}
 
 /* ---------- many at once: a dark bar that stays at the bottom of the screen ---------- */
-.swm-bulk{position:sticky;bottom:calc(16px + var(--swm-bottom,0px));z-index:5;display:flex;flex-wrap:wrap;align-items:center;gap:2px;width:max-content;max-width:calc(100% - 24px);margin:12px auto 14px;
-  background:var(--m-bar);color:#f6f5f2;border-radius:12px;padding:6px 8px 6px 16px;box-shadow:0 16px 36px -14px rgb(0 0 0 / .5);font-size:13.5px}
+/* A dock stays at the bottom while the shop scrolls. The list's dock holds the bar for the ticked items, as a strip
+   the list's full width (never over the open item); a message (with Undo) shows just above it, in its own light look. */
+.swm-dock{position:sticky;bottom:var(--swm-bottom,0px);z-index:5;display:grid;justify-items:center;pointer-events:none}
+.swm-split.is-open .swm-bulk{border-radius:0 0 0 13px}
+.swm-dock>*{pointer-events:auto}
+.swm-bulk{position:relative;display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:2px;width:100%;
+  background:var(--m-bar);color:#f6f5f2;border-radius:0 0 13px 13px;padding:8px 12px 8px 18px;font-size:13.5px}
 .swm-bulk>b{font-weight:470;margin-right:4px;white-space:nowrap}
 .swm-bulk .swm-sep{width:1px;height:22px;background:rgb(255 255 255 / .16);margin:0 6px}
 .swm-bulk>button{background:none;border:0;color:#f6f5f2;display:inline-flex;gap:6px;align-items:center;padding:8px 9px;border-radius:8px;opacity:.9;white-space:nowrap}
@@ -289,11 +294,10 @@
 .swm-pop-acts{display:flex;justify-content:flex-end;gap:8px;margin-top:4px}
 
 /* ---------- toast (with Undo) ---------- */
-.swm-toast{position:fixed;left:50%;bottom:calc(24px + var(--swm-bottom,0px));transform:translateX(-50%);z-index:60;display:flex;gap:14px;align-items:center;max-width:min(560px,calc(100vw - 32px));
-  background:var(--m-bar);color:#f6f5f2;border-radius:10px;padding:10px 12px 10px 16px;box-shadow:0 14px 34px -12px rgb(0 0 0 / .5);font-size:13.5px}
-.swm:has(.swm-bulk:not([hidden])) .swm-toast{bottom:calc(92px + var(--swm-bottom,0px))}
-.swm-undo{display:inline-flex;gap:6px;align-items:center;background:rgb(255 255 255 / .12);border:0;border-radius:7px;padding:6px 10px;color:#fff;font-weight:470;white-space:nowrap}
-.swm-undo:hover{background:rgb(255 255 255 / .2)}
+.swm-toast{display:flex;gap:14px;align-items:center;max-width:min(560px,calc(100% - 24px));margin:0 12px 10px;
+  background:var(--m-paper);color:var(--m-ink);border:1px solid color-mix(in srgb,var(--m-ink) 18%,var(--m-line));border-radius:10px;padding:8px 8px 8px 14px;box-shadow:0 10px 28px -10px rgb(0 0 0 / .35);font-size:13.5px}
+.swm-undo{display:inline-flex;gap:6px;align-items:center;background:var(--m-paper);border:1px solid color-mix(in srgb,var(--m-ink) 22%,var(--m-line));border-radius:7px;padding:6px 10px;color:var(--m-accent-t);font-weight:470;white-space:nowrap}
+.swm-undo:hover{background:var(--m-soft)}
 
 /* ---------- dialogs: Changes, photos found, pick from the website ---------- */
 .swm-dlg{border:1px solid var(--m-line);border-radius:12px;padding:0;width:min(560px,calc(100vw - 32px));max-height:min(86vh,900px);background:var(--m-paper);color:var(--m-ink);

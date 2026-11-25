@@ -14,6 +14,7 @@
  *   data-api          SW Core, if it ever moves (default https://site-notes.jsglisson.workers.dev)
  *   data-buy          the button's words for something to buy        (default "Buy")
  *   data-book         the button's words for a class or workshop     (default "Sign up")
+ *   data-none         the line shown when nothing is for sale        (default "Nothing is for sale online right now. Please check back soon.")
  * Settings on a [data-shop] box:
  *   data-kind="class" only classes and workshops;  data-kind="item" only things to buy
  *   data-cat="Bread"  only that category
@@ -25,8 +26,9 @@
  *   link opens the item's checkout. The element gets data-shop-state: "live"; "sold" (shop.css hides its Buy
  *   links and shows its [data-shop-sold]); or "hidden" when the item is set to Hidden or deleted (shop.css hides
  *   the whole element, and a radio tab inside it hands its turn to the next one still showing).
- *   When none of the page's items are in the shop list at all (an empty or brand-new shop, or every one of them
- *   Hidden), nothing is touched: the page keeps what is typed into it, so it can never go blank.
+ *   A list or a row of tabs left with nothing showing (a ul, ol, nav, radiogroup or tablist whose items are all
+ *   hidden) is hidden too. When nothing at all is for sale on the page, one quiet line says so where the items
+ *   were (data-none on the script tag changes its words). The rest of the page is never touched.
  * Each item shows its photos (up to 5: swipe, or the arrows, to see the next), its price (a sale's price with the
  * regular one crossed out, and the sale's last day), its options (Size: S, M, L), and a tag for a sale, New or Featured.
  * The page's policy must allow SW Core: connect-src and img-src https://site-notes.jsglisson.workers.dev
@@ -35,7 +37,8 @@
 (function () {
   var me = document.currentScript, set = me ? me.dataset : {};
   var API = String(set.api || "https://site-notes.jsglisson.workers.dev").replace(/\/+$/, ""), SITE = set.site || "";
-  var BUY = set.buy || "Buy", BOOK = set.book || "Sign up", TAGS = { new: "New", featured: "Featured" };
+  var BUY = set.buy || "Buy", BOOK = set.book || "Sign up", NONE = set.none || "Nothing is for sale online right now. Please check back soon.", TAGS = { new: "New", featured: "Featured" };
+  var GROUPS = 'ul, ol, nav, [role="radiogroup"], [role="tablist"], [role="list"]';   // what hides with its last item
   var still = window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches;
   var money = function (c) { return "$" + (c / 100).toLocaleString("en-US", { minimumFractionDigits: c % 100 ? 2 : 0, maximumFractionDigits: 2 }); };
   // A class's date is kept as the client's own local time (2026-12-06T10:00), so it is read and shown as written.
@@ -178,7 +181,6 @@
       return items.filter(function (i) { return [i.ref, i.id, i.name].some(function (k) { return k && key(k) === want; }); })[0];
     };
     var boxes = Array.prototype.slice.call(document.querySelectorAll("[data-shop-item]"));
-    if (!boxes.some(find)) return used;   // none of them is in the list: the page stays as typed, never blank
     boxes.forEach(function (box) {
       var x = find(box);
       box.setAttribute("data-shop-state", !x ? "hidden" : x.soldOut ? "sold" : "live");
@@ -194,7 +196,21 @@
       var next = Array.prototype.filter.call(document.getElementsByName(r.name), function (o) { return !o.closest(gone); })[0];
       if (next) { next.checked = true; next.dispatchEvent(new Event("change", { bubbles: true })); }
     });
+    // A list or a row of tabs with nothing left showing goes out of sight with its items.
+    boxes.forEach(function (box) {
+      var group = box.parentElement;
+      if (group && group.matches(GROUPS) && !group.querySelector("[data-shop-item]:not(" + gone + ")")) group.setAttribute("data-shop-state", "hidden");
+    });
     return used;
+  }
+  // Nothing on the page is for sale (every item of its own is hidden and no list filled in): one quiet line where
+  // the first of them was, so the page reads as open for business later, not as broken.
+  function nothing() {
+    var first = document.querySelector("[data-shop-item]"); if (!first) return;
+    if (document.querySelector('[data-shop-item]:not([data-shop-state="hidden"]), [data-shop-ready]')) return;
+    while (first.parentElement && first.parentElement.getAttribute("data-shop-state") === "hidden") first = first.parentElement;
+    var note = el("p", "sw-shop-none", NONE); note.setAttribute("role", "status");
+    first.parentNode.insertBefore(note, first);
   }
   function start() {
     var boxes = document.querySelectorAll("[data-shop]"); if ((!boxes.length && !document.querySelector("[data-shop-item]")) || !SITE) return;
@@ -203,6 +219,7 @@
         if (!d || !d.ok || !Array.isArray(d.items)) return;
         var used = spots(d.items), rest = d.items.filter(function (x) { return used.indexOf(x) < 0; });
         Array.prototype.forEach.call(boxes, function (b) { fill(b, rest); });
+        nothing();
       })
       .catch(function () {});   // can't reach it: the page keeps what it had
   }

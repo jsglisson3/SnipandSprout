@@ -64,6 +64,7 @@ Cloudflare Workers and Pages app on GitHub still has this repository under Repos
 | `src/stray-badge.html` | The Stray Wolf footer badge, the dark logo version, copied unchanged from Stray Wolf's badge kit. Its styles are the kit's, in `site.css` under "Stray Wolf Technology footer badge". Holding it opens the Client Portal. |
 | `src/portal.html` | Her Client Portal page: Stray Wolf's standard page with her details. The build fills in her short name, the service address and the list of photos on her site. |
 | `src/shop-scene.svg` | Her shop across the top of the footer: the counter and wall shelves with plants, pots and her terrariums, and her watering can. A still picture until `site.js` plays it; still for anyone who asked for less motion. Drawn by `tools/make-shop-scene.py` (Python, no packages): change that and run it again rather than editing the SVG. |
+| `src/shop-picks/*.svg` | The three little windows on the shelf at the top of the Shop page (a DIY kit made up, the Terrarium Bar, the Plant Bar). The build puts them in the page itself so `site.css` can grow the plants in; still for anyone who asked for less motion. The names, prices and the line under each window are in `build.mjs` (the Shop block). Drawn by `tools/make-shop-picks.py` (Python, no packages) with the footer scene's own pots and plants: change that and run it again rather than editing the SVGs. |
 | `src/leaves.svg` | Fine leaf outlines tiled behind every page, faint enough that the page still reads as her cream paper (a soft sage wash across the top of each page sits with it, in `site.css`). Drawn by `tools/make-leaves.py` (Python, no packages): change that and run it again rather than editing the SVG. |
 | `src/logo.svg`, `src/logo-tag.svg` | Her logo (Snip &, SPROUT, PLANT CO.), redrawn as outlines so it stays sharp at every size: `logo.svg` for light grounds (Client Portal), and `logo-tag.svg`, her logo on its olive box as she uses it, hanging from the header like a shop tag and sitting above the blurb in the footer. |
 | `src/_headers`, `src/robots.txt` | Cloudflare's response headers, and the search-engine file (the build adds the line naming `sitemap.xml`, the list of pages it writes, each with the date of the latest version). |
@@ -86,14 +87,17 @@ no MIME sniffing, no framing by other sites, and keeps the `.pages.dev` copy out
   Business info) or in her portal; the pages follow within a minute. Only if the typed fallback should change
   too: `WEEK`, `HOURS3` and the Store block's hours in `build.mjs` (the three must agree), `C.email`, `C.ig`,
   `C.etsy`, and the "On your site now" lists in `src/portal.html`.
+- **Her Google rating on Home:** nothing to edit here. Link her Google listing in Stray Wolf Admin (her page,
+  Business info, Find on Google); SW Core reads the rating once a day and `site.js` shows it. Until then Home
+  shows the typed line and one button. The three quotes are typed in `build.mjs` (the Home block).
 - **A new kind of social link** (TikTok, say): add a footer line like the Facebook one in `build.mjs`, marked
-  `data-info="social:tiktok"`, and its name to `data-note-fields` on the social box in `src/portal.html`.
+  `data-info="social:tiktok"`, a header icon beside the others (`social(...)` in the header), and its name to `data-note-fields` on the social box in `src/portal.html`.
 - **The next workshop:** `WS` near the top of `build.mjs` (its name, day, time, start and end, and lowest price).
   The Home band, the Workshops page, both calendar links and the event details search engines read all follow
   it. Once the day has passed the next build leaves the event details out; the pages keep showing the workshop
   until `WS` is changed.
-- **A Shop price or Square link:** `src/shop-section.html`. Square charges what is set in Square, so change
-  both.
+- **A Shop price or Square link:** `src/shop-section.html`, and the price on its marker at the top of the page
+  (`build.mjs`, the Shop block). Square charges what is set in Square, so change it there too.
 - **Items and workshop seats:** nothing to edit here. They come from Stray Wolf Admin, Shop.
 - With every change add a line to `version.json`.
 

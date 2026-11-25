@@ -203,6 +203,23 @@
     go(mail('Private event: ' + f.get('occasion'), ['Hi Dani!', '', 'I’d like to plan a private event.', '', 'Name: ' + f.get('name'), 'Email: ' + f.get('email'), 'Occasion: ' + f.get('occasion'), 'Guests: ' + (f.get('guests') || '?'), 'Dates: ' + (f.get('dates') || '?'), '', f.get('notes') || ''].join('\n')));
   });
 
+  /* ---------- Home: her Google rating. SW Core reads her listing once a day (GET /api/reviews); with no answer
+     the section keeps its typed line and its one link ---------- */
+  const rev = $('[data-reviews]');
+  const web = (u) => (/^https:\/\//.test(u || '') ? u : '');
+  if (rev && rev.dataset.api) fetch(rev.dataset.api + '/api/reviews?site=' + encodeURIComponent(rev.dataset.site)).then((r) => (r.ok ? r.json() : null)).then((d) => {
+    if (!d || !d.ok || !(d.rating > 0) || !(d.count > 0)) return;
+    const rating = Math.round(d.rating * 10) / 10, stars = $('[data-reviews-stars]', rev), write = $('[data-reviews-write]', rev);
+    stars.style.setProperty('--fill', rating * 20 + '%');
+    stars.setAttribute('aria-label', rating.toFixed(1) + ' out of 5 stars');
+    $('[data-reviews-rating]', rev).textContent = rating.toFixed(1);
+    $('[data-reviews-count]', rev).textContent = 'from ' + d.count.toLocaleString('en-US') + (d.count === 1 ? ' review' : ' reviews') + ' on Google';
+    $('[data-reviews-line]', rev).hidden = false;
+    $('[data-reviews-typed]', rev).hidden = true;
+    if (web(d.url)) $('[data-reviews-read]', rev).href = d.url;
+    if (web(d.write)) { write.href = d.write; write.hidden = false; }
+  }).catch(() => {});
+
   /* ---------- mail links inside a preview frame open in a new tab ---------- */
   if (framed) $$('a[href^="mailto:"]').forEach((a) => { a.target = '_blank'; a.rel = 'noopener'; });
 
