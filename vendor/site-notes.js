@@ -2632,7 +2632,7 @@
   // own website, sales, options, many items at once, and Changes with Undo. Every Buy button opens the item's own
   // checkout link, so no payment ever comes through here. Stray Wolf starts the shop, imports into it and picks its
   // kind of checkout in the admin. No shop: no Shop page.
-  var SHOP_FILES = "4";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
+  var SHOP_FILES = "5";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
   var spShop = null, spMgr = null, spDemo = null, spPics = {};
   function loadShop() {
     var box = document.querySelector("[data-shop-portal]"); if (!box || spMgr) return;

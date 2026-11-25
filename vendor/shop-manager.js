@@ -43,14 +43,13 @@
     check: '<path d="m5 12 5 5 9-10"/>', folder: '<path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>', dollar: '<path d="M12 3v18"/><path d="M17 7H9.5a3 3 0 0 0 0 6h5a3 3 0 0 1 0 6H6"/>',
     grip: '<circle cx="9" cy="6" r="1"/><circle cx="15" cy="6" r="1"/><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><circle cx="9" cy="18" r="1"/><circle cx="15" cy="18" r="1"/>',
     back: '<path d="M19 12H5"/><path d="m12 19-7-7 7-7"/>', ban: '<circle cx="12" cy="12" r="9"/><path d="m5.7 5.7 12.6 12.6"/>', lock: '<rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/>',
-    sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>', undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>'
+    sparkle: '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>', undo: '<path d="M9 14 4 9l5-5"/><path d="M4 9h11a5 5 0 0 1 0 10h-3"/>',
+    more: '<circle cx="5" cy="12" r="1.4"/><circle cx="12" cy="12" r="1.4"/><circle cx="19" cy="12" r="1.4"/>'
   };
   // The words for each kind of checkout a shop takes (SW Core keeps the kind on the shop: shop.checkout).
   var KINDS = {
-    square: { label: "Square checkout link", ph: "square.link/u/…", help: "The Buy button opens this. Payments go only to Square.",
-      need: "Add the Square checkout link first, so the Buy button has somewhere to go.", tip: "Only Square links are taken, so every payment goes to Square." },
-    generic: { label: "Checkout link", ph: "https://buy.stripe.com/…", help: "The Buy button opens this: Stripe, PayPal, Shopify, Etsy or any https checkout page.",
-      need: "Add the checkout link first, so the Buy button has somewhere to go.", tip: "Any https checkout link is taken: Stripe, PayPal, Shopify, Etsy and others." }
+    square: { ph: "square.link/u/…", help: "Where the Buy button goes. Square links only.", need: "Add the Buy link first (a Square link), so the Buy button has somewhere to go." },
+    generic: { ph: "https://…", help: "Where the Buy button goes: Square, Stripe, PayPal or any checkout page.", need: "Add the Buy link first, so the Buy button has somewhere to go." }
   };
   // Whose checkout a link opens, for the note at the top: the name SW Core keeps on each link ("via"), or, for an item
   // not saved yet, read from its address the same way SW Core does (CHECKOUT_HOSTS in worker.js). Anything else is
@@ -453,33 +452,45 @@
     function paintFoot() { if (!foot) return; var s = foot.querySelector(".swm-save"); s.disabled = !st.dirty && st.open !== "new"; foot.querySelector(".swm-cancel").textContent = st.dirty || st.open === "new" ? "Cancel" : "Close"; }
 
     function paintEditor() {
-      var d = st.draft, isNew = st.open === "new", c = kind();
+      var d = st.draft, isNew = st.open === "new";
       ed.hidden = false; ed.setAttribute("aria-label", isNew ? "New item" : d.name);
       var title = el("h2", { text: isNew ? "New item" : d.name });
       savedNote = el("span", { class: "swm-saved", text: isNew ? "Not saved yet" : "" });
+      // Showing, Sold out or Hidden: one small menu beside the name, saved with the rest.
+      var show = el("select", { class: "swm-state is-" + d.show, "aria-label": "On " + whose, title: "Showing: on " + whose + " with its Buy button. Sold out: on " + whose + ", no Buy button. Hidden: not on " + whose + "." },
+        SHOW.map(function (s) { return el("option", { value: s[0], text: s[1], selected: s[0] === d.show }); }));
+      show.onchange = function () {
+        if (show.value !== "hidden" && !(d.link || "").trim()) { show.value = d.show; showErr(kind().need, ed.querySelector(".swm-link")); return; }
+        d.show = show.value; show.className = "swm-state is-" + d.show; showW.className = "swm-state-w is-" + d.show; changed();
+      };
+      var showW = el("span", { class: "swm-state-w is-" + d.show }, [show]);
       var head = el("header", { class: "swm-ed-hd" }, [
         el("button", { class: "swm-back", type: "button", onclick: function () { closeItem(); } }, [ico("back", 15), "All items"]),
-        el("div", { class: "swm-ed-t" }, [title, el("p", {}, [isNew ? null : pill(byId(d.id) ? byId(d.id).show : d.show), isNew ? null : flag(d), savedNote])]),
+        el("div", { class: "swm-ed-t" }, [title, el("p", {}, [savedNote])]), showW,
         el("button", { class: "swm-close", type: "button", "aria-label": "Close " + (d.name || "this item"), title: "Close", onclick: function () { closeItem(); } }, [ico("x", 18)])]);
       errBox = el("p", { class: "swm-err", role: "alert", hidden: true });
       foot = el("div", { class: "swm-foot" }, [
-        el("div", { class: "swm-foot-l" }, isNew ? [] : [
-          el("button", { class: "swm-btn plain is-sm", type: "button", title: "A hidden copy, right after it, with the same photos", onclick: duplicate }, [ico("copy", 14), "Duplicate"]),
-          el("button", { class: "swm-btn plain is-sm swm-del", type: "button", onclick: removeItem }, [ico("trash", 14), "Delete"])]),
-        el("div", { class: "swm-foot-r" }, [el("button", { class: "swm-btn plain swm-cancel", type: "button", text: "Cancel", onclick: function () { closeItem(true); } }),
-          el("button", { class: "swm-btn swm-save", type: "submit", text: isNew ? "Add it" : "Save", title: "Shows on " + whose + " within a minute. Any change can be undone under Changes." })])]);
+        el("div", { class: "swm-foot-l" }, [el("button", { class: "swm-btn swm-save", type: "submit", text: isNew ? "Add it" : "Save", title: "Shows on " + whose + " within a minute. Any change can be undone under Changes." }),
+          el("button", { class: "swm-btn plain swm-cancel", type: "button", text: "Cancel", onclick: function () { closeItem(true); } })]),
+        isNew ? null : moreMenu()]);
       var form = el("form", { class: "swm-form", novalidate: true, onsubmit: function (e) { e.preventDefault(); saveDraft(); } }, [
-        el("div", { class: "swm-cards" }, [photosPart(), namePart(), salePart(), optionsPart(), linkPart(), showPart(), errBox]), foot]);
+        el("div", { class: "swm-cards" }, [photosPart(), basicsPart(), extrasPart(), errBox]), foot]);
       form.onkeydown = function (e) { if ((e.ctrlKey || e.metaKey) && (e.key === "s" || e.key === "S")) { e.preventDefault(); saveDraft(); } };
       form.addEventListener("input", function (e) { if (!e.target.closest(".swm-noedit")) changed(); });
       fill(ed, [head, form]); paintFoot();
     }
-    function pill(show) { var s = SHOW.filter(function (x) { return x[0] === show; })[0]; return el("span", { class: "swm-st is-" + show }, [el("i"), s[1]]); }
-    function section(kids, cls) { return el("div", { class: "swm-sec" + (cls ? " " + cls : "") }, kids); }
-    // One card of the item form: a short title (with an optional (i) or note beside it), then its fields. No title: the
-    // card starts with its own switch (Sale).
-    function card(title, kids, cls, aside) {
-      return el("section", { class: "swm-sec swm-card" + (cls ? " " + cls : ""), "aria-label": title }, [title ? el("div", { class: "swm-card-hd" }, [el("h3", { text: title }), aside || null]) : null].concat(kids));
+    // The "⋯" button at the end of the Save row: what is done to the whole item, rarely (Duplicate, Delete).
+    function moreMenu() {
+      var btn = el("button", { class: "swm-btn plain swm-more", type: "button", "aria-label": "More: Duplicate, Delete", title: "More", "aria-haspopup": "true", "aria-expanded": "false" }, [ico("more", 18)]);
+      var menu = el("div", { class: "swm-menu", hidden: true }, [
+        el("button", { type: "button", title: "A hidden copy, right after it, with the same photos", onclick: function () { shut(); duplicate(); } }, [ico("copy", 15), "Duplicate"]),
+        el("button", { class: "swm-del", type: "button", title: "Takes it off " + whose + ". Undo brings it back.", onclick: function () { shut(); removeItem(); } }, [ico("trash", 15), "Delete"])]);
+      var wrap = el("div", { class: "swm-foot-r" }, [btn, menu]);
+      var shut = function () { menu.hidden = true; btn.setAttribute("aria-expanded", "false"); };
+      btn.onclick = function () { menu.hidden = !menu.hidden; btn.setAttribute("aria-expanded", String(!menu.hidden)); if (!menu.hidden) menu.querySelector("button").focus(); };
+      wrap.onkeydown = function (e) { if (e.key === "Escape" && !menu.hidden) { e.stopPropagation(); shut(); btn.focus(); } };
+      wrap.addEventListener("focusout", function (e) { if (!wrap.contains(e.relatedTarget)) shut(); });
+      return wrap;
     }
     // A small (i): its words show on hover, keyboard focus or a tap, so the form itself stays short. title is the
     // fallback where the page has no tooltips of its own.
@@ -501,7 +512,7 @@
         var grid = el("div", { class: "swm-ph", role: "list", "aria-label": "Photos, the first is the main one" });
         list.forEach(function (p, i) { grid.appendChild(tile(p, i, list.length, paint)); });
         if (room > 0) grid.appendChild(el("div", { class: "swm-ph-slot", role: "listitem" }, [el("button", { type: "button", class: "swm-ph-add" + (list.length ? "" : " is-first"), onclick: function () { pickFiles(paint); } },
-          [ico("photo", list.length ? 18 : 24), el("span", { text: list.length ? "Add" : "Add photos" }), list.length ? null : el("small", { text: "Pick from " + whose + ", or upload. Up to 5." })])]));
+          [ico("photo", list.length ? 18 : 24), el("span", { text: list.length ? "Add" : "Add photos" }), list.length ? null : el("small", { text: "Upload, or drag photos here. Up to 5." })])]));
         dropFiles(grid, paint);
         var sel = list[Math.min(st.sel, list.length - 1)];
         var alt = sel ? input("swm-alt", sel.alt || "", { maxlength: String(MAX.alt), class: "swm-noedit-not", oninput: function () { sel.alt = alt.value; if (!sel.local && !sel.pick) changed(); auto.hidden = true; } }) : null;
@@ -510,8 +521,7 @@
           el("div", { class: "swm-card-hd" }, [el("h3", { text: "Photos" }), el("span", { class: "swm-count", text: list.length + " of " + MAX.photos }),
             list.length > 1 ? tipBtn("Drag a photo to move it. The first one is the main photo on " + whose + "; the rest show when someone opens it.", "Photos") : null]), grid,
           el("div", { class: "swm-ph-acts" }, [
-            el("button", { class: "swm-btn plain is-sm", type: "button", disabled: room <= 0, onclick: function () { openPicker(paint); } }, [ico("globe", 14), "Pick from " + whose]),
-            el("button", { class: "swm-btn plain is-sm", type: "button", disabled: room <= 0, onclick: function () { pickFiles(paint); } }, [ico("up", 14), "Upload a photo"])]),
+            el("button", { class: "swm-btn plain is-sm", type: "button", disabled: room <= 0, onclick: function () { openPicker(paint); } }, [ico("globe", 14), "Pick from " + whose]),]),
           sel ? el("div", { class: "swm-f swm-alt" }, [el("div", { class: "swm-lblrow is-tip" }, [el("label", { for: "swm-alt" }, [(st.sel === 0 ? "Main photo" : "Photo " + (st.sel + 1)) + " description"]),
             tipBtn("Read aloud to people who can't see the photo, and read by Google. Change it if it's not right.", "Photo description"), auto]), alt]) : null]);
       };
@@ -580,49 +590,87 @@
     }
 
     /* Details: name, price and category side by side, the description, and whether it's a class (a date and seats). */
-    function namePart() {
-      var d = st.draft, cats = [];
+    /* The basics every item has: name, price, category, description and where its Buy button goes. */
+    var choicePaint = function () {};
+    function basicsPart() {
+      var d = st.draft, c = kind(), cats = [];
       shop.items.forEach(function (x) { if (x.cat && cats.indexOf(x.cat) < 0) cats.push(x.cat); });
       var name = input("swm-name", d.name, { maxlength: String(MAX.name), placeholder: "What it's called", required: true, oninput: function () { d.name = name.value; } });
-      var price = input("swm-price", dollarsIn(d.price), { inputmode: "decimal", placeholder: "0.00", oninput: function () { d.priceText = price.value; salePaint(); sqPaint(); } });
-      var cat = input("swm-cat", d.cat, { maxlength: String(MAX.cat), list: "swm-cats", placeholder: cats[0] || "Planters", oninput: function () { d.cat = cat.value; } });
-      var isClass = el("input", { type: "checkbox", role: "switch", id: "swm-class", checked: d.kind === "class" });
-      var when = input("swm-when", d.when, { type: "datetime-local", oninput: function () { d.when = when.value; } }), seats = input("swm-seats", d.seats, { maxlength: "40", placeholder: "8 seats", oninput: function () { d.seats = seats.value; } });
-      var classBits = el("div", { class: "swm-grid swm-sub", hidden: d.kind !== "class" }, [field("Date and time", when, "When it starts, local time."), field("Seats", seats, "Words shown beside the date, like 8 seats. The checkout keeps the real count.")]);
-      isClass.onchange = function () { d.kind = isClass.checked ? "class" : "item"; classBits.hidden = !isClass.checked; changed(); if (isClass.checked) when.focus(); };
+      var price = input("swm-price", dollarsIn(d.price), { inputmode: "decimal", placeholder: "0.00", title: "The regular price. Leave it empty to show no price.", oninput: function () { d.priceText = price.value; salePaint(); sqPaint(); choicePaint(); } });
+      var cat = input("swm-cat", d.cat, { maxlength: String(MAX.cat), list: "swm-cats", placeholder: cats[0] || "Gifts", title: "Groups items on " + whose + ". Pick one you used before, or type a new one.", oninput: function () { d.cat = cat.value; } });
       // Square keeps its own price: a line under the price only when the two differ.
       var sqNote = el("small", { class: "swm-warn", hidden: true });
       var sqPaint = function () {
         var show = shop.checkout !== "generic" && d.sqPrice != null && d.sqPrice !== toCents(price.value); sqNote.hidden = !show;
         if (show) sqNote.textContent = "Square charges " + money(d.sqPrice) + ". Change it in Square too, or type the same here.";
       }; sqPaint();
-      var desc = el("textarea", { id: "swm-desc", rows: "5", maxlength: String(MAX.desc), placeholder: "What it is, what's included, sizes, care." }), left = el("small", { class: "swm-muted", hidden: true });
+      var desc = el("textarea", { id: "swm-desc", rows: "4", maxlength: String(MAX.desc), placeholder: "What it is and what's included.", title: "Shown when someone opens the item. A blank line starts a new paragraph." }), left = el("small", { class: "swm-muted", hidden: true });
       desc.value = d.desc || "";
       var count = function () { var n = MAX.desc - desc.value.length; left.hidden = n > 300; left.textContent = n + " characters left."; };
       desc.oninput = function () { d.desc = desc.value; count(); }; count();
-      return card("Details", [el("div", { class: "swm-grid" }, [
+      var lk = input("swm-link", d.link, { class: "swm-link", inputmode: "url", autocapitalize: "off", spellcheck: "false", placeholder: c.ph, "aria-describedby": "swm-link-h" });
+      var test = el("a", { class: "swm-test", target: "_blank", rel: "noopener", hidden: true }, ["Test it", ico("ext", 12)]);
+      var testable = function () { var v = lk.value.trim(); test.hidden = !/^(https:\/\/)?[\w-]+(\.[\w-]+)+\/\S*/i.test(v); test.href = /^https:/i.test(v) ? v : "https://" + v; };
+      lk.oninput = function () { d.link = lk.value; testable(); }; testable();
+      var optional = function (text, id) { return el("label", { for: id }, [text + " ", el("em", { text: "(optional)" })]); };
+      return el("section", { class: "swm-sec swm-card", "aria-label": "Details" }, [el("div", { class: "swm-grid" }, [
         field("Name", name, null, "is-span"),
-        field("Price", el("div", { class: "swm-money" }, [el("span", { "aria-hidden": "true", text: "$" }), price]), shop.checkout !== "generic" && d.sqPrice != null ? "Square charges " + money(d.sqPrice) + ". Leave it empty to show no price." : "The regular price. Leave it empty to show no price.", null, sqNote),
-        field("Category", cat, "Groups items on " + whose + ". Pick one you used before, or type a new one."),
-        field("Description", desc, "Shown when someone opens the item. A blank line starts a new paragraph.", "is-span", left)]),
-        el("div", { class: "swm-swrow" }, [el("label", { class: "swm-sw", for: "swm-class" }, [isClass, el("span", { class: "swm-track", "aria-hidden": "true" }), el("b", { text: "Class or workshop" })]),
-          tipBtn("It gets a date and seats, and its button says Sign up.", "Class or workshop")]), classBits,
+        field("Price", el("div", { class: "swm-money" }, [el("span", { "aria-hidden": "true", text: "$" }), price]), null, null, sqNote),
+        field(optional("Category", "swm-cat"), cat),
+        field(optional("Description", "swm-desc"), desc, null, "is-span", left),
+        el("div", { class: "swm-f is-span" }, [el("div", { class: "swm-lblrow" }, [el("label", { for: "swm-link", text: "Buy link" }), test]), lk, el("small", { class: "swm-muted", id: "swm-link-h", text: c.help })])]),
         cats.length ? el("datalist", { id: "swm-cats" }, cats.map(function (c) { return el("option", { value: c }); })) : null]);
     }
     // The price as typed in the editor right now, in cents (the saved one until it's changed).
     function draftPrice() { var d = st.draft; return d.priceText != null ? toCents(d.priceText) : d.price; }
     var salePaint = function () {};
-    function salePart() {
-      var d = st.draft, s = d.sale || {}, mode = s.price != null && !s.pct ? "price" : "pct";
-      var on = el("input", { type: "checkbox", role: "switch", id: "swm-sale", checked: !!d.sale });
+
+    /* What only some items need, each added with one button and taken off with Remove: a sale price, choices (up to
+       3 sets), a date and time, a badge. A box that isn't added takes no room. */
+    function extrasPart() {
+      var d = st.draft, wrap = el("section", { class: "swm-sec swm-card swm-extras", "aria-label": "Extras" });
+      var adds = el("div", { class: "swm-adds" }), head = el("h3", { text: "Add if it applies" });
+      // One box: its name, Remove, its fields. key names its add button, so Remove can hand the cursor back to it.
+      var box = function (key, title, removeWords, kids, off) {
+        return el("div", { class: "swm-box", role: "group", "aria-label": title }, [el("div", { class: "swm-box-hd" }, [el("b", { text: title }),
+          el("button", { class: "swm-link-b swm-unadd", type: "button", text: "Remove", "aria-label": removeWords, onclick: function () { off(); changed(); paintAdds(key); } })])].concat(kids));
+      };
+      var sale = saleBox(box), when = whenBox(box), badge = badgeBox(box), choices = el("div", { class: "swm-boxes" });
+      var paintChoices = function (focusSel) {
+        fill(choices, d.options.map(function (o, oi) { return choiceBox(box, o, oi, paintChoices); })); choicePaint();
+        if (focusSel) { var f = choices.querySelector(focusSel); if (f) f.focus(); }
+      };
+      choicePaint = function () { var p = draftPrice(); Array.prototype.forEach.call(choices.querySelectorAll(".swm-ch-price"), function (i) { i.placeholder = p != null ? dollarsIn(p) : "Same"; }); };
+      var ADDS = [
+        ["sale", "Sale price", "A lower price, with the regular one crossed out.", function () { return !d.sale; }, function () { sale.on(); }],
+        ["choices", function () { return d.options.length ? "More choices" : "Choices"; }, "Like size, color or flavor. Each can have its own price.", function () { return d.options.length < MAX.options; },
+          function () { d.options.push({ name: "", choices: [{ name: "" }, { name: "" }] }); paintChoices(".swm-box:last-child .swm-opt-name"); }],
+        ["when", "Date and time", "For a class, event, tour or appointment. Its button says Sign up.", function () { return d.kind !== "class"; }, function () { when.on(); }],
+        ["badge", "Badge", "New or Featured. Shows first on " + whose + ".", function () { return !d.tag; }, function () { badge.on(); }]];
+      // The add buttons for what isn't on yet. focusKey: the button to put the cursor on (after a Remove).
+      var paintAdds = function (focusKey) {
+        var open = ADDS.filter(function (a) { return a[3](); });
+        fill(adds, open.map(function (a) {
+          return el("button", { class: "swm-addchip", type: "button", "data-add": a[0], title: a[2], onclick: function () { a[4](); changed(); paintAdds(); } }, [ico("plus", 13, 2.2), typeof a[1] === "function" ? a[1]() : a[1]]);
+        }));
+        head.hidden = adds.hidden = !open.length;
+        if (focusKey) { var f = adds.querySelector('[data-add="' + focusKey + '"]') || adds.querySelector("button"); if (f) f.focus(); }
+      };
+      fill(wrap, [head, adds, el("div", { class: "swm-boxes" }, [sale.el, choices, when.el, badge.el])]);
+      paintChoices(); paintAdds();
+      return wrap;
+    }
+    // Sale price: a percent off or a set price, with an optional last day, and one line saying what the website shows.
+    function saleBox(box) {
+      var d = st.draft, s = d.sale || {}, mode = s.price != null && !s.pct ? "price" : "pct", on = !!d.sale;
       var pct = input("swm-pct", s.pct || "", { inputmode: "numeric", placeholder: "15" }), fixed = input("swm-sp", dollarsIn(s.price), { inputmode: "decimal", placeholder: "40.00" });
       var ends = input("swm-ends", s.ends || "", { type: "date" });
       var amount = el("div", { class: "swm-f" }), seg = el("div", { class: "swm-seg is-sm", role: "group", "aria-label": "Sale by" });
-      var line = el("p", { class: "swm-preview" }), body = el("div", { class: "swm-sale-b", hidden: !d.sale });
+      var line = el("p", { class: "swm-preview" });
       var sync = function () {
-        d.sale = on.checked ? (mode === "pct" ? { pct: pct.value === "" ? "" : Number(pct.value) } : { price: fixed.value }) : null;
+        d.sale = on ? (mode === "pct" ? { pct: pct.value === "" ? "" : Number(pct.value) } : { price: fixed.value }) : null;
         if (d.sale && ends.value) d.sale.ends = ends.value;
-        body.hidden = !on.checked; salePaint();
+        me.hidden = !on; salePaint();
       };
       [["pct", "Percent off"], ["price", "Sale price"]].forEach(function (o, i) {
         seg.appendChild(el("button", { type: "button", "aria-pressed": String(mode === o[0]), text: o[1], onclick: function () {
@@ -633,69 +681,62 @@
           : [el("label", { for: "swm-sp", text: "Sale price" }), el("div", { class: "swm-money" }, [el("span", { text: "$" }), fixed])]);
       };
       salePaint = function () {
-        var price = draftPrice(), sale = d.sale; line.hidden = !on.checked; if (!on.checked) return;
+        var price = draftPrice(), sale = d.sale; if (!on) return;
         var now = price == null || price === undefined ? null : mode === "pct" ? (pct.value >= 1 && pct.value <= 95 ? Math.round(price * (100 - Number(pct.value)) / 100) : null) : toCents(fixed.value);
         line.className = "swm-preview";
         if (price == null) { fill(line, [ico("tag", 14), el("span", { text: "Add the regular price above first." })]); return; }
         if (now == null || now === undefined || now >= price) { fill(line, [ico("tag", 14), el("span", { text: mode === "pct" ? "Type a whole number from 1 to 95." : "Type a sale price under " + money(price) + "." })]); return; }
-        if (sale && sale.ends && sale.ends < today) { line.className = "swm-preview is-warn"; fill(line, [ico("tag", 14), el("span", { text: "This sale ended " + dayWords(sale.ends, true) + ", so " + whose + " shows " + money(price) + ". Change the last day, or switch the sale off." })]); return; }
+        if (sale && sale.ends && sale.ends < today) { line.className = "swm-preview is-warn"; fill(line, [ico("tag", 14), el("span", { text: "This sale ended " + dayWords(sale.ends, true) + ", so " + whose + " shows " + money(price) + ". Change the last day, or remove the sale." })]); return; }
         fill(line, [ico("tag", 14), el("span", {}, [whoseCap + " shows ", el("b", { text: money(now) }), " with ", el("s", { text: money(price) }), " crossed out" +
-          (sale && sale.ends ? " until the end of " + dayWords(sale.ends, true) + ", then goes back to " + money(price) + " by itself." : " until you switch the sale off.")])]);
+          (sale && sale.ends ? " until the end of " + dayWords(sale.ends, true) + ", then goes back to " + money(price) + " by itself." : " until you remove the sale.")])]);
       };
-      on.onchange = function () { if (on.checked && !pct.value && mode === "pct") pct.value = "15"; sync(); changed(); if (on.checked) (mode === "pct" ? pct : fixed).focus(); };
-      pct.oninput = fixed.oninput = ends.oninput = sync; ends.min = today;
+      pct.oninput = fixed.oninput = ends.oninput = function () { sync(); }; ends.min = today;
+      var me = box("sale", "Sale price", "Remove the sale price", [seg, el("div", { class: "swm-row2" }, [amount, field(el("label", { for: "swm-ends" }, ["Last day ", el("em", { text: "(optional)" })]), ends)]), line],
+        function () { on = false; sync(); });
       paintAmount(); sync();
-      return card(null, [el("div", { class: "swm-swrow" }, [el("label", { class: "swm-sw", for: "swm-sale" }, [on, el("span", { class: "swm-track", "aria-hidden": "true" }), el("b", { text: "On sale" })]),
-          tipBtn("Shows a lower price with the regular one crossed out, until you switch it off or the last day passes.", "On sale")]),
-        body, line].map(function (k) { if (k === body) fill(body, [seg, el("div", { class: "swm-row2" }, [amount, field(el("label", { for: "swm-ends" }, ["Last day ", el("em", { text: "(optional)" })]), ends)])]); return k; }), "swm-salebox");
+      return { el: me, on: function () { on = true; if (!pct.value && mode === "pct") pct.value = "15"; sync(); (mode === "pct" ? pct : fixed).focus(); } };
     }
-    /* Options, like sizes or colors: up to 3, each with up to 20 choices; a choice can have its own price. */
-    function optionsPart() {
-      var d = st.draft, wrap = el("section", { class: "swm-sec swm-card", "aria-label": "Options" });
-      var paint = function (focusSel) {
-        var boxes = d.options.map(function (o, oi) {
-          var name = el("input", { class: "swm-opt-name", value: o.name, maxlength: String(MAX.optName || 40), placeholder: "Size", "aria-label": "Option " + (oi + 1) + " name", oninput: function () { o.name = name.value; } });
-          var rows = o.choices.map(function (c, ci) {
-            var cn = el("input", { value: c.name, maxlength: "60", placeholder: ci === 0 ? "Small" : "", "aria-label": (o.name || "Option") + " choice " + (ci + 1), oninput: function () { c.name = cn.value; } });
-            var cp = el("input", { value: c.priceText != null ? c.priceText : dollarsIn(c.price), inputmode: "decimal", placeholder: "Same price", "aria-label": "Price for " + (c.name || "choice " + (ci + 1)) + ", empty for the same price", oninput: function () { c.priceText = cp.value; } });
-            return el("li", {}, [cn, el("div", { class: "swm-money is-sm" }, [el("span", { text: "$" }), cp]),
-              el("button", { class: "swm-x", type: "button", "aria-label": "Take off " + (c.name || "this choice"), onclick: function () { o.choices.splice(ci, 1); changed(); paint(".swm-opt:nth-child(" + (oi + 1) + ") li:last-child input"); } }, [ico("x", 12, 2.4)])]);
-          });
-          return el("div", { class: "swm-opt" }, [el("div", { class: "swm-opt-hd" }, [name, el("button", { class: "swm-link-b", type: "button", text: "Remove", "aria-label": "Remove the option " + (o.name || oi + 1), onclick: function () { d.options.splice(oi, 1); changed(); paint(); } })]),
-            el("ul", {}, rows), o.choices.length < MAX.choices ? el("button", { class: "swm-link-b swm-add", type: "button", onclick: function () { o.choices.push({ name: "" }); changed(); paint(".swm-opt:nth-child(" + (oi + 1) + ") li:last-child input"); } }, [ico("plus", 13), "Add a choice"]) : null]);
-        });
-        fill(wrap, [el("div", { class: "swm-card-hd" }, [el("h3", { text: "Options" }), tipBtn("Like sizes or colors. Buyers see them on " + whose + " and pick one at checkout. A choice can have its own price.", "Options")]),
-          el("div", { class: "swm-opts" }, boxes),
-          d.options.length < MAX.options ? el("button", { class: "swm-btn plain is-sm", type: "button", onclick: function () { d.options.push({ name: "", choices: [{ name: "" }, { name: "" }] }); changed(); paint(".swm-opt:last-child .swm-opt-name"); } },
-            [ico("plus", 14), d.options.length ? "Add another option" : "Add an option, like Size"]) : null]);
-        if (focusSel) { var f = wrap.querySelector(focusSel); if (f) f.focus(); }
-      };
-      paint(); return wrap;
-    }
-    function segmented(id, label, list, now, help, pick) {
-      var seg = el("div", { class: "swm-seg", role: "radiogroup", "aria-labelledby": id });
-      list.forEach(function (o, i) {
-        seg.appendChild(el("button", { type: "button", role: "radio", "aria-checked": String(o[0] === now), tabindex: o[0] === now ? "0" : "-1", title: o[2], onclick: function () {
-          if (pick(o[0]) === false) return;
-          Array.prototype.forEach.call(seg.children, function (b, j) { b.setAttribute("aria-checked", String(j === i)); b.tabIndex = j === i ? 0 : -1; }); changed();
-        } }, [id === "swm-show-l" ? el("i", { class: "swm-dot is-" + o[0] }) : o[0] === "featured" ? ico("star", 13, 2.2) : null, o[1]]));
-      });
-      seg.onkeydown = function (e) { var b = Array.prototype.indexOf.call(seg.children, document.activeElement), n = seg.children.length; if (b < 0) return;
-        var to = e.key === "ArrowRight" || e.key === "ArrowDown" ? (b + 1) % n : e.key === "ArrowLeft" || e.key === "ArrowUp" ? (b + n - 1) % n : -1; if (to < 0) return; e.preventDefault(); seg.children[to].focus(); seg.children[to].click(); };
-      return el("div", { class: "swm-f" }, [el("span", { class: "swm-flabel", id: id, text: label }), seg]);
-    }
-    function showPart() {
+    // Date and time: for anything that happens at a set time. Its button on the website says Sign up.
+    function whenBox(box) {
       var d = st.draft;
-      return card("Visibility", [segmented("swm-show-l", you ? "On your website" : "On the website", SHOW, d.show, null, function (v) {
-          if (v !== "hidden" && !(st.draft.link || "").trim()) { showErr(kind().need, ed.querySelector(".swm-link")); return false; } d.show = v; }),
-        segmented("swm-tag-l", "Tag", TAGS, d.tag || "", null, function (v) { d.tag = v; })], "swm-grid is-one");
+      var when = input("swm-when", d.when, { type: "datetime-local", oninput: function () { d.when = when.value; } });
+      var seats = input("swm-seats", d.seats, { maxlength: "40", placeholder: "8 seats", title: "Words shown beside the date, like 8 seats. The checkout keeps the real count.", oninput: function () { d.seats = seats.value; } });
+      var me = box("when", "Date and time", "Remove the date and time", [el("div", { class: "swm-grid" }, [field("Starts", when),
+        field(el("label", { for: "swm-seats" }, ["Spots ", el("em", { text: "(optional)" })]), seats)])], function () { d.kind = "item"; me.hidden = true; });
+      me.hidden = d.kind !== "class";
+      return { el: me, on: function () { d.kind = "class"; me.hidden = false; when.focus(); } };
     }
-    function linkPart() {
-      var d = st.draft, c = kind(), lk = input("swm-link", d.link, { class: "swm-link", inputmode: "url", autocapitalize: "off", spellcheck: "false", placeholder: c.ph });
-      var test = el("a", { class: "swm-test", target: "_blank", rel: "noopener", hidden: true }, ["Test the link", ico("ext", 12)]);
-      var testable = function () { var v = lk.value.trim(); test.hidden = !/^(https:\/\/)?[\w-]+(\.[\w-]+)+\/\S*/i.test(v); test.href = /^https:/i.test(v) ? v : "https://" + v; };
-      lk.oninput = function () { d.link = lk.value; testable(); }; testable();
-      return card("Checkout", [el("div", { class: "swm-f" }, [el("div", { class: "swm-lblrow" }, [el("span", { class: "swm-lblrow is-tip" }, [el("label", { for: "swm-link", text: c.label }), tipBtn(c.help, c.label)]), test]), lk])]);
+    // Badge: New or Featured, shown on the item and putting it first on the website.
+    function badgeBox(box) {
+      var d = st.draft, seg = el("div", { class: "swm-seg", role: "radiogroup", "aria-label": "Badge" });
+      var paint = function () { Array.prototype.forEach.call(seg.children, function (b) { var on = b.value === d.tag; b.setAttribute("aria-checked", String(on)); b.tabIndex = on || (!d.tag && b === seg.firstChild) ? 0 : -1; }); };
+      TAGS.filter(function (t) { return t[0]; }).forEach(function (t) {
+        seg.appendChild(el("button", { type: "button", role: "radio", value: t[0], title: t[2], onclick: function () { d.tag = t[0]; paint(); changed(); } }, [t[0] === "featured" ? ico("star", 13, 2.2) : null, t[1]]));
+      });
+      seg.onkeydown = function (e) { if (!/^Arrow/.test(e.key)) return; e.preventDefault(); var next = d.tag === "new" ? seg.lastChild : seg.firstChild; next.focus(); next.click(); };
+      var me = box("badge", "Badge", "Remove the badge", [seg], function () { d.tag = ""; me.hidden = true; });
+      me.hidden = !d.tag; paint();
+      return { el: me, on: function () { d.tag = "new"; me.hidden = false; paint(); seg.firstChild.focus(); } };
+    }
+    /* Choices, like sizes, colors or flavors: up to 3 sets, each with up to 20 choices; a choice can have its own
+       price, and an empty price means the regular one (shown in grey). */
+    function choiceBox(box, o, oi, paint) {
+      var d = st.draft, at = ".swm-box:nth-child(" + (oi + 1) + ") ", title = d.options.length > 1 ? "Choices " + (oi + 1) : "Choices";
+      var name = el("input", { id: "swm-opt-" + oi, class: "swm-opt-name", value: o.name, maxlength: "40", placeholder: "Size, color, flavor…", oninput: function () { o.name = name.value; me.querySelector(".swm-unadd").setAttribute("aria-label", removeWords()); } });
+      var removeWords = function () { return "Remove " + (o.name ? "the choices for " + o.name : "these choices"); };
+      var rows = o.choices.map(function (c, ci) {
+        var cn = el("input", { value: c.name, maxlength: "60", placeholder: ci === 0 ? "Small" : ci === 1 ? "Large" : "", "aria-label": (o.name || "Choice") + " " + (ci + 1), oninput: function () { c.name = cn.value; } });
+        var cp = el("input", { class: "swm-ch-price", value: c.priceText != null ? c.priceText : dollarsIn(c.price), inputmode: "decimal", "aria-label": "Price for " + (c.name || "choice " + (ci + 1)) + ", empty for the regular price", oninput: function () { c.priceText = cp.value; } });
+        return el("li", {}, [cn, el("div", { class: "swm-money is-sm" }, [el("span", { "aria-hidden": "true", text: "$" }), cp]),
+          el("button", { class: "swm-x", type: "button", "aria-label": "Take off " + (c.name || "this choice"), title: "Take off", onclick: function () { o.choices.splice(ci, 1); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("x", 12, 2.4)])]);
+      });
+      var me = box("choices", title, removeWords(), [
+        el("div", { class: "swm-f" }, [el("label", { for: "swm-opt-" + oi, text: "What the buyer picks" }), name]),
+        el("ul", { class: "swm-opt" }, rows),
+        el("div", { class: "swm-ch-foot" }, [o.choices.length < MAX.choices ? el("button", { class: "swm-link-b swm-add", type: "button", onclick: function () { o.choices.push({ name: "" }); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("plus", 13), "Add a choice"]) : null,
+          el("small", { class: "swm-muted", text: "An empty price means the regular price." })])],
+        function () { d.options.splice(oi, 1); paint(); });
+      return me;
     }
     function showErr(text, at) { errBox.textContent = text; errBox.hidden = false; if (at) at.focus(); }
 

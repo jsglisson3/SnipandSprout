@@ -138,24 +138,16 @@
 .swm-ed-hd{display:flex;gap:12px;align-items:flex-start;padding:16px 20px 12px;border-bottom:1px solid var(--m-line);position:sticky;top:var(--swm-top,0px);background:var(--m-paper);z-index:3}
 .swm-ed-t{flex:1;min-width:0}
 .swm-ed-hd h2{margin:0;font-size:20px;font-weight:470;line-height:1.25;overflow-wrap:anywhere;outline:0}
+.swm .swm-ed-hd h2:focus-visible{outline:0}
 .swm-ed-hd p{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:6px 0 0}
 .swm-back{display:none;gap:6px;align-items:center;background:none;border:0;padding:4px 0;color:var(--m-accent-t);font-size:13.5px;white-space:nowrap}
 .swm-saved{color:var(--m-muted);font-size:12.5px}
-.swm-st{display:inline-flex;gap:6px;align-items:center;font-size:12.5px;padding:1px 9px 1px 8px;border-radius:999px;border:1px solid;white-space:nowrap;line-height:20px}
-.swm-st i{width:7px;height:7px;border-radius:50%;background:currentColor}
-.swm-st.is-live{color:var(--m-ok);background:color-mix(in srgb,var(--m-ok) 8%,var(--m-paper));border-color:color-mix(in srgb,var(--m-ok) 24%,var(--m-paper))}
-.swm-st.is-sold{color:var(--m-warn);background:#fdf5e6;border-color:#f0dcb3}
-.swm-st.is-hidden{color:var(--m-muted);background:var(--m-soft);border-color:var(--m-line)}
-.swm-st.is-hidden i{background:transparent;box-shadow:inset 0 0 0 1.5px currentColor}
 .swm-ask{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:12px 20px 0;padding:10px 12px;border-radius:10px;background:#fdf5e6;border:1px solid #f0dcb3;font-size:13.5px}
 .swm-ask span{flex:1 1 200px}
 .swm-sec{padding:16px 20px;border-bottom:1px solid var(--m-line)}
-.swm-lbl{display:flex;flex-wrap:wrap;gap:2px 10px;align-items:baseline;margin-bottom:10px}
-.swm-lbl b{font-weight:470;font-size:14px}
-.swm-lbl span{color:var(--m-muted);font-size:12.5px}
 .swm-hint{color:var(--m-muted);font-size:12.5px;margin:10px 0 0}
 .swm-f{display:flex;flex-direction:column;gap:5px;min-width:0}
-.swm-f>label,.swm-flabel,.swm-lblrow label{font-size:13px;font-weight:470;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.swm-f>label,.swm-lblrow label{font-size:13px;font-weight:470;display:flex;flex-wrap:wrap;gap:8px;align-items:center}
 .swm-f label em,.swm-f em{font-style:normal;color:var(--m-muted);font-weight:365}
 .swm-f>small,.swm-f small{color:var(--m-muted);font-size:12.5px}
 .swm-ed input:not([type=checkbox]):not([type=radio]),.swm-ed textarea,.swm-pop input,.swm-dlg input:not([type=checkbox]){border:1px solid var(--m-line);border-radius:8px;padding:8px 11px;
@@ -174,9 +166,6 @@
 .swm .swm-money.is-r input{padding-left:11px}
 .swm-money.is-sm{width:120px;flex:none}
 .swm .swm-money.is-sm input{padding:6px 8px;font-size:13.5px}
-.swm-check{display:flex;gap:10px;align-items:flex-start;font-size:13.5px;color:var(--m-muted);cursor:pointer}
-.swm-check input{width:17px;height:17px;margin:1px 0 0;accent-color:var(--m-accent);flex:none}
-.swm-check b{font-weight:470;color:var(--m-ink);margin-right:4px}
 
 /* photos: the main one big, the rest beside it */
 .swm-ph{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;border-radius:10px}
@@ -198,7 +187,7 @@
 .swm-ph-slot{display:contents}
 .swm-ph-add{aspect-ratio:1;border:1.5px dashed color-mix(in srgb,var(--m-ink) 22%,var(--m-line));border-radius:9px;background:var(--m-paper);color:var(--m-muted);display:grid;place-content:center;justify-items:center;gap:4px;font-size:12.5px;padding:6px;text-align:center}
 .swm-ph-add:hover{border-color:var(--m-accent);color:var(--m-accent)}
-.swm-ph-add.is-first{grid-column:1/-1;aspect-ratio:auto;padding:26px 16px;font-size:14px;gap:6px}
+.swm-ph-add.is-first{grid-column:1/-1;aspect-ratio:auto;padding:16px;font-size:14px;gap:4px}
 .swm-ph-add.is-first span{font-weight:470;color:var(--m-ink)}
 .swm-ph-add small{font-size:12.5px;color:var(--m-muted)}
 .swm-ph-acts{display:flex;gap:8px;margin-top:12px;flex-wrap:wrap}
@@ -206,15 +195,6 @@
 .swm-auto{display:inline-flex;gap:4px;align-items:center;font-size:12.5px;font-weight:470;color:#3f6a3a;background:#e9f1e4;border-radius:6px;padding:1px 7px}
 
 /* sale */
-.swm-sw{display:inline-flex;gap:10px;align-items:center;font-size:14px;cursor:pointer;position:relative}
-.swm-sw b{font-weight:470}
-.swm-sw input{position:absolute;opacity:0;width:42px;height:24px;margin:0;cursor:pointer}
-.swm-sw .swm-track{width:42px;height:24px;border-radius:999px;background:#8f887d;position:relative;transition:background .15s;flex:none}
-.swm-sw .swm-track::after{content:"";position:absolute;top:3px;left:3px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgb(0 0 0 / .25);transition:left .15s}
-.swm-sw input:checked+.swm-track{background:var(--m-accent)}
-.swm-sw input:checked+.swm-track::after{left:21px}
-.swm-sw input:focus-visible+.swm-track{outline:2px solid var(--m-accent);outline-offset:2px}
-.swm-sale-b{margin-top:12px}
 .swm-preview{display:flex;gap:9px;align-items:flex-start;margin:12px 0 0;font-size:13px;background:var(--m-tint);border:1px solid color-mix(in srgb,var(--m-accent) 18%,var(--m-paper));border-radius:9px;padding:9px 11px}
 .swm-preview svg{color:var(--m-accent);margin-top:2px}
 .swm-preview b{font-weight:470}
@@ -223,17 +203,11 @@
 .swm-preview.is-warn svg{color:var(--m-warn)}
 
 /* options */
-.swm-opts{display:grid;gap:10px;margin-bottom:10px}
-.swm-opts:empty{display:none}
-.swm-opt{border:1px solid var(--m-line);border-radius:10px;padding:10px 12px;background:var(--m-paper)}
-.swm-opt-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:8px}
-.swm .swm-opt-name{font-weight:470;max-width:200px;padding:6px 9px}
-.swm-opt ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.swm-opt{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .swm-opt li{display:flex;gap:8px;align-items:center}
-.swm .swm-opt li>input{padding:6px 9px;font-size:13.5px}
+.swm-opt li>input{flex:1;min-width:0}
 .swm-x{background:none;border:0;color:var(--m-muted);padding:5px;display:grid;border-radius:6px}
 .swm-x:hover{color:var(--m-bad);background:var(--m-soft)}
-.swm-add{margin-top:8px}
 
 /* the segmented choices: On the website, Tag, Percent off or Sale price */
 .swm-seg{display:flex;border:1px solid var(--m-line);border-radius:9px;padding:3px;gap:3px;background:var(--m-soft)}
@@ -242,10 +216,6 @@
 .swm-seg button[aria-pressed="true"],.swm-seg button[aria-checked="true"]{background:var(--m-paper);color:var(--m-ink);font-weight:470;box-shadow:0 1px 3px rgb(0 0 0 / .1)}
 .swm-seg button[aria-checked="true"] svg{color:var(--m-accent)}
 .swm-seg.is-sm{display:inline-flex}
-.swm-seg .swm-dot{width:7px;height:7px;border-radius:50%;flex:none}
-.swm-seg .swm-dot.is-live{background:var(--m-ok)}
-.swm-seg .swm-dot.is-sold{background:#d89a2b}
-.swm-seg .swm-dot.is-hidden{box-shadow:inset 0 0 0 1.5px var(--m-muted)}
 .swm-lblrow{display:flex;justify-content:space-between;align-items:center;gap:10px}
 .swm-test{display:inline-flex;gap:5px;align-items:center;min-height:24px;font-size:13px;color:var(--m-accent);text-decoration:none}
 .swm-test:hover{text-decoration:underline}
@@ -253,14 +223,38 @@
 .swm-pop .swm-err{margin:10px 0 0}
 /* --m-accent-t: the accent a step darker, for small words on pale tints (4.5:1 or better). */
 /* The Save row stays in view at the bottom of the item while it scrolls. */
-.swm-foot{display:flex;justify-content:space-between;gap:10px;padding:12px 20px;flex-wrap:wrap;position:sticky;bottom:var(--swm-bottom,0px);z-index:3;background:var(--m-paper);border-top:1px solid var(--m-line);border-radius:0 0 13px 0}
+.swm-foot{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:12px 20px;flex-wrap:wrap;position:sticky;bottom:var(--swm-bottom,0px);z-index:3;background:var(--m-paper);border-top:1px solid var(--m-line);border-radius:0 0 13px 0}
 .swm-foot-l,.swm-foot-r{display:flex;gap:8px;flex-wrap:wrap}
 .swm-foot-r{margin-left:auto}
 
-/* ---------- the item form: white cards on a soft grey, each with a short title ---------- */
-.swm-cards{display:grid;gap:12px;padding:14px;background:var(--m-soft)}
-.swm-cards .swm-err{margin:0}
-.swm .swm-card{background:var(--m-paper);border:1px solid var(--m-line);border-radius:12px;padding:16px 18px}
+/* ---------- the item form: one page, its parts divided by a line ---------- */
+.swm-cards{display:grid;padding:0 20px}
+.swm-cards .swm-err{margin:0 0 16px}
+.swm .swm-card{border:0;border-bottom:1px solid var(--m-line);padding:18px 0}
+.swm .swm-card:last-of-type{border-bottom:0}
+/* Extras: a row of add buttons, then a box for each one added */
+.swm-extras h3{margin:0 0 10px;font-size:13px;font-weight:470;color:var(--m-muted);font-family:inherit}
+.swm-adds{display:flex;flex-wrap:wrap;gap:8px}
+.swm-addchip{display:inline-flex;gap:6px;align-items:center;min-height:34px;border:1px solid var(--m-line);border-radius:999px;background:var(--m-paper);padding:5px 13px 5px 10px;font-size:13.5px}
+.swm-addchip svg{color:var(--m-accent)}
+.swm-addchip:hover{border-color:color-mix(in srgb,var(--m-ink) 30%,var(--m-line));background:var(--m-soft)}
+.swm-boxes{display:grid;gap:12px}
+.swm-adds:not([hidden])+.swm-boxes:has(.swm-box:not([hidden])){margin-top:14px}
+.swm-boxes .swm-boxes:empty{display:none}
+.swm-box{border:1px solid var(--m-line);border-radius:10px;padding:12px 14px 14px;display:grid;gap:12px}
+.swm-box-hd{display:flex;justify-content:space-between;align-items:center;gap:10px;min-height:24px}
+.swm-box-hd b{font-weight:470;font-size:14px}
+.swm-unadd{color:var(--m-muted);text-decoration:underline;min-height:24px}
+.swm-box .swm-row2,.swm-box .swm-preview{margin-top:0}
+.swm-ch-foot{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:center}
+.swm-ch-foot small{font-size:12.5px}
+/* The "more" button at the end of the Save row, and its small menu */
+.swm-foot-r{position:relative;align-items:center}
+.swm .swm-more{padding:8px 9px}
+.swm-menu{position:absolute;right:0;bottom:calc(100% + 8px);min-width:170px;display:grid;padding:5px;background:var(--m-paper);border:1px solid var(--m-line);border-radius:10px;box-shadow:0 8px 24px rgb(0 0 0 / .12);z-index:4}
+.swm-menu button{display:flex;gap:9px;align-items:center;border:0;background:none;border-radius:7px;padding:9px 10px;text-align:left;font-size:14px}
+.swm-menu button:hover,.swm-menu button:focus-visible{background:var(--m-soft)}
+.swm-menu .swm-del{color:var(--m-bad)}
 .swm-card-hd{display:flex;align-items:center;gap:6px;min-height:24px;margin-bottom:14px}
 .swm-card-hd h3{margin:0;font-size:14.5px;font-weight:470;line-height:1.3;font-family:inherit}
 .swm-count{color:var(--m-muted);font-size:12.5px;margin-left:4px;font-variant-numeric:tabular-nums}
@@ -268,9 +262,6 @@
 .swm-lblrow.is-tip{justify-content:flex-start;gap:6px}
 .swm-i{width:26px;height:26px;display:inline-grid;place-items:center;flex:none;border:0;border-radius:50%;background:none;padding:0;color:var(--m-muted)}
 .swm-i:hover,.swm-i[aria-expanded="true"]{color:var(--m-ink);background:var(--m-soft)}
-.swm-swrow{display:flex;gap:4px;align-items:center;min-height:28px}
-.swm-grid+.swm-swrow{margin-top:16px;padding-top:14px;border-top:1px solid var(--m-line)}
-.swm-sub{margin-top:12px}
 .swm-f>small:not(.swm-muted){color:var(--m-warn)}
 .swm-ph-acts .swm-btn{flex:1 1 0}
 
@@ -387,8 +378,8 @@
   .swm-grip{margin-left:-4px}
   .swm-sec,.swm-ed-hd{padding-left:14px;padding-right:14px}
   .swm-foot{padding-left:14px;padding-right:14px}
-  .swm-cards{padding:10px}
-  .swm .swm-card{padding:14px}
+  .swm-cards{padding:0 14px}
+  .swm .swm-card{padding:16px 0}
   .swm-err{margin-left:14px;margin-right:14px}
   .swm-grid{grid-template-columns:1fr}
   .swm-row2{grid-template-columns:1fr}
