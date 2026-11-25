@@ -17,7 +17,7 @@
  *     image:   function (path) -> Promise of an address the page may show for "/api/shop/pic?key=..." or
  *              "/api/shop/peek?..." (each host's page policy decides how: a blob: address, or the service itself).
  *     extra:   more top buttons, put before Export (the admin's Import), who: an element at the left of the top row
- *              (the admin's menu of shops), checkout: an element in place of the checkout badge (the admin's
+ *              (the admin's menu of shops), checkout: an element in place of the "Checkout at ..." note (the admin's
  *              Square or Generic switch), onChange: function (shop) after every save.
  *   });
  *   m.el (the box), m.update(shop) (a newer copy, e.g. after an import), m.open(id), m.add(), m.destroy()
@@ -47,11 +47,22 @@
   };
   // The words for each kind of checkout a shop takes (SW Core keeps the kind on the shop: shop.checkout).
   var KINDS = {
-    square: { badge: "Square checkout", label: "Square checkout link", ph: "square.link/u/…", help: "The Buy button opens this. Payments go only to Square.",
+    square: { label: "Square checkout link", ph: "square.link/u/…", help: "The Buy button opens this. Payments go only to Square.",
       need: "Add the Square checkout link first, so the Buy button has somewhere to go.", tip: "Only Square links are taken, so every payment goes to Square." },
-    generic: { badge: "Any checkout link", label: "Checkout link", ph: "https://buy.stripe.com/…", help: "The Buy button opens this: Stripe, PayPal, Shopify, Etsy or any https checkout page.",
+    generic: { label: "Checkout link", ph: "https://buy.stripe.com/…", help: "The Buy button opens this: Stripe, PayPal, Shopify, Etsy or any https checkout page.",
       need: "Add the checkout link first, so the Buy button has somewhere to go.", tip: "Any https checkout link is taken: Stripe, PayPal, Shopify, Etsy and others." }
   };
+  // Whose checkout a link opens, for the note at the top: the name SW Core keeps on each link ("via"), or, for an item
+  // not saved yet, read from its address the same way SW Core does (CHECKOUT_HOSTS in worker.js). Anything else is
+  // named by its own address.
+  var VIA = [["Square", /(^|\.)(square\.link|square\.site|squareup\.com)$/i], ["Stripe", /(^|\.)stripe\.com$/i], ["PayPal", /(^|\.)paypal\.(com|me)$/i],
+    ["Shopify", /(^|\.)(myshopify\.com|shop\.app)$/i], ["Etsy", /(^|\.)etsy\.com$/i], ["Squarespace", /(^|\.)squarespace\.com$/i], ["Eventbrite", /(^|\.)eventbrite\.com$/i]];
+  function viaOf(x) {
+    if (x.via) return x.via;
+    var host; try { host = new URL(/^https?:\/\//i.test(x.link) ? x.link : "https://" + x.link).hostname.replace(/^www\./i, ""); } catch (e) { return ""; }
+    var known = VIA.filter(function (v) { return v[1].test(host); })[0];
+    return known ? known[0] : host;
+  }
   var SHOW = [["live", "Showing", "On the website with its Buy button."], ["sold", "Sold out", "On the website, marked Sold out, with no Buy button."],
     ["hidden", "Hidden", "Not on the website. Everything stays saved here."]];
   var TAGS = [["", "None", "No tag."], ["new", "New", "Shows a New badge, near the top of the shop."], ["featured", "Featured", "Shows first on the website, with a Featured badge."]];
@@ -176,12 +187,22 @@
     // Drag to reorder only when the whole list shows in its own order.
     function reorderable() { return st.sort === "order" && st.chip === "all" && !st.cat && !st.q.trim(); }
     function paintTop() {
-      var n = counts(), c = kind();
+      var n = counts();
       fill(sum, [plural(n.all, "item", "items"), n.live + " showing", n.sold ? n.sold + " sold out" : "", n.hidden ? n.hidden + " hidden" : ""].filter(Boolean).map(function (t) { return el("span", { text: t }); }));
       saved.textContent = shop.updated ? "Saved " + ago(shop.updated) + (shop.by === "client" ? (you ? " by you" : " by " + (opts.name || "the client") + " in their portal") : you ? " by Stray Wolf" : "") : "";
-      if (!opts.checkout) { fill(coBadge, [ico("lock", 13), c.badge]); coBadge.title = c.tip; }
+      if (!opts.checkout) paintCheckout();
       changesBtn.disabled = !(shop.history || []).length;
       exportBtn.disabled = !shop.items.length;
+    }
+    // Where this shop's Buy buttons go, named from its own checkout links: "Checkout at Square", "Checkout at Stripe and
+    // PayPal". A shop with no links yet shows nothing, so no service is ever named that the client doesn't use.
+    function paintCheckout() {
+      var at = [];
+      shop.items.forEach(function (x) { var v = x.link && viaOf(x); if (v && at.indexOf(v) < 0) at.push(v); });
+      coBadge.hidden = !at.length; if (!at.length) return;
+      var words = at.length === 1 ? at[0] : at.slice(0, -1).join(", ") + " and " + at[at.length - 1];
+      fill(coBadge, [ico("lock", 13), "Checkout at " + (at.length < 3 ? words : at.length + " services")]);
+      coBadge.title = "Each Buy button opens that item's own checkout page at " + words + ". No payment comes through Stray Wolf.";
     }
     function paintChips() {
       var n = counts();

@@ -25,6 +25,8 @@
  *   link opens the item's checkout. The element gets data-shop-state: "live"; "sold" (shop.css hides its Buy
  *   links and shows its [data-shop-sold]); or "hidden" when the item is set to Hidden or deleted (shop.css hides
  *   the whole element, and a radio tab inside it hands its turn to the next one still showing).
+ *   When none of the page's items are in the shop list at all (an empty or brand-new shop, or every one of them
+ *   Hidden), nothing is touched: the page keeps what is typed into it, so it can never go blank.
  * Each item shows its photos (up to 5: swipe, or the arrows, to see the next), its price (a sale's price with the
  * regular one crossed out, and the sale's last day), its options (Size: S, M, L), and a tag for a sale, New or Featured.
  * The page's policy must allow SW Core: connect-src and img-src https://site-notes.jsglisson.workers.dev
@@ -171,9 +173,14 @@
   function spots(items) {
     var key = function (s) { return String(s || "").trim().toLowerCase(); }, used = [];
     var within = function (box, sel) { var list = Array.prototype.slice.call(box.querySelectorAll(sel)); if (box.matches(sel)) list.unshift(box); return list; };
-    Array.prototype.forEach.call(document.querySelectorAll("[data-shop-item]"), function (box) {
+    var find = function (box) {
       var want = key(box.getAttribute("data-shop-item"));
-      var x = items.filter(function (i) { return [i.ref, i.id, i.name].some(function (k) { return k && key(k) === want; }); })[0];
+      return items.filter(function (i) { return [i.ref, i.id, i.name].some(function (k) { return k && key(k) === want; }); })[0];
+    };
+    var boxes = Array.prototype.slice.call(document.querySelectorAll("[data-shop-item]"));
+    if (!boxes.some(find)) return used;   // none of them is in the list: the page stays as typed, never blank
+    boxes.forEach(function (box) {
+      var x = find(box);
       box.setAttribute("data-shop-state", !x ? "hidden" : x.soldOut ? "sold" : "live");
       if (!x) return;
       used.push(x);
