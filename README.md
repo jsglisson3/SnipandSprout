@@ -29,9 +29,13 @@ agrees to switch. While `DRAFT` is `true` in `build.mjs`, every page tells searc
   Your social pages). Every page reads them and fills the spots marked `data-info`, within a minute of a save.
   What is typed in `build.mjs` is only the fallback, for before anything is saved or when the service can't be
   reached. Holidays in the next two weeks show under each hours table, and the open-now line knows about them.
-- **The Client Portal** (`/portal/`) is where Dani sends change requests and photos, and sees where each one
-  stands, and keeps her own shop list (Your shop: items, prices, photos, Square links). The same script gives
-  her Edit mode on her own pages.
+- **The Client Portal** (`/portal/`) has a page for each part, one on screen at a time: Home (what needs her
+  first, then Website visitors: the last 4 weeks, week by week), Messages (when her website's form sends there),
+  Shop (her own shop list: items, prices, photos, Square links), Website info (hours, contact info and social
+  pages, which she edits and saves herself; a new logo and photos, which she sends to Stray Wolf) and Requests
+  (where each thing she sent stands). Each page is a `<section data-page>` in `src/portal.html`; `site-notes.js`
+  draws the links, a phone's bottom bar and the whole Website visitors card (into the page's empty
+  `<div class="wv">`). The same script gives her Edit mode on her own pages.
 
 ## Build and preview
 

@@ -31,95 +31,55 @@
         --slab:"SW Zilla","Zilla Slab",Georgia,serif;--mono:"SW Mono","IBM Plex Mono",ui-monospace,Menlo,monospace}
   *{box-sizing:border-box}
   html.swn-locked main{visibility:hidden}
-  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  body{margin:0;background:var(--paper);color:var(--ink);font:16px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;-webkit-font-smoothing:antialiased;overflow-x:hidden;display:flex;flex-direction:column;min-height:100vh;min-height:100dvh}
   a{color:inherit}
-  .wrap{max-width:900px;margin:0 auto;padding:0 20px}
+  .wrap{max-width:940px;margin:0 auto;padding:0 20px}
+  main.wrap{flex:1 0 auto;width:100%;padding-bottom:64px}
 
   /* ---------- header: a charcoal Stray Wolf strip (who runs the portal, private, Help, Log out), then a white row
-     with whose portal it is and a link to each part of the page. Jeremy picked this on Nov 17 2026. ---------- */
+     with whose portal it is and a link to each page of the portal (site-notes.js draws and styles the links).
+     Jeremy picked this on Nov 17 2026; the pages on Nov 24 2026. ---------- */
   .sw-head{position:sticky;top:0;z-index:5;background:var(--card);border-bottom:1px solid var(--line);box-shadow:0 6px 18px -16px rgb(36 34 31 / .5)}
   .sw-head .wrap{max-width:1440px;display:flex;align-items:center}
   .sw-strip{background:var(--char);color:#f4f2ee}
   .sw-strip .wrap{gap:14px;min-height:46px}
-  .sw-brand{display:block;line-height:0;border-radius:6px}
+  .sw-brand{display:flex;align-items:center;min-height:24px;border-radius:6px}
   .sw-brand img{height:24px;width:auto}
   .sw-brand:focus-visible,.head-acts button:focus-visible{outline:2px solid #f4f2ee;outline-offset:3px}
-  .sw-tag{display:flex;align-items:center;height:18px;padding-left:13px;border-left:1px solid rgb(255 255 255 / .22);font:500 10.5px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:rgb(244 242 238 / .72);white-space:nowrap}
+  .sw-tag{display:flex;align-items:center;height:18px;padding-left:13px;border-left:1px solid rgb(255 255 255 / .22);font:400 13px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:rgb(244 242 238 / .78);white-space:nowrap}
   .sw-head .gap{flex:1}
   .secure{display:inline-flex;align-items:center;gap:7px;font-size:13px;color:rgb(244 242 238 / .78);white-space:nowrap}
   .secure svg{width:14px;height:14px;flex:none;color:#a9c39a}
   .head-acts{display:flex;align-items:center;gap:2px;margin-left:6px}.head-acts:empty{display:none}
-  .head-acts button{display:inline-flex;align-items:center;gap:7px;font:500 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#f4f2ee;background:none;border:0;border-radius:8px;padding:0 10px;min-height:34px;cursor:pointer}
+  .head-acts button{display:inline-flex;align-items:center;gap:7px;white-space:nowrap;font:500 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#f4f2ee;background:none;border:0;border-radius:8px;padding:0 10px;min-height:34px;cursor:pointer}
   .head-acts button:hover{background:rgb(255 255 255 / .1)}
   .head-acts svg{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  /* whose portal: their logo on a small white tile and their name, then the links (site-notes.js styles those) */
+  /* whose portal: their logo on a small white tile and their name, then the links */
   .sw-row .wrap{min-height:58px}
   .sw-lead{display:flex;align-items:center;gap:11px;flex:none;min-height:38px}
   .sw-row .sw-nav:not([hidden]){flex:1;min-width:0;border:0;margin-left:16px;padding-left:6px;border-left:1px solid var(--line)}
-  /* position:relative makes the row the links measure from, so on a narrow screen the one underlined slides into view
-     from the row's own start (the logo and name sit before it here) */
-  .sw-row .sw-nav .nav-in{position:relative;max-width:none;margin:0;padding:0 0 0 4px;min-height:58px}
-  .sw-row .sw-nav a{height:58px}.sw-row .sw-nav a.nav-edit{height:38px;padding:0 16px 0 14px}
   .sw-tile{display:grid;place-items:center;height:38px;min-width:38px;padding:5px 7px;background:#fff;border:1px solid var(--line);border-radius:10px;box-shadow:0 2px 8px -4px rgb(36 34 31 / .22)}
   .sw-tile img{display:block;height:26px;width:auto;max-width:92px;object-fit:contain}
   .sw-who{font-size:15.5px;font-weight:650;line-height:1.2;color:var(--ink);white-space:nowrap}
 
   /* ---------- welcome ---------- */
-  .hero{position:relative;display:flex;align-items:center;gap:26px;padding:40px 0 30px;isolation:isolate}
-  .hero::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:100vw;transform:translateX(-50%);z-index:-1;pointer-events:none;
-     background:
-      linear-gradient(180deg,rgba(244,242,238,0) 50%,var(--paper)),
-      conic-gradient(from 210deg at 14% 0%,rgba(36,34,31,.03) 0 38deg,transparent 38deg 66deg,rgba(36,34,31,.02) 66deg 118deg,transparent 118deg),
-      conic-gradient(from 125deg at 86% 6%,rgba(217,83,30,.04) 0 34deg,transparent 34deg 78deg,rgba(36,34,31,.025) 78deg 124deg,transparent 124deg)}
-  .plate{flex:none;display:grid;place-items:center;width:150px;height:150px;background:var(--card);border-radius:22px;padding:18px;
+  .hero{display:flex;align-items:center;gap:20px;padding:30px 0 6px}
+  .plate{flex:none;display:grid;place-items:center;width:84px;height:84px;background:var(--card);border-radius:16px;padding:10px;
          box-shadow:0 0 0 1px var(--line),0 16px 34px -20px rgba(36,34,31,.35)}
   .plate img{display:block;max-width:100%;max-height:100%;width:auto;height:auto;object-fit:contain}
-  .kicker{display:flex;align-items:center;gap:10px;font:500 11.5px/1 var(--mono);letter-spacing:.18em;text-transform:uppercase;color:var(--accent-text);margin:0 0 10px}
-  .kicker::after{content:"";width:28px;height:1px;background:currentColor;opacity:.5}
-  h1{font:700 clamp(28px,3.6vw,38px)/1.1 var(--slab);letter-spacing:-.005em;margin:0 0 8px;text-wrap:balance}
-  .lead{margin:0;color:var(--muted);max-width:540px;font-size:16px}
-  .hero-go{display:flex;flex-wrap:wrap;gap:10px;margin:18px 0 0}
-  .hero-go button,.hero-go a{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:11px;font:600 15px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;cursor:pointer;text-decoration:none;transition:background .15s,border-color .15s}
-  .hero-go svg{width:18px;height:18px;flex:none}
-  .go-talk{color:#fff;background:var(--sage);border:1px solid var(--sage)}.go-talk:hover{background:#4d5e42}
-  .go-edit{color:var(--ink);background:var(--card);border:1px solid var(--line)}.go-edit:hover{border-color:var(--accent)}
-  .hero-go :focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}
-  .trust{list-style:none;padding:0;margin:12px 0 0;display:flex;flex-wrap:wrap;gap:4px 16px;color:var(--soft);font-size:13px}
-  .trust li{display:inline-flex;align-items:center;gap:6px}
-  .trust svg{width:14px;height:14px;color:var(--sage)}
+  h1{font:700 30px/1.15 var(--slab);letter-spacing:-.005em;margin:0 0 4px;text-wrap:balance}
+  .lead{margin:0;color:var(--muted);font-size:16px}
   .hero > div:nth-child(2){flex:1;min-width:0}
 
-  /* ---------- a few numbers from Google Analytics ---------- */
-  /* the website numbers: one wide strip, same width as the Edit mode card */
-  .stats{display:grid;grid-template-columns:minmax(190px,.9fr) 2.4fr;gap:10px 26px;align-items:center;background:var(--card);border-radius:18px;padding:18px 22px 12px;margin:0 0 16px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3)}
-  .stats[hidden]{display:none}
-  .stats p{margin:0}
-  .stats-k{font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage)}
-  .stats-when{margin-top:5px!important;font-size:12.5px;color:var(--soft)}
-  .stats-sum{margin-top:10px!important;font-size:15px;line-height:1.4;color:var(--muted)}.stats-sum:empty{display:none}
-  .stats-sum b{color:var(--ink);font-weight:700;white-space:nowrap}.stats-sum b.out{color:var(--accent-text)}
-  .stats-nums{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:0}
-  .stats-nums li{display:flex;flex-direction:column;align-items:flex-start;padding:2px 0 2px 18px;border-left:1px solid var(--line);min-width:0}
-  .stats-nums b{font:700 28px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}
-  .stats-nums span{margin-top:6px;font-size:14px;font-weight:650;color:var(--ink);line-height:1.25}
-  .stats-nums i{font-style:normal;font-size:12px;color:var(--soft);line-height:1.35;margin-top:1px}
-  .stats-nums small{margin-top:6px;font-weight:600;font-size:12px;line-height:1.3;color:var(--soft)}
-  .stats-nums small:empty{display:none}
-  .stats-nums small.up{color:#3f7a3a}.stats-nums small.down{color:#b4361c}
-  .stats-f{grid-column:1/-1;padding-top:8px;border-top:1px dashed var(--line);font-size:11px;line-height:1.4;color:var(--soft);display:flex;justify-content:space-between;align-items:center;gap:8px}
-  .stats-f .ga{display:inline-flex;align-items:center;gap:7px}.stats-f .ga svg{width:13px;height:13px;flex:none}
-  .stats-f .sample{flex:none;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--accent-text);border:1px solid var(--accent-soft);border-radius:999px;padding:3px 6px}
-
-  /* ---------- Edit mode: the main action, in the same calm white card as the boxes ---------- */
-  .edit{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:14px 18px;align-items:center;color:var(--ink);border-radius:18px;padding:18px 18px 18px 20px;margin:0 0 36px;text-decoration:none;cursor:pointer;
+  /* ---------- Need changes? The way into Edit mode, in the same calm white card as the boxes ---------- */
+  .edit{position:relative;display:grid;grid-template-columns:auto 1fr auto;gap:14px 18px;align-items:center;color:var(--ink);border-radius:16px;padding:18px 18px 18px 20px;text-decoration:none;cursor:pointer;
         background:var(--card);box-shadow:0 0 0 1px var(--line),0 10px 26px -18px rgba(36,34,31,.28);transition:box-shadow .18s}
   .edit:hover{box-shadow:0 0 0 2px var(--accent),0 12px 26px -16px rgba(194,84,27,.4)}
   .edit .ic{width:46px;height:46px;border-radius:13px;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center}
   .edit .ic svg{width:23px;height:23px}
-  .edit .k{font:500 11px/1 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--accent-text);margin:0 0 6px}
-  .edit b{display:block;font:700 20px/1.2 var(--slab)}
+  .edit h2{margin:0;font:700 23px/1.2 var(--slab);letter-spacing:-.005em}
   .edit em{font-style:normal}
-  .edit .t{color:var(--muted);font-size:14.5px;line-height:1.45;margin:4px 0 0}
+  .edit .t{color:var(--muted);font-size:15.5px;line-height:1.45;margin:4px 0 0;max-width:460px}
   .edit .go{position:relative;display:flex;justify-content:center;align-items:center;gap:8px;background:var(--accent);color:#fff;font-weight:650;font-size:15.5px;border-radius:11px;min-height:46px;padding:0 18px;white-space:nowrap;transition:background .15s}
   .edit .go svg{width:18px;height:18px;transition:transform .2s}
   .edit:hover .go{background:#a94816}.edit:hover .go svg{transform:translateX(3px)}
@@ -128,27 +88,23 @@
   .edit[data-edit-mode="soon"] .go{background:var(--stone);color:var(--muted)}
   .edit .soon,.edit[data-edit-mode="soon"] .ready{display:none}.edit[data-edit-mode="soon"] .soon{display:inline}
   /* their website, framed, inside the Edit mode card (light and subtle) */
-  .edit.has-shot{grid-template-columns:minmax(0,1.05fr) 1fr;gap:22px;padding:16px 22px 16px 16px}
+  .edit.has-shot{grid-template-columns:300px minmax(0,1fr);gap:26px;padding:14px 22px 14px 14px}
   .shot{position:relative;border-radius:10px;overflow:hidden;background:var(--stone);box-shadow:0 0 0 1px var(--line),0 10px 24px -16px rgba(36,34,31,.4)}
-  .shot .bar{display:flex;align-items:center;gap:5px;height:24px;padding:0 9px;background:#f1ede7;border-bottom:1px solid var(--line)}
+  .shot .bar{display:flex;align-items:center;gap:5px;height:28px;padding:0 9px;background:#f1ede7;border-bottom:1px solid var(--line)}
   .shot .bar i{width:7px;height:7px;border-radius:50%;background:#d8d1c6}
-  .shot .bar span{margin-left:8px;flex:1;height:14px;border-radius:7px;background:#fff;font:500 9.5px/14px var(--mono);color:#6f685e;padding:0 8px;letter-spacing:.02em;overflow:hidden;white-space:nowrap}
+  .shot .bar span{margin-left:8px;flex:1;height:18px;border-radius:9px;background:#fff;font:500 12.5px/18px var(--mono);color:#6f685e;padding:0 8px;letter-spacing:.02em;overflow:hidden;white-space:nowrap}
   .shot img{display:block;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;object-position:top}
   .has-shot .side{display:flex;flex-direction:column;gap:14px;min-width:0}
-  .has-shot .live{display:inline-flex;align-items:center;gap:7px;align-self:flex-start;font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage);background:var(--sage-soft);border:1px solid #d6dfcd;border-radius:999px;padding:6px 10px}
-  .has-shot .live::before{content:"";width:7px;height:7px;border-radius:50%;background:#6f9a5c;box-shadow:0 0 0 3px rgba(111,154,92,.2)}
   .has-shot .go{align-self:flex-start}
   @media (max-width:760px){.edit.has-shot{grid-template-columns:1fr;padding:14px}.has-shot .go{align-self:stretch}}
 
   /* ---------- Your requests: what they've asked for, and where each one stands (filled in by site-notes.js) ---------- */
-  .edit:has(+ .rq:not([hidden])){margin-bottom:16px}
-  .rq{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:hidden}
-  .rq-hd{display:flex;gap:12px;align-items:baseline;justify-content:space-between;padding:18px 22px 12px}
-  .rq-hd h2{font:700 22px/1.2 var(--slab);margin:0}
-  .rq-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}
-  .rq-all,.rq-no{font:650 14px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:none;border:0;padding:8px 0;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:3px}
-  .rq-all{color:var(--accent-text)}.rq-no{color:var(--muted);padding:8px 6px}
+  .rq{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .rq[hidden]{display:none}
+  .rq-no{font:600 14px/1.2 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--muted);background:none;border:0;padding:8px 6px;cursor:pointer;white-space:nowrap;text-decoration:underline;text-underline-offset:3px}
   .rq-list{list-style:none;margin:0;padding:0}
+  .rq-list > li:first-child{border-top:0}
+  .rq-none{padding:16px 22px 18px;color:var(--muted);font-size:15px}
   .rq-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:4px 16px;align-items:start;padding:14px 22px;border-top:1px solid var(--line)}
   .rq-row > b{font-size:16px;font-weight:600;line-height:1.35;overflow-wrap:anywhere}
   .rq-m{grid-column:1;color:var(--muted);font-size:13.5px}
@@ -168,13 +124,13 @@
   .rq-go:hover{background:#a94816}.rq-go[disabled]{opacity:.6;cursor:default}
   .rq-err{flex:1 1 100%;margin:0;color:#b4361c;font-size:14px}
   .rq button:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}
-  @media (min-width:1800px){.rq-hd h2{font-size:24px}.rq-row > b{font-size:17px}}
-  @media (min-width:2400px){.rq-hd h2{font-size:27px}.rq-hd p,.rq-said,.rq-q{font-size:16px}.rq-row > b{font-size:18.5px}.rq-m{font-size:14.5px}.rq-tag{font-size:12px}.rq-go{font-size:15.5px;min-height:46px}}
-  @media (max-width:560px){.rq-hd{padding:16px 16px 10px}.rq-hd h2{font-size:20px}.rq-row{grid-template-columns:minmax(0,1fr);padding:14px 16px}.rq-row .rq-tag{grid-row:1;justify-self:start}.rq-q .rq-go{flex:1 1 100%;min-height:46px}.rq-q.open .rq-no{flex:1 1 100%}}
+  @media (min-width:1800px){.rq-row > b{font-size:17px}}
+  @media (min-width:2400px){.rq-said,.rq-q,.rq-none{font-size:16px}.rq-row > b{font-size:18.5px}.rq-m{font-size:14.5px}.rq-tag{font-size:14px}.rq-go{font-size:15.5px;min-height:46px}}
+  @media (max-width:560px){.rq-none{padding:14px 16px}.rq-row{grid-template-columns:minmax(0,1fr);padding:14px 16px}.rq-row .rq-tag{grid-row:1;justify-self:start}.rq-q .rq-go{flex:1 1 100%;min-height:46px}.rq-q.open .rq-no{flex:1 1 100%}}
 
   /* ---------- Your shop: its styles come with site-notes.js (PAGE_CSS), in this page's colors ---------- */
 
-  /* ---------- tappable cards ---------- */
+  /* ---------- Website info: a box for each thing, with its button; a tap anywhere on the box does the same ---------- */
   .box{position:relative;background:var(--card);border-radius:16px;padding:16px 16px 16px 18px;cursor:pointer;
        box-shadow:0 0 0 1px var(--line),0 1px 0 rgba(36,34,31,.03);transition:box-shadow .18s,transform .18s}
   /* photos dragged from the computer onto a box (site-notes.js) */
@@ -187,26 +143,19 @@
   .bh .grow{flex:1;min-width:0}
   .box b{display:block;font-size:16.5px;line-height:1.3;font-weight:650}
   .bh span{display:block;color:var(--muted);font-size:14px;line-height:1.4;margin-top:1px}
-  .box .tap{flex:none;display:inline-flex;align-items:center;gap:5px;background:var(--accent-soft);color:var(--accent-text);font-weight:650;font-size:13.5px;padding:7px 12px;border-radius:999px;font-style:normal;white-space:nowrap;transition:background .15s,color .15s}
-  .box .tap svg{width:14px;height:14px}
+  .box .tap{flex:none;display:inline-flex;align-items:center;min-height:36px;padding:0 14px;border:0;border-radius:999px;background:var(--accent-soft);color:var(--accent-text);font:600 14px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;white-space:nowrap;cursor:pointer;transition:background .15s,color .15s}
   .box:hover .tap{background:var(--accent);color:#fff}
-  .meet{margin:0 0 40px;padding:14px 14px 14px 18px}
-  .meet .ic{background:var(--sage-soft);color:var(--sage)}
-  .meet .tap{background:var(--sage-soft);color:var(--sage)}
-  .meet:hover{box-shadow:0 0 0 2px var(--sage),0 12px 26px -16px rgba(95,113,82,.5)}
-  .meet:hover .tap{background:var(--sage);color:#fff}
+  .box .tap:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}
 
-  .sec-h{font:700 24px/1.2 var(--slab);margin:0 0 4px}
-  .sub{margin:0 0 16px;color:var(--muted);font-size:15.5px;max-width:640px}
-  .boxes{display:grid;gap:12px;margin:0 0 40px;padding:0;list-style:none}
+  .boxes{display:grid;gap:12px;margin:0;padding:0;list-style:none}
   @media (min-width:700px){.boxes{grid-template-columns:1fr 1fr}.box.wide{grid-column:1/-1}}
 
   /* ---------- what's on the site now ---------- */
   .now{margin:14px 0 0;padding:12px 0 0;border-top:1px dashed var(--line)}
-  .now-k{display:flex;align-items:center;gap:6px;font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--sage);margin:0 0 10px}
-  .now-dl{margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card);font:600 12.5px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;letter-spacing:0;text-transform:none;color:var(--ink);text-decoration:none}
+  .now-k{display:flex;align-items:center;gap:6px;font:500 13.5px/1.3 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--muted);margin:0 0 10px}
+  .now-dl{margin-left:auto;display:inline-flex;align-items:center;gap:5px;padding:5px 9px;border:1px solid var(--line);border-radius:999px;background:var(--card);font:600 12.5px/1 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);text-decoration:none}
   .now-dl:hover{border-color:var(--ink)}.now-k .now-dl svg{width:14px;height:14px}
-  .now-k svg{width:12px;height:12px}
+  .now-k > svg{width:14px;height:14px;color:var(--sage)}
   .now.empty .now-k{color:var(--soft)}
   .now .none{margin:0;color:var(--soft);font-size:14px}
   .logo-now{display:grid;place-items:center;height:96px;border-radius:12px;padding:12px;
@@ -218,26 +167,26 @@
   .pics > img:hover{transform:scale(1.04);box-shadow:0 6px 16px -8px rgba(36,34,31,.5)}
   .pics .more{position:relative;overflow:hidden}
   .pics .more img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.35;filter:grayscale(.3)}
-  .pics .more span{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-size:11.5px;line-height:1.2;font-weight:600;color:var(--ink);background:rgba(255,255,255,.55);padding:4px}
+  .pics .more span{position:absolute;inset:0;display:grid;place-content:center;text-align:center;font-size:12.5px;line-height:1.2;font-weight:600;color:var(--ink);background:rgba(255,255,255,.55);padding:4px}
   .pics .more b{display:block;font:700 22px/1 var(--slab);margin-bottom:2px}
   .facts{margin:0;display:grid;gap:7px}
   .facts div{display:grid;grid-template-columns:96px 1fr;gap:10px;align-items:baseline}
-  .facts dt{color:var(--soft);font-size:13px}
+  .facts dt{color:var(--soft);font-size:14px}
   .facts dd{margin:0;font-size:14.5px;line-height:1.45;overflow-wrap:anywhere}
   .facts dd.miss{color:var(--soft);font-style:italic}
   .facts .q{font-family:var(--slab);font-weight:600;font-size:16px}
   .soc{list-style:none;margin:0;padding:0;display:grid;gap:7px}
   .soc li{display:grid;grid-template-columns:96px minmax(0,1fr);gap:10px;align-items:center;font-size:14.5px}
-  .soc li > span:first-child{color:var(--soft);font-size:13px}
+  .soc li > span:first-child{color:var(--soft);font-size:14px}
   .soc .on{display:inline-flex;align-items:center;gap:6px;min-width:0;overflow-wrap:anywhere}
   .soc .on svg{flex:none;width:15px;height:15px;color:var(--sage)}
   .soc .url{min-width:0;overflow-wrap:anywhere}
   .soc .off{display:inline-flex;align-items:center;gap:8px;min-width:0;color:var(--soft);padding-left:21px}
-  .soc .off em{flex:none;font:500 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;font-style:normal;color:var(--soft);border:1px solid var(--line);border-radius:999px;padding:4px 7px}
+  .soc .off em{flex:none;font:400 12.5px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;font-style:normal;color:var(--muted);border:1px solid var(--line);border-radius:999px;padding:1px 9px}
 
   /* ---------- private ---------- */
   /* "private" reassurance: one quiet row */
-  .kept{list-style:none;margin:0 0 40px;padding:12px 18px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;border:1px solid var(--line);border-radius:14px;font-size:13.5px;color:var(--muted)}
+  .kept{list-style:none;margin:44px 0 0;padding:12px 18px;display:flex;flex-wrap:wrap;justify-content:center;gap:8px 26px;border:1px solid var(--line);border-radius:14px;font-size:13.5px;color:var(--muted)}
   .kept li{display:flex;align-items:center;gap:7px}
   .kept svg{flex:none;width:16px;height:16px;color:var(--sage)}
 
@@ -249,41 +198,44 @@
   .sw-foot .row img{height:34px;width:auto;display:block}
   .sw-foot .row .gap{flex:1}
   .sw-foot .contact{font-size:14.5px;margin:0}
-  .sw-foot .contact a{color:#fff;text-decoration:none;border-bottom:1px solid rgba(238,106,53,.7)}
+  .sw-foot .contact a{display:inline-block;line-height:23px;color:#fff;text-decoration:none;border-bottom:1px solid rgba(238,106,53,.7)}
   .sw-foot .contact a:hover{border-color:#ee6a35}
   .sw-foot .rule{height:1px;background:rgba(216,210,200,.16);margin:20px 0 14px}
-  .sw-foot .fine{display:flex;flex-wrap:wrap;gap:6px 20px;font:500 11.5px/1.6 var(--mono);letter-spacing:.06em;color:#a59d91}
-  .sw-foot .fine a{color:#d8d2c8;text-decoration:none}.sw-foot .fine a:hover{color:#fff;text-decoration:underline}
+  .sw-foot .fine{display:flex;flex-wrap:wrap;gap:6px 20px;font-size:13px;line-height:1.6;color:#a59d91}
+  .sw-foot .fine a{display:inline-block;line-height:24px;color:#d8d2c8;text-decoration:none}.sw-foot .fine a:hover{color:#fff;text-decoration:underline}
   .sw-foot .fine .lock{display:inline-flex;align-items:center;gap:6px}
-  .sw-foot .fine svg{width:12px;height:12px}
+  .sw-foot .fine svg{width:13px;height:13px}
 
-  @media (min-width:1800px){body{font-size:17px}.wrap{max-width:1000px}.hero{padding-top:52px}.plate{width:170px;height:170px}h1{font-size:42px}
-    .edit b{font-size:22px}.box b{font-size:17.5px}.sw-brand img{height:26px}.sec-h{font-size:27px}.facts dd,.soc li{font-size:15.5px}.logo-now{height:110px}.logo-now img{max-height:84px}}
-  @media (min-width:2400px){body{font-size:18.5px}.wrap{max-width:1120px}.sw-head .wrap{max-width:1640px}.sw-foot .wrap{max-width:1400px}.plate{width:190px;height:190px}h1{font-size:48px}.lead{font-size:18px}
-    .trust{font-size:14.5px}.edit b{font-size:25px}.edit .t{font-size:16px}.edit .go{font-size:17px;min-height:52px}.box b{font-size:19px}.bh span{font-size:15.5px}.box .tap{font-size:15px}
-    .bh .ic{width:44px;height:44px}.sec-h{font-size:30px}.sub{font-size:17px;max-width:720px}.now-k{font-size:11.5px}.facts dt,.soc li > span:first-child{font-size:14.5px}.facts dd,.soc li{font-size:17px}
+  @media (min-width:1800px){body{font-size:17px}.wrap{max-width:1040px}.hero{padding-top:36px}.plate{width:96px;height:96px}h1{font-size:33px}
+    .edit h2{font-size:25px}.box b{font-size:17.5px}.sw-brand img{height:26px}.facts dd,.soc li{font-size:15.5px}.logo-now{height:110px}.logo-now img{max-height:84px}}
+  @media (min-width:2400px){body{font-size:18.5px}.wrap{max-width:1160px}.sw-head .wrap{max-width:1640px}.sw-foot .wrap{max-width:1400px}.plate{width:108px;height:108px}h1{font-size:37px}.lead{font-size:18px}
+    .edit h2{font-size:28px}.edit .t{font-size:17px}.edit .go{font-size:17px;min-height:52px}.box b{font-size:19px}.bh span{font-size:15.5px}.box .tap{font-size:15px}
+    .bh .ic{width:44px;height:44px}.now-k{font-size:15px}.facts dt,.soc li > span:first-child{font-size:14.5px}.facts dd,.soc li{font-size:17px}
     .facts div,.soc li{grid-template-columns:110px 1fr}.logo-now{height:124px}.logo-now img{max-height:94px}.kept{font-size:15px}.sw-brand img{height:28px}}
-  @media (min-width:561px) and (max-width:899px){.stats{grid-template-columns:1fr}}
   @media (max-width:699px){
     .pics{grid-template-columns:repeat(3,1fr)}
   }
   @media (max-width:560px){
     .sw-strip .wrap{min-height:44px;gap:10px}.sw-brand img{height:22px}.sw-row .wrap{min-height:52px}
-    .hero{flex-direction:column;text-align:center;gap:16px;padding:26px 0 22px}.stats{grid-template-columns:1fr;padding:16px 16px 10px}.stats-nums{grid-template-columns:1fr}.stats-nums li{display:grid;grid-template-columns:72px minmax(0,1fr);column-gap:12px;align-items:baseline;border-left:0;border-top:1px solid var(--line);padding:10px 0}.stats-nums b{grid-row:span 2;font-size:26px}.stats-nums span{margin-top:0}.stats-nums small{margin-top:2px}.stats-nums i{display:none}.plate{width:116px;height:116px;padding:14px;border-radius:18px}.plate.wide{width:min(280px,100%);height:110px;padding:12px 16px}
-    .kicker{justify-content:center}.kicker::before{content:"";width:28px;height:1px;background:currentColor;opacity:.5}
-    h1{font-size:27px}.lead{font-size:15.5px}.trust{justify-content:center;font-size:12.5px;gap:4px 12px}
+    .hero{gap:14px;padding:22px 0 0}.plate{width:60px;height:60px;padding:7px;border-radius:13px}.plate.wide{width:104px;padding:7px 9px}
+    h1{font-size:23px}.lead{font-size:15px}
     .edit{grid-template-columns:auto 1fr;padding:16px;gap:12px 14px}.edit .ic{width:40px;height:40px;border-radius:11px}.edit .ic svg{width:20px;height:20px}
-    .edit b{font-size:18px}.edit .go{grid-column:1/-1;min-height:50px;font-size:16px}
-    .meet{flex-wrap:wrap}
-    .sec-h{font-size:22px}.box{padding:14px}.bh{gap:10px}.box .tap{font-size:12.5px;padding:6px 10px}
+    .edit h2{font-size:21px}.edit .go{grid-column:1/-1;min-height:50px;font-size:16px}
+    .box{padding:14px}.bh{gap:10px}.box .tap{padding:0 12px}
     .facts div,.soc li{grid-template-columns:84px 1fr}
     .soc{gap:10px}.soc li{grid-template-columns:1fr;gap:1px}.soc .off{flex-wrap:wrap;row-gap:4px}
     .kept{padding:12px 14px;justify-content:flex-start;flex-direction:column;align-items:flex-start;gap:8px}
   }
   @media (max-width:860px){.secure:has(~ .head-acts:not(:empty)){display:none}}
-  @media (max-width:720px){.sw-row .sw-nav:not([hidden]){margin-left:10px;padding-left:2px}.sw-lead:has(~ .sw-nav:not([hidden])) .sw-who{display:none}.sw-tile{height:34px;min-width:34px;padding:4px 6px}.sw-tile img{height:24px;max-width:72px}.sw-row .sw-nav .nav-in{min-height:52px}.sw-row .sw-nav a{height:52px}}
+  /* their name gives way when the links run short of room (site-notes.js measures, and marks them .snug), and on a phone */
+  .sw-lead:has(~ .sw-nav.snug) .sw-who{display:none}
+  @media (max-width:860px){.sw-lead:has(~ .sw-nav:not([hidden])) .sw-who{display:none}.sw-row .sw-nav:not([hidden]){margin-left:8px;padding-left:0;border-left:0}}
+  @media (max-width:720px){.sw-tile{height:34px;min-width:34px;padding:4px 6px}.sw-tile img{height:24px;max-width:72px}}
   @media (max-width:560px){.head-acts button{padding:0 9px}}
+  @media (max-width:640px){.sw-tag:has(~ .head-acts:not(:empty)){display:none}}
   @media (max-width:420px){.sw-tag{display:none}}
+  @media (max-width:440px){.head-acts svg{display:none}}
+  @media (max-width:359px){.wrap{padding:0 12px}.head-acts{margin-left:0}.head-acts button{padding:0 5px}}
   @media (max-width:360px){.secure .w{display:none}}
   @media (prefers-reduced-motion:reduce){*{transition:none!important}}
   .flat{line-height:0}.nojs{padding:24px}
@@ -298,137 +250,142 @@
       <span class="sw-tag">Client Portal</span>
       <span class="gap"></span>
       <span class="secure" title="Only you can open this page, with your password. Nothing here is public."><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Private <span class="w">and secure</span></span></span>
-      <!-- Help and Log out go here (site-notes.js fills it in) -->
-      <span class="head-acts" data-portal-actions></span>
+      <!-- Let's talk, Help and Log out go here (site-notes.js fills it in). data-booking-url is Stray Wolf's booking
+           page, which Let's talk opens in a new tab; empty = no Let's talk. -->
+      <span class="head-acts" data-portal-actions data-booking-url="https://calendar.app.google/XseK2nweRYW1hea37"></span>
     </div>
   </div>
-  <!-- Whose portal it is, then a link to each part of the page below (each part has data-nav="its name"), filled in by site-notes.js after login -->
+  <!-- Whose portal it is, then a link to each page below, "Need changes?" and Edit my website (site-notes.js fills it in after login) -->
   <div class="sw-row">
     <div class="wrap">
       <span class="sw-lead"><span class="sw-tile"><img src="../logo.svg" alt=""></span><span class="sw-who">Snip &amp; Sprout Co.</span></span>
-      <nav class="sw-nav" data-portal-nav hidden aria-label="Parts of your portal"></nav>
+      <nav class="sw-nav" data-portal-nav hidden aria-label="Your portal"></nav>
     </div>
   </div>
 </header>
 
 <main class="wrap">
-  <section class="hero" id="overview" data-nav="Overview" data-area="Welcome">
-    <div class="plate"><img src="../logo.svg" alt="The Snip &amp; Sprout Plant Co. logo" width="149" height="113"></div>
-    <div>
-      <p class="kicker">Client Portal</p>
-      <h1>Welcome, Snip &amp; Sprout Co.</h1>
-      <p class="lead">Send what's needed, ask for changes to your website, and set up a time to talk, all in one place.</p>
-      <p class="hero-go">
-        <button class="go-talk" type="button" data-talk title="Pick a time to talk with Stray Wolf about your website"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/></svg>Let's talk</button>
-        <a class="go-edit" href="{{home}}" data-edit-mode="{{home}}" title="Open your website to point at what you'd like changed"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M17 3a2.8 2.8 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/></svg>Edit my website</a>
-      </p>
-    </div>
-  </section>
+  <!-- The portal is cut into pages: each <section id data-page="its name"> below is one, and the first is Home. Only one
+       shows at a time; site-notes.js draws the header's links, the phone's bar and the link back to Home, and leaves
+       out Messages or Shop for a client who has none (see "The pages of their portal" in site-notes.js). -->
 
-  <h2 class="sec-h">What's on your site now</h2>
-  <p class="sub">Here's what your website shows today. Tap a box to add something new or fix anything that's wrong, then tap <b>Send to Stray Wolf</b> at the bottom.</p>
-  <ul class="boxes">
-    <li class="box" id="logo" data-nav="Logo" data-note-box data-note-photos data-area="Logo" data-note-ask="Add your logo below. Anything I should know about it?" data-note-hint="For example: This is the newest one. Use the round version.">
-      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></div><div class="grow"><b>Your logo</b><span>Have a newer one?</span></div><em class="tap">Add or change</em></div>
-      <div class="now">
-        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now<a class="now-dl" href="../logo.svg" download="Snip &amp; Sprout Co. logo.svg" title="Save the logo file on your website to this computer or phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>Download</a></p>
-        <div class="logo-now"><img src="../logo.svg" alt="The Snip &amp; Sprout Plant Co. logo on the website" width="149" height="113"></div>
-      </div>
-    </li>
-    <li class="box" id="contact" data-nav="Contact info" data-info="contact" data-note-box data-area="Contact info" data-note-fields="Email|Address|Phone" data-note-now="Email=snipandsproutco@gmail.com|Address=413 E. Emma Ave., Springdale, AR 72764" data-note-ask="Here&#x27;s what&#x27;s on your site. Tap Change on anything that&#x27;s new or wrong.">
-      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div class="grow"><b>Contact info</b><span>How people reach you.</span></div><em class="tap">Add or change</em></div>
-      <div class="now">
-        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
-        <dl class="facts"><div><dt>Email</dt><dd>snipandsproutco@gmail.com</dd></div><div><dt>Address</dt><dd>413 E. Emma Ave., Springdale, AR 72764</dd></div></dl>
-      </div>
-    </li>
-    <li class="box" id="hours" data-nav="Shop hours" data-info="hours" data-info-typed="{{week}}" data-note-box data-area="Shop hours" data-note-fields="Mon – Tue|Wed – Fri|Sat – Sun|A holiday or a day off" data-note-now="Mon – Tue=10 AM – 3 PM|Wed – Fri=9 AM – 6 PM|Sat – Sun=9 AM – 2 PM" data-note-ask="Here are the hours on your site. Tap Change on any that are different now.">
-      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="grow"><b>Shop hours</b><span>When you&#x27;re open.</span></div><em class="tap">Add or change</em></div>
-      <div class="now">
-        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
-        <dl class="facts"><div><dt>Mon – Tue</dt><dd>10 AM – 3 PM</dd></div><div><dt>Wed – Fri</dt><dd>9 AM – 6 PM</dd></div><div><dt>Sat – Sun</dt><dd>9 AM – 2 PM</dd></div></dl>
-      </div>
-    </li>
-    <li class="box" id="social" data-nav="Social pages" data-info="social" data-note-box data-area="Your social pages" data-note-fields="Instagram|Etsy|Facebook|Google" data-note-now="Instagram=instagram.com/snipandsprout.co|Etsy=etsy.com/shop/SnipAndSproutCo" data-note-ask="Tap Change if a link is wrong, or paste a link for a page you have.">
-      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg></div><div class="grow"><b>Your social pages</b><span>Just the ones you have.</span></div><em class="tap">Add or change</em></div>
-      <div class="now">
-        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
-        <ul class="soc"><li><span data-brand="instagram">Instagram</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">instagram.com/snipandsprout.co</span></span></li><li><span data-brand="etsy">Etsy</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">etsy.com/shop/SnipAndSproutCo</span></span></li><li><span data-brand="facebook">Facebook</span><span class="off"><span class="url">facebook.com/yourpage</span><em>Example</em></span></li><li><span data-brand="google">Google</span><span class="off"><span class="url">maps.app.goo.gl/yourplace</span><em>Example</em></span></li></ul>
-      </div>
-    </li>
-    <li class="box wide" id="your-photos" data-nav="Photos" data-note-box data-photos-page data-note-photos data-area="Photos" data-note-ask="Add new photos below. Want a photo on your site swapped out? Tell me which one." data-note-hint="For example: Swap the pumpkin photo for this one.">
-      <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></div><div class="grow"><b>Photos</b><span>Your shop, your workshops, what people made.</span></div><em class="tap">Open</em></div>
-      <div class="now">
-        <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
-        <div class="pics"><img src="../img/ig-dani.webp" data-big="../img/ig-dani.webp" alt="Dani beside a big alocasia in the shop" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/kit-flatlay.webp" data-big="../img/kit-flatlay.webp" alt="A DIY terrarium kit laid out in labelled bags" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/tbar-lantern.webp" data-big="../img/tbar-lantern.webp" alt="Dani holding an empty glass lantern terrarium" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/stakes-tall.webp" data-big="../img/stakes-tall.webp" alt="Wooden plant markers and pastel pots" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/ig-globe.webp" data-big="../img/ig-globe.webp" alt="A glass terrarium with succulents and tiny pumpkins" title="Tap to see it bigger" loading="lazy" decoding="async"><span class="more"><img src="../img/bar-wide.webp" alt="" loading="lazy" decoding="async"><span><b>See all</b>your photos</span></span></div>
-      </div>
-    </li>
-  </ul>
-
-  <!-- Messages from your website: what people send with the form on the website, for a client whose form sends
-       to the notes service. Hidden while the form is off; site-notes.js asks /api/my-form after login and builds it. -->
-  <section class="fp" id="messages" data-nav="Messages" data-form-portal hidden aria-labelledby="fp-h"></section>
-
-  <!-- Your shop: for a client whose website sells things (kit/shop on their site), through Square or any other
-       checkout. Hidden until Stray Wolf starts their shop in the admin (site-notes.js asks /api/my-shop after login,
-       builds the rows, and words the last line for the shop's kind of checkout). They add, change and delete items,
-       type the shown price in each row, and set each item's photo and checkout link. -->
-  <section class="sp" id="shop" data-nav="Your shop" data-shop-portal hidden aria-labelledby="sp-h">
-    <div class="sp-hd"><div><h2 id="sp-h">Your shop</h2><p data-shop-count>What your website sells.</p></div>
-      <button class="sp-add" type="button" data-shop-add><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add an item</button></div>
-    <div data-shop-form></div>
-    <div data-shop-list></div>
-    <p class="sp-foot">Every Buy button on your website opens your Square checkout, so payments never come through here. Changes show on your website within a minute.</p>
-  </section>
-
-  <a class="edit has-shot" href="{{home}}" data-edit-mode="{{home}}">
-    <div class="shot" aria-hidden="true"><div class="bar"><i></i><i></i><i></i><span>snipandsproutco.com</span></div><img src="brand/site-preview.jpg" alt="" width="960" height="600"></div>
-    <div class="side">
-      <span class="live">Your new website</span>
+  <!-- Home: what needs them, the way to ask for a change, then each other page with where it stands -->
+  <section id="home" data-page="Home">
+    <div class="hero" data-area="Welcome">
+      <div class="plate"><img src="../logo.svg" alt="The Snip &amp; Sprout Plant Co. logo" width="149" height="113"></div>
       <div>
-        <p class="k">Edit mode</p>
-        <b>Want something changed?</b>
-        <p class="t">Open your website, tap the part you mean, and say what you'd like. Nothing changes until the update is made.</p>
+        <h1>Welcome, Snip &amp; Sprout Co.</h1>
+        <p class="lead">What needs you is first. Each part of your website has its own page.</p>
       </div>
-      <div class="go">Open Edit mode<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
     </div>
-  </a>
 
-  <!-- Your requests: what they've asked for and where each one stands, under the Edit mode card. Hidden until
-       the notes service sends at least one (site-notes.js asks /api/my-requests after login and builds the rows).
-       The status is the one Stray Wolf picks in the admin; a question gets an Answer button. -->
-  <section class="rq" id="requests" data-nav="Requests" data-requests hidden aria-labelledby="rq-h">
-    <div class="rq-hd"><div><h2 id="rq-h">Your requests</h2><p>What you've asked for, and where each one stands.</p></div><button class="rq-all" type="button" data-requests-all hidden></button></div>
-    <ul class="rq-list" data-requests-list></ul>
+    <!-- Needs you: a question from Stray Wolf, new messages, anything not sent yet (site-notes.js fills the list) -->
+    <section class="pp-sec" aria-labelledby="needs-h">
+      <div class="pp-h"><div><h2 id="needs-h">Needs you <span class="pp-n hot" data-needs-n hidden></span></h2></div></div>
+      <div class="pp-card"><ul class="pp-rows" data-needs></ul></div>
+    </section>
+
+    <!-- Need changes? Opens their website in Edit mode, where they point at what they'd like changed -->
+    <div class="pp-sec">
+      <a class="edit has-shot" href="{{home}}" data-edit-mode="{{home}}">
+        <div class="shot" aria-hidden="true"><div class="bar"><i></i><i></i><i></i><span>snipandsproutco.com</span></div><img src="brand/site-preview.jpg" alt="" width="960" height="600"></div>
+        <div class="side">
+          <div>
+            <h2>Need changes?</h2>
+            <p class="t">Open your website, tap the part you mean, and say what you'd like. Stray Wolf makes the change.</p>
+          </div>
+          <div class="go">Edit my website<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>
+        </div>
+      </a>
+    </div>
+
+    <!-- Your website: the other pages, each with where it stands (site-notes.js fills the list) -->
+    <section class="pp-sec" aria-labelledby="glance-h">
+      <div class="pp-h"><div><h2 id="glance-h">Your website</h2></div></div>
+      <div class="pp-card"><ul class="pp-rows" data-glance></ul></div>
+    </section>
+
+    <!-- Website visitors: a few numbers from Google Analytics, each with its last four weeks. site-notes.js asks
+         /api/stats after login and draws the card in the empty box; hidden until real numbers come (the demo shows
+         sample ones). -->
+    <section class="pp-sec" data-stats hidden aria-labelledby="stats-h">
+      <div class="pp-h"><div><h2 id="stats-h">Website visitors</h2><p data-stat="range">Last 4 weeks</p></div></div>
+      <div class="wv"></div>
+    </section>
+
+    <ul class="kept" aria-label="Your portal is private">
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Only with your password</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Sent only to Stray Wolf</li>
+      <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Your visitors never see it</li>
+    </ul>
   </section>
 
-  <!-- A few numbers from Google Analytics, in one wide strip above Let's talk. Hidden until the notes
-       service sends real ones (site-notes.js asks /api/stats after login); the demo shows sample numbers. -->
-  <aside class="stats" data-stats hidden aria-label="Your website, last 28 days">
-    <div class="stats-head">
-      <p class="stats-k">Your website</p>
-      <p class="stats-when" data-stat="range">Last 28 days</p>
-      <p class="stats-sum" data-stat="summary"></p>
-    </div>
-    <ul class="stats-nums">
-      <li><b data-stat="visitors">–</b><span>Visitors</span><i>Different people who opened your website</i><small data-chg="visitors"></small></li>
-      <li><b data-stat="calls">–</b><span>Phone calls</span><i>Tapped your number on the website</i><small data-chg="calls"></small></li>
-      <li><b data-stat="leads">–</b><span>Form requests</span><i>Filled in and sent your form</i><small data-chg="leads"></small></li>
+  <!-- Messages: what people send with the form on the website, for a client whose form sends to the notes service.
+       No page while the form is off; site-notes.js asks /api/my-form after login and builds the list. -->
+  <section id="messages" data-page="Messages" data-page-about="From the form on your website" hidden>
+    <div class="pp-h"><div><h1>Messages from your website</h1><p data-form-count>What people send with the form on your website. Each one is also emailed to you.</p></div></div>
+    <div class="fp" data-form-portal hidden></div>
+  </section>
+
+  <!-- Shop: for a client whose website sells things (kit/shop on their site), through Square or any other checkout.
+       No page until Stray Wolf starts their shop in the admin. After login, site-notes.js puts the shop manager in
+       data-shop-list (the same screen as Stray Wolf's admin). -->
+  <section id="shop" data-page="Shop" data-page-about="Items, prices and photos" data-page-wide hidden>
+    <div class="pp-h"><div><h1>Your shop</h1><p>What your website sells. Every Buy button opens your Square checkout.</p></div></div>
+    <div class="sp" data-shop-portal hidden><div data-shop-list></div></div>
+  </section>
+
+  <!-- Website info: what the website says today, a box for each thing. Hours, contact info and social pages open
+       their editor (data-info, saved live); the logo and photos go to Stray Wolf as a request. -->
+  <section id="info" data-page="Website info" data-page-short="Info" data-page-about="Hours, contact info, social pages, logo and photos" hidden>
+    <div class="pp-h"><div><h1>Your website info</h1><p>What your website says today.</p></div></div>
+    <ul class="boxes">
+      <li class="box" id="contact" data-info="contact" data-note-box data-area="Contact info" data-note-fields="Email|Address|Phone" data-note-now="Email=snipandsproutco@gmail.com|Address=413 E. Emma Ave., Springdale, AR 72764" data-note-ask="This is what your website shows. Change anything that&#x27;s new or wrong.">
+        <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg></div><div class="grow"><b>Contact info</b><span>How people reach you.</span></div><button class="tap" type="button">Edit</button></div>
+        <div class="now">
+          <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+          <dl class="facts"><div><dt>Email</dt><dd>snipandsproutco@gmail.com</dd></div><div><dt>Address</dt><dd>413 E. Emma Ave., Springdale, AR 72764</dd></div></dl>
+        </div>
+      </li>
+      <li class="box" id="hours" data-info="hours" data-info-typed="{{week}}" data-note-box data-area="Shop hours" data-note-fields="Mon – Tue|Wed – Fri|Sat – Sun|A holiday or a day off" data-note-now="Mon – Tue=10 AM – 3 PM|Wed – Fri=9 AM – 6 PM|Sat – Sun=9 AM – 2 PM" data-note-ask="These are the hours on your website. Change any that are different now.">
+        <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div><div class="grow"><b>Shop hours</b><span>When you&#x27;re open.</span></div><button class="tap" type="button">Edit</button></div>
+        <div class="now">
+          <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+          <dl class="facts"><div><dt>Mon – Tue</dt><dd>10 AM – 3 PM</dd></div><div><dt>Wed – Fri</dt><dd>9 AM – 6 PM</dd></div><div><dt>Sat – Sun</dt><dd>9 AM – 2 PM</dd></div></dl>
+        </div>
+      </li>
+      <li class="box" id="social" data-info="social" data-note-box data-area="Your social pages" data-note-fields="Instagram|Etsy|Facebook|Google" data-note-now="Instagram=instagram.com/snipandsprout.co|Etsy=etsy.com/shop/SnipAndSproutCo" data-note-ask="Fix a link that&#x27;s wrong, or paste a link for a page you have.">
+        <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10 14a4.5 4.5 0 0 0 6.4 0l3-3a4.5 4.5 0 0 0-6.4-6.4l-1 1"/><path d="M14 10a4.5 4.5 0 0 0-6.4 0l-3 3a4.5 4.5 0 0 0 6.4 6.4l1-1"/></svg></div><div class="grow"><b>Your social pages</b><span>Just the ones you have.</span></div><button class="tap" type="button">Edit</button></div>
+        <div class="now">
+          <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+          <ul class="soc"><li><span data-brand="instagram">Instagram</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">instagram.com/snipandsprout.co</span></span></li><li><span data-brand="etsy">Etsy</span><span class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span class="url">etsy.com/shop/SnipAndSproutCo</span></span></li><li><span data-brand="facebook">Facebook</span><span class="off"><span class="url">facebook.com/yourpage</span><em>Example</em></span></li><li><span data-brand="google">Google</span><span class="off"><span class="url">maps.app.goo.gl/yourplace</span><em>Example</em></span></li></ul>
+        </div>
+      </li>
+      <li class="box" id="logo" data-note-title="Send a new logo" data-note-box data-note-photos data-area="Logo" data-note-ask="Stray Wolf puts it on your website and tells you when it&#x27;s done." data-note-hint="For example: This is the newest one. Use the round version.">
+        <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l2.6 5.3 5.9.9-4.3 4.1 1 5.8L12 16.4 6.8 19.1l1-5.8L3.5 9.2l5.9-.9z"/></svg></div><div class="grow"><b>Your logo</b><span>Stray Wolf puts it on your website.</span></div><button class="tap" type="button">Send a new logo</button></div>
+        <div class="now">
+          <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now<a class="now-dl" href="../logo.svg" download="Snip &amp; Sprout Co. logo.svg" title="Save the logo file on your website to this computer or phone"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11M7 10.5l5 5 5-5M5 20h14"/></svg>Download</a></p>
+          <div class="logo-now"><img src="../logo.svg" alt="The Snip &amp; Sprout Plant Co. logo on the website" width="149" height="113"></div>
+        </div>
+      </li>
+      <li class="box wide" id="your-photos" data-note-box data-photos-page data-note-photos data-area="Photos" data-note-ask="Add new photos below. Want a photo on your site swapped out? Tell me which one." data-note-hint="For example: Swap the pumpkin photo for this one.">
+        <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="14" rx="2"/><circle cx="9" cy="10" r="1.6"/><path d="M21 16l-5-5-8 8"/></svg></div><div class="grow"><b>Photos</b><span>Your shop, your workshops, what people made.</span></div><button class="tap" type="button">Open</button></div>
+        <div class="now">
+          <p class="now-k"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>On your site now</p>
+          <div class="pics"><img src="../img/ig-dani.webp" data-big="../img/ig-dani.webp" alt="Dani beside a big alocasia in the shop" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/kit-flatlay.webp" data-big="../img/kit-flatlay.webp" alt="A DIY terrarium kit laid out in labelled bags" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/tbar-lantern.webp" data-big="../img/tbar-lantern.webp" alt="Dani holding an empty glass lantern terrarium" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/stakes-tall.webp" data-big="../img/stakes-tall.webp" alt="Wooden plant markers and pastel pots" title="Tap to see it bigger" loading="lazy" decoding="async"><img src="../img/ig-globe.webp" data-big="../img/ig-globe.webp" alt="A glass terrarium with succulents and tiny pumpkins" title="Tap to see it bigger" loading="lazy" decoding="async"><span class="more"><img src="../img/bar-wide.webp" alt="" loading="lazy" decoding="async"><span><b>See all</b>your photos</span></span></div>
+        </div>
+      </li>
     </ul>
-    <p class="stats-f"><span class="ga"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="16" y="2" width="6" height="20" rx="3" fill="#F9AB00"/><rect x="9" y="9" width="6" height="13" rx="3" fill="#E37400"/><circle cx="4.5" cy="18.5" r="3.5" fill="#E37400"/></svg><span data-stat="note">From Google Analytics</span></span></p>
-  </aside>
+  </section>
 
-  <!-- Let's talk opens Stray Wolf's Google Calendar booking page (data-booking-url) in a new tab.
-       Empty data-booking-url = it goes back to a note with times that work. -->
-  <div class="meet box" id="talk" data-nav="Let's talk" data-note-box data-booking-url="https://calendar.app.google/XseK2nweRYW1hea37" data-area="Meeting request" data-note-fields="Days that work for you=For example: Tuesday or Thursday|Best time of day=For example: mornings, or after 3|Phone, video or in person?=For example: a phone call is easiest" data-note-ask="When can we talk? I'll set it up and confirm with you.">
-    <div class="bh"><div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/><path d="M8.5 15l2.2 2.2 4.8-4.8"/></svg></div><div class="grow"><b>Let's talk</b><span>Pick a time that works for you, for a call or a meeting.</span></div><em class="tap">Pick a time</em></div>
-  </div>
+  <!-- Requests: what they've asked Stray Wolf for and where each one stands (site-notes.js asks /api/my-requests
+       after login and builds the rows). The status is the one Stray Wolf picks in the admin; a question gets an
+       Answer button. -->
+  <section id="requests" data-page="Requests" data-page-about="What you've asked Stray Wolf for" hidden>
+    <div class="pp-h"><div><h1>Your requests</h1><p>What you've asked Stray Wolf for, and where each one stands.</p></div><button class="pp-link" type="button" data-requests-all hidden></button></div>
+    <div class="rq" data-requests hidden><ul class="rq-list" data-requests-list></ul></div>
+  </section>
 
-  <ul class="kept" aria-label="Your portal is private">
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Only with your password</li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>Sent only to Stray Wolf</li>
-    <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Your visitors never see it</li>
-  </ul>
   <!-- Every photo on the site's pages, for the Photos page ("On your site now"). build.mjs writes this
        list from the pages themselves, so it always matches the site. data-on = the pages a photo is on. -->
   <template data-site-photos>

@@ -42,8 +42,10 @@
  * On the client's page:
  *   data-edit-mode="/"      on a button or card: opens the site in Edit mode
  *   data-edit-mode="soon"   the mockup isn't ready yet (says so when tapped)
- *   data-note-box           a box that opens a note with one tap
+ *   data-note-box           a box that opens a note with one tap: a small box over the dimmed page, with Cancel
+ *                   left of the one main button
  *     data-area / data-note-ask / data-note-hint   its name, question, example
+ *     data-note-title="Send a new logo"             the box's heading, when the name alone isn't one
  *     data-note-fields="Facebook|Instagram"         one line to fill in for each
  *     data-note-now="Phone=423-555-0100|Email=..."  what's on the site now: those lines show the
  *                   current value with a Change button, so they only type what's new
@@ -56,19 +58,32 @@
  *   fx, fy, py (how far down the page, 0 to 1), snip (its words) and vw (screen width), plus
  *   shot: a small picture of the spot (uploaded like a photo; needs html2canvas.min.js next
  *   to this file, or data-shot-lib="its address"; data-shot-lib="none" = no pictures).
- *   data-booking-url  on the Let's talk box: a booking page (like a Google Calendar
- *                   appointment schedule). Set = tapping it opens that page; empty = a note.
+ *   data-booking-url  on any element of their page: a booking page (like a Google Calendar appointment
+ *                   schedule). Set = a Let's talk button in the header opens that page; empty = no button.
  *   data-alert-key  optional Web3Forms key: emails a heads-up when notes arrive
+ * The pages of their portal (their own page only): each <section id="shop" data-page="Shop"> on their page is one
+ *   page of the portal, and the first is Home. One shows at a time and the address says which (/portal/#shop), so
+ *   Back, Forward and a saved link work; a link to something on a page (#hours) opens the page holding it. This
+ *   script draws the links in <nav data-portal-nav> (then "Need changes?" and Edit my website, from their page's
+ *   data-edit-mode link), the same pages as a bar along the bottom of a phone, and a link back to Home on every
+ *   other page. A page shows for a client who has what it holds: Messages needs [data-form-portal] and Shop needs
+ *   [data-shop-portal]; the rest are always there.
+ *     data-page-short="Info"                         its name in the phone's bar, when the full one is too long
+ *     data-page-about="Items, prices and photos"     its line in Home's list
+ *     data-page-wide                                 a wider page, for the shop's table
+ *   Home's two lists are filled in here: <ul data-needs> with <span data-needs-n hidden> (what needs them: a
+ *   question from Stray Wolf, new messages, notes not sent yet) and <ul data-glance> (each other page with where
+ *   it stands). A page with no [data-page] gets none of this.
  * Your requests (their own page only): <section data-requests hidden> holding <ul data-requests-list>
  *   and <button data-requests-all hidden>. After login it lists what they've asked for and where each
  *   one stands: Received, Working on it, Stray Wolf has a question, Done, Not doing this one. It is the
  *   same status Stray Wolf picks in the admin (POST /api/my-requests). A question gets an Answer button
- *   (POST /api/my-request/answer {batch, n, text}). Nothing sent yet = the card stays hidden.
- * Your shop (their own page only): <section data-shop-portal hidden> holding <div data-shop-list> (an older page's
- *   [data-shop-add] and [data-shop-form] are hidden). For a client whose website sells things (kit/shop), it holds
- *   the shop manager, the same screen as Stray Wolf's admin: shop-manager.js and shop-manager.css, copied next to
- *   this file and fetched only when they have a shop (POST /api/my-shop and its calls; SW Core 2.2 or newer).
- *   Stray Wolf starts the shop and sets its kind of checkout. No shop = the card stays hidden.
+ *   (POST /api/my-request/answer {batch, n, text}). Nothing sent yet = one line saying so.
+ * Your shop (their own page only): <section data-shop-portal hidden> holding <div data-shop-list>. For a client
+ *   whose website sells things (kit/shop), it holds the shop manager, the same screen as Stray Wolf's admin:
+ *   shop-manager.js and shop-manager.css, copied next to this file and fetched only when they have a shop
+ *   (POST /api/my-shop and its calls; SW Core 2.2 or newer). Stray Wolf starts the shop and sets its kind of
+ *   checkout. No shop = no Shop page.
  * Business info (their own page only): a box with data-info="hours", "contact" or "social" opens the business info
  *   editor as a page over the portal (kit/info: info.js, info-editor.js and info-editor.css, copied next to this
  *   file). What they save there goes live on their website (POST /api/my-info and its calls; SW Core 2.5 or newer),
@@ -77,17 +92,18 @@
  *     data-info-typed="09:00-14:00,10:00-15:00,...,closed"   the hours box: the week typed into the website, Sunday first
  *     data-note-fields / data-note-now (as for a note)       the contact lines and the social pages the site has a spot for
  * Messages from your website (their own page only): for a client whose website form sends to the notes service.
- *   A page places its own empty <section data-form-portal hidden> where it wants it; otherwise this script adds
- *   one under the boxes of what's on their site (or under the shop or Your requests on an older page). It's a
+ *   Their page places an empty <section data-form-portal hidden> where it wants the list (and, anywhere, a
+ *   [data-form-count] line for how many there are). It's a
  *   short inbox: one row per message (who, what they want, when, a dot while it's new) with Reply, Call, Mark
  *   replied and Delete (one tap, with Undo); a row opens to every answer and file; ticked rows (or Select all)
  *   are marked or deleted together (POST /api/my-form, /api/my-form/lead {id, status}, /lead/delete {id}).
  *   "Emails go to" lets the client change where the emails go (POST /api/my-form/to {to}; a new address gets a
- *   short email at once). Form off in the admin, or an older service: no card.
- * Let's talk: any element with data-talk (a button in their page's top section) and a button this script adds
- *   in the header beside Help open the booking page of the Let's talk box (data-booking-url), or go to that box.
+ *   short email at once). Form off in the admin, or an older service: no Messages page.
+ * Let's talk: one button, which this script adds in the header beside Help when their page carries a
+ *   data-booking-url. It opens that booking page in a new tab (so does any element with data-talk).
  * The Photos page (their own page only): a box with data-photos-page opens a full page instead of
- *   a small note (also at <portal>#photos). Adding photos (drag and drop, a few words each), then
+ *   a small note (also at <portal>#photos). Adding photos (drag and drop, a few words each) and sending them
+ *   from that page, which stays open for more, then
  *   "Photos you sent", each marked Received, Approved, On your site or Not used (Stray Wolf picks
  *   that in the admin; POST /api/my-photos and /api/my-photo {key}), then
  *   "On your site now" from <template data-site-photos> on their page:
@@ -220,7 +236,16 @@
     reply: ["M9 14L4 9l5-5", "M4 9h10.5a5.5 5.5 0 0 1 0 11H11"],
     mail: ["M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1z", "M3 7l9 6 9-6"],
     clip: ["M21 11.5l-8.6 8.6a5 5 0 0 1-7.1-7.1l8.6-8.6a3.3 3.3 0 0 1 4.7 4.7l-8.6 8.6a1.7 1.7 0 0 1-2.4-2.4l7.9-7.9"],
-    calendar: ["M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z", "M16 3v4", "M8 3v4", "M3 10h18"]
+    calendar: ["M5 5h14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z", "M16 3v4", "M8 3v4", "M3 10h18"],
+    search: ["M11 18a7 7 0 1 0 0-14 7 7 0 0 0 0 14z", "M20 20l-4.1-4.1"],
+    person: ["M12 12a4 4 0 1 0 0-8 4 4 0 0 0 0 8z", "M4 21a8 8 0 0 1 16 0"],
+    home: ["M3 11.5L12 4l9 7.5", "M5.5 10v9.5h13V10"],
+    bag: ["M5 8h14l-1 12H6z", "M9 8V6.5a3 3 0 0 1 6 0V8"],
+    globe: ["M12 21a9 9 0 1 0 0-18 9 9 0 0 0 0 18z", "M3 12h18", "M12 3c3 3.2 3 14.8 0 18", "M12 3c-3 3.2-3 14.8 0 18"],
+    list: ["M8 6h12", "M8 12h12", "M8 18h12", "M4 6h.01", "M4 12h.01", "M4 18h.01"],
+    chev: ["M9 5l7 7-7 7"],
+    back: ["M15 5l-7 7 7 7"],
+    upload: ["M12 15V4", "M7 9l5-5 5 5", "M5 20h14"]
   };
   // Social sites the portal knows by name: the site's own logo (drawn in a 24 by 24 box), the name it goes by when
   // that isn't the field's own ("Google" = Google business), and an example of the address to paste. A social page
@@ -284,7 +309,7 @@
     ":host{all:initial;position:absolute;top:0;left:0;width:0;height:0;z-index:2147483000}",
     "*{box-sizing:border-box}",
     "[hidden]{display:none!important}",
-    ".r{--ink:#1f1d1b;--muted:#5f5a53;--line:#e4dfd7;--soft:#f7f4ef;--paper:#fff;--accent:#c2541b;--accent-dk:#a3441a;--accent-soft:#fbeee6;--go:#2f7a4b;--go-dk:#26633d;--bad:#b3261e;",
+    ".r{--ink:#1f1d1b;--muted:#5f5a53;--line:#e4dfd7;--soft:#f7f4ef;--paper:#fff;--accent:#c2541b;--accent-dk:#a3441a;--accent-soft:#fbeee6;--edge:#8f877b;--go:#2f7a4b;--go-dk:#26633d;--bad:#b3261e;",
     "  font:17px/1.5 system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;color:var(--ink);-webkit-text-size-adjust:100%;letter-spacing:0}",
     "button{font:inherit;color:inherit;cursor:pointer;-webkit-tap-highlight-color:transparent}",
     "button:focus-visible,textarea:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #2563c9;outline-offset:2px}",
@@ -341,8 +366,8 @@
     ".pin{position:absolute;width:36px;height:36px;margin:-38px 0 0 -6px;border-radius:50% 50% 50% 6px;border:3px solid #fff;background:var(--accent);color:#fff;font-weight:700;font-size:16px;",
     "  display:grid;place-items:center;padding:0;box-shadow:0 3px 10px rgba(0,0,0,.35);font-variant-numeric:tabular-nums;transform-origin:6px 36px}",
     ".pin.on{transform:scale(1.15);box-shadow:0 0 0 5px rgba(194,84,27,.35),0 3px 10px rgba(0,0,0,.35)}",
-    ".pin.drop{animation:drop .35s cubic-bezier(.2,1.4,.4,1)}",
-    "@keyframes drop{from{transform:translateY(-16px) scale(.6);opacity:0}}",
+    ".pin.drop{animation:drop .18s ease-out}",
+    "@keyframes drop{from{transform:translateY(-8px);opacity:0}}",
     // while placing a note with a mouse: the pin rides on the pointer, its tip exactly where it will land
     ".ghost{position:fixed;left:0;top:0;width:0;height:0;pointer-events:none}",
     ".ghost .pin{opacity:.9;font-size:22px;font-weight:600}",
@@ -351,9 +376,11 @@
     ".ghost.left .tip{left:auto;right:16px}",
 
     /* cards: the note box, the review list, help, login */
-    ".card{position:fixed;background:var(--paper);border-radius:18px;box-shadow:0 18px 48px rgba(0,0,0,.3),0 0 0 1px rgba(0,0,0,.05);display:flex;flex-direction:column;overflow:hidden}",
+    ".card{position:fixed;background:var(--paper);border-radius:14px;box-shadow:0 18px 48px rgba(0,0,0,.3),0 0 0 1px rgba(0,0,0,.05);display:flex;flex-direction:column;overflow:hidden}",
+    ".veil,.r>.note{animation:fade .14s ease-out}",   // a box over the page, a note beside its pin, the Photos page
+    "@keyframes fade{from{opacity:0}}",
     ".card .hd{display:flex;align-items:flex-start;gap:12px;padding:18px 20px 10px}",
-    ".card .hd h2{margin:0;font-size:21px;line-height:1.25;font-weight:700}",
+    ".card .hd h2{margin:0;font-size:20px;line-height:1.25;font-weight:600}",
     ".card .hd p{margin:3px 0 0;color:var(--muted);font-size:15px;overflow-wrap:anywhere}",
     ".card .hd .grow{flex:1;min-width:0}",
     ".xbtn{flex:none;display:grid;place-items:center;width:44px;height:44px;margin:-6px -8px 0 0;border:0;background:none;border-radius:999px;color:var(--muted)}",
@@ -362,30 +389,16 @@
     ".card .ft{padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px));border-top:1px solid var(--line);display:flex;gap:10px;align-items:center;background:var(--paper)}",
     ".num{display:inline-grid;place-items:center;flex:none;width:34px;height:34px;border-radius:50% 50% 50% 6px;background:var(--accent);color:#fff;font-weight:700;font-size:16px;font-variant-numeric:tabular-nums}",
     "label.q{font-weight:600;font-size:17px}",
-    /* lines to fill in (Shop hours, Contact info...): one white list, a fine line between rows, each row its name then
-       what is on the site now (with Change) or a box to type in, all the same height */
-    ".fields{display:grid;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:clip}",   // clip, not hidden: a phone's short sheet scrolls it instead of squeezing it
-    ".field{display:grid;grid-template-columns:116px minmax(0,1fr);align-items:center;gap:6px 12px;min-height:58px;padding:7px 7px 7px 14px}",
-    ".field+.field{border-top:1px solid var(--line)}.field:focus-within{background:#fdfaf7}",
-    ".field .lb{font-weight:600;font-size:15.5px;line-height:1.25}",
-    ".field input{font:inherit;font-size:16.5px;color:var(--ink);width:100%;min-width:0;min-height:44px;border:1px solid var(--line);border-radius:10px;padding:8px 12px;background:var(--soft)}",
-    ".field input:focus{outline:none;border-color:var(--accent);background:#fff;box-shadow:0 0 0 3px rgba(194,84,27,.12)}",
-    ".fields.stack .field{grid-template-columns:1fr;padding:10px 12px 12px 14px}",
-    "@media (max-width:480px){.field{grid-template-columns:96px minmax(0,1fr);column-gap:10px}.cur>svg{display:none}.cur .chg{padding:0 12px}}",   // a phone: room for the value
-    "@media (max-width:360px){.field{grid-template-columns:1fr;padding:10px 10px 12px 14px}}",
-    ".fv{min-width:0}.fv [hidden]{display:none!important}",
-    ".cur{display:flex;align-items:center;gap:9px;min-height:44px}",
-    ".cur svg{flex:none;width:17px;height:17px;color:var(--go)}",
-    ".cur .val{flex:1;min-width:0;font-size:16.5px;line-height:1.3;overflow-wrap:break-word}",
-    ".cur .chg,.ed .undo{flex:none;border:0;min-height:40px;padding:0 14px;border-radius:10px;font-size:15px;font-weight:600}",
-    ".cur .chg{background:var(--accent-soft);color:var(--accent-dk,#a3441a)}.cur .chg:hover{background:#f6dccd}",
-    ".ed{display:flex;align-items:center;gap:6px}.ed input{flex:1}",
-    ".ed .undo{background:transparent;color:var(--muted);text-decoration:underline;text-underline-offset:3px;padding:0 8px}",
-    /* social pages: the site's own logo beside its name, the link on one line under them */
-    ".field.brand{grid-template-columns:minmax(0,1fr);padding:10px 7px 10px 14px}",
-    ".field.brand .lb{display:flex;align-items:center;gap:10px}",
-    ".field .logo{flex:none;width:24px;height:24px}.field .logo svg{display:block;width:100%;height:100%}",
-    ".field.brand .cur .val{font-size:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
+    /* lines to fill in (a box on their page that asks for a few named things): each name above its box, the box
+       starting with what the site says today */
+    ".fields{display:grid;gap:14px}",
+    ".field{display:grid;gap:6px;min-width:0}",
+    ".field .lb{display:flex;flex-wrap:wrap;align-items:center;gap:4px 8px;font-weight:600;font-size:15.5px;line-height:1.3}",
+    ".field .lb em{font-style:normal;font-weight:400;font-size:14.5px;color:var(--muted)}",
+    ".field input{font:inherit;font-size:16.5px;color:var(--ink);width:100%;min-width:0;min-height:46px;border:1px solid var(--edge);border-radius:10px;padding:8px 12px;background:#fff}",
+    ".field input:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px rgba(194,84,27,.18)}",
+    ".field input::placeholder{color:#8d877e}",
+    ".field .logo{flex:none;width:22px;height:22px}.field .logo svg{display:block;width:100%;height:100%}",
     ".tip{display:flex;gap:10px;align-items:flex-start;margin:-4px 0 0;color:var(--muted);font-size:15px;line-height:1.45}.tip .ic{flex:none;width:20px;height:20px;margin-top:1px;color:var(--accent-dk,#a3441a)}",
     ".note.wide{width:480px}",
     /* photos: a big tap/drop area, big pictures with their words under them, idea chips */
@@ -437,10 +450,10 @@
     ".thumbs .cap{font:inherit;font-size:16px;color:var(--ink);width:100%;min-width:0;min-height:46px;border:2px solid var(--line);border-radius:10px;padding:8px 11px;background:var(--soft)}",
     ".thumbs .cap:focus{outline:none;border-color:var(--accent);background:#fff}.thumbs .cap::placeholder{color:#8d877e}",
     ".capts{justify-self:start;border:0;background:none;padding:6px 0;color:var(--accent-dk,#a3441a);font-weight:600;font-size:15px;text-decoration:underline;text-underline-offset:3px}",
-    ".b{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:52px;padding:0 20px;border-radius:12px;border:2px solid transparent;font-size:17px;font-weight:600;white-space:nowrap}",
+    ".b{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:46px;padding:0 18px;border-radius:10px;border:1px solid transparent;font-size:16px;font-weight:600;white-space:nowrap}",
     ".b.main{background:var(--accent);color:#fff}.b.main:hover{background:var(--accent-dk)}",
     ".b.go{background:var(--go);color:#fff}.b.go:hover{background:var(--go-dk)}",
-    ".b.plain{background:#fff;border-color:var(--line);color:var(--ink)}.b.plain:hover{border-color:#bdb5a9}",
+    ".b.plain{background:#fff;border-color:#cfc7bb;color:var(--ink)}.b.plain:hover{border-color:var(--edge)}",
     "a.b{text-decoration:none}",
     ".b.quiet{background:none;color:var(--muted);padding:0 10px;font-weight:600}.b.quiet:hover{color:var(--ink)}",
     ".b.danger{background:none;color:var(--bad);padding:0 10px;font-weight:600}",
@@ -460,6 +473,21 @@
     ".veil{position:fixed;inset:0;background:rgba(24,22,20,.55);display:grid;place-items:center;padding:16px}",
     ".veil > .card{position:relative;width:min(560px,100%);max-height:calc(100vh - 32px)}",
     "@media (max-width:719px){.veil{place-items:end stretch;padding:0}.veil > .card{width:100%;max-height:92vh;border-radius:20px 20px 0 0}}",
+    /* their own page: one calm box for what goes to Stray Wolf (a new logo). A plain title, each label above its
+       box, one row of buttons */
+    ".ask .hd{padding:20px 22px 16px;border-bottom:1px solid var(--line)}",
+    ".ask .hd p{font-size:15.5px;line-height:1.45;margin-top:4px}",
+    ".ask .bd{padding:18px 22px 20px;gap:16px}",
+    ".ask textarea,.pg .field textarea{min-height:92px;font-size:16.5px;border:1px solid var(--edge);border-radius:10px;padding:10px 12px;background:#fff}",
+    ".ask textarea:focus,.pg .field textarea:focus{box-shadow:0 0 0 3px rgba(194,84,27,.18)}",
+    ".ask .add-ph.big,.ask.photos .add-ph.big:has(~ .thumbs:not([hidden])){flex-direction:row;justify-content:flex-start;text-align:left;gap:14px;min-height:0;padding:16px;border:1.5px dashed var(--edge);border-radius:12px;background:#fff}",
+    ".ask .add-ph.big .ic,.ask.photos .add-ph.big:has(~ .thumbs:not([hidden])) .ic{width:44px;height:44px;padding:11px;border-radius:11px;background:var(--accent-soft);stroke-width:2}",
+    ".ask .add-ph.big div{flex:1;min-width:0}.ask .add-ph.big b{font-size:16.5px;font-weight:600}.ask .add-ph.big span{font-size:14.5px;line-height:1.4}",
+    ".ask .add-ph .pick{flex:none;display:inline-flex;align-items:center;min-height:40px;padding:0 16px;border:1px solid #cfc7bb;border-radius:10px;background:#fff;color:var(--ink);font-size:15.5px;font-weight:600}",
+    ".ask .ft{flex-wrap:wrap;padding:14px 22px calc(16px + env(safe-area-inset-bottom,0px))}",
+    ".ask .ft .say{margin-right:auto;color:var(--muted);font-size:14.5px}",
+    ".ask .ft .bar,.ask .ft .err{flex:1 1 100%}",
+    "@media (max-width:719px){.ask .ft .say{flex:1 1 100%;order:-2}.ask .add-ph .pick{display:none}}",
     ".steps{list-style:none;margin:0;padding:0;display:grid;gap:10px}",
     ".steps li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:16px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:16px;padding:14px 18px 14px 14px}",
     ".steps .circ{width:52px;height:52px;border-radius:15px;background:var(--accent-soft);color:var(--accent-dk,#a3441a);display:grid;place-items:center;position:relative}",
@@ -479,12 +507,13 @@
     ".pg{position:fixed;inset:0;overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;background:#f4f2ee}",
     ".pg.note.photos{width:auto;max-width:none}",
     ".pg .dropcover{position:fixed!important;inset:10px!important}",
-    ".pg-top{position:sticky;top:0;z-index:2;background:rgba(244,242,238,.95);-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}",
-    ".pg-top-in{max-width:1040px;margin:0 auto;display:flex;align-items:center;gap:14px;padding:10px max(16px,env(safe-area-inset-right,0px)) 10px max(16px,env(safe-area-inset-left,0px))}",
-    ".pg-back{display:inline-flex;align-items:center;gap:8px;min-height:48px;padding:0 18px 0 12px;border-radius:12px;border:2px solid var(--line);background:#fff;font-weight:600;font-size:16px;white-space:nowrap}",
-    ".pg-back:hover{border-color:#bdb5a9}.pg-back .ic{transform:scaleX(-1)}",
-    ".pg-top h1{margin:0;font:700 25px/1.15 'SW Zilla','Zilla Slab',Georgia,serif;letter-spacing:-.005em}",
-    ".pg-in{max-width:1040px;margin:0 auto;padding:18px max(16px,env(safe-area-inset-right,0px)) 64px max(16px,env(safe-area-inset-left,0px));display:grid;gap:18px}",
+    ".pg-top,.pg-in{max-width:1040px;margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}",
+    ".pg-top{padding-top:22px}",
+    ".pg-back{display:inline-flex;align-items:center;gap:4px;min-height:44px;margin-left:-8px;padding:0 10px 0 4px;border:0;border-radius:10px;background:none;color:var(--muted);font-size:15px}",
+    ".pg-back:hover{color:var(--ink);background:#ece7df}.pg-back .ic{width:18px;height:18px}",
+    ".pg-top h1{margin:4px 0;font:700 30px/1.15 'SW Zilla','Zilla Slab',Georgia,serif;letter-spacing:-.005em}",
+    ".pg-top p{margin:0;color:var(--muted);font-size:16px}",
+    ".pg-in{padding-top:18px;padding-bottom:64px;display:grid;gap:18px}",
     ".pg-sec{background:#fff;border:1px solid var(--line);border-radius:18px;padding:20px 22px 22px;display:grid;gap:14px;min-width:0}",
     ".pg-hd{display:flex;align-items:baseline;justify-content:space-between;gap:4px 14px;flex-wrap:wrap}",
     ".pg-sec h2{margin:0;font:700 22px/1.2 'SW Zilla','Zilla Slab',Georgia,serif}",
@@ -505,15 +534,15 @@
     ".tag .ic{width:15px;height:15px;stroke-width:3}",
     ".tag.on{background:#e3efe6;color:#22603a}.tag.off{background:#f0ebe4;color:#5f5a53;padding-left:10px}.tag.yes{background:#fbeee6;color:#9a4315;padding-left:10px}",
     ".pg-none{margin:0;padding:18px;border:2px dashed var(--line);border-radius:14px;color:var(--muted);text-align:center;font-size:15.5px}",
-    ".pg-more{margin:0;font-size:15.5px;color:var(--muted)}.pg-more a{color:var(--accent-dk,#a3441a);font-weight:600}",
+    ".pg-more{margin:0;font-size:15.5px;color:var(--muted)}.pg-more a{display:inline-block;line-height:24px;color:var(--accent-dk,#a3441a);font-weight:600}",
     /* "On your site now": one button per page of their site, the picked one dark */
     ".pg-pages{display:flex;flex-wrap:wrap;gap:8px}",
     ".pg-page{display:inline-flex;align-items:center;gap:7px;min-height:38px;padding:0 14px;border:1px solid var(--line);border-radius:999px;background:#fff;color:var(--ink);font-size:15px;font-weight:500}",
     ".pg-page:hover{border-color:#bdb5a9}.pg-page .n{color:var(--muted);font-size:13.5px}",
     ".pg-page[aria-pressed=true]{background:var(--ink);border-color:var(--ink);color:#fff}.pg-page[aria-pressed=true] .n{color:#d9d4cc}",
-    "@media (max-width:719px){.pg-grid{grid-template-columns:1fr 1fr;gap:14px 10px}.pg-sec{padding:16px;border-radius:16px}.pg-top h1{font-size:21px}.pg-back{min-height:44px;padding:0 14px 0 10px}.pg-in{padding-top:14px;gap:14px}.pg-act .b{width:100%}.pg-pages{gap:6px}.pg-page{min-height:36px;padding:0 11px;gap:6px;font-size:14px}.tag{font-size:12.5px;padding:5px 8px}.tag.off,.tag.yes{padding-left:8px}.card.photo .hd h2{font-size:17px}}",
+    "@media (max-width:719px){.pg-grid{grid-template-columns:1fr 1fr;gap:14px 10px}.pg-sec{padding:16px;border-radius:16px}.pg-top{padding-top:12px}.pg-top h1{font-size:25px}.pg-in{padding-top:14px;gap:14px}.pg-act .b{width:100%}.pg-pages{gap:6px}.pg-page{min-height:36px;padding:0 11px;gap:6px;font-size:14px}.tag{font-size:12.5px;padding:5px 8px}.tag.off,.tag.yes{padding-left:8px}.card.photo .hd h2{font-size:17px}}",
     ".card.help .hd{padding:26px 26px 6px}.card.help .hd h2{font-size:23px}.card.help .hd p{font-size:16px;margin-top:5px}",
-    ".card.help .bd{padding:14px 26px 22px;gap:12px}.card.help .ft{padding:16px 26px calc(20px + env(safe-area-inset-bottom,0px))}.card.help .ft .b{min-height:56px;font-size:18px}",
+    ".card.help .bd{padding:14px 26px 22px;gap:12px}.card.help .ft{padding:16px 26px calc(20px + env(safe-area-inset-bottom,0px))}",
     "@media (max-width:719px){.card.help .hd{padding:22px 20px 4px}.card.help .bd{padding:12px 20px 18px}.card.help .ft{padding:14px 20px calc(16px + env(safe-area-inset-bottom,0px))}}",
 
     /* review list */
@@ -532,8 +561,6 @@
     /* sent */
     ".done-ic{width:84px;height:84px;border-radius:50%;background:var(--go);color:#fff;display:grid;place-items:center;margin:10px auto 4px}",
     ".done-ic .ic{width:44px;height:44px;stroke-width:3}",
-    ".done-ic.pop{animation:pop .45s cubic-bezier(.2,1.5,.4,1)}",
-    "@keyframes pop{from{transform:scale(.3);opacity:0}}",
     ".center{text-align:center}",
     ".center h2{font-size:26px;margin:4px 0 6px}",
     ".center p{margin:0 auto;max-width:36ch;color:var(--muted);font-size:17px}",
@@ -542,7 +569,8 @@
     ".lock{width:64px;height:64px;border-radius:50%;background:var(--accent-soft);color:var(--accent-dk,#a3441a);display:grid;place-items:center;margin:6px auto 0}",
     ".lock .ic{width:30px;height:30px}",
     ".veil.solid{background:transparent;top:70px;bottom:auto;min-height:calc(100vh - 70px);padding:40px 16px}@media (max-width:719px){.veil.solid{top:58px;min-height:calc(100vh - 58px);place-items:center stretch;padding:16px}.veil.solid > .card{border-radius:20px}}",
-    ".veil.solid > .card{width:min(460px,100%);box-shadow:0 0 0 1px #e2dcd2,0 30px 60px -28px rgba(36,34,31,.45)}",
+    ".veil.solid > .card{width:min(460px,100%);border-radius:18px;box-shadow:0 0 0 1px #e2dcd2,0 30px 60px -28px rgba(36,34,31,.45)}",
+    ".veil.solid .b{min-height:52px;border-radius:12px;font-size:17px}",
     ".veil.solid h2{font-family:'SW Zilla','Zilla Slab',Georgia,serif;font-size:30px;line-height:1.1;letter-spacing:-.005em}",
     ".kick{display:inline-flex;align-items:center;gap:6px}.kick .ic{width:14px;height:14px}",
     ".veil.solid .kick{color:#5F7152}",
@@ -571,18 +599,15 @@
   // (--card, --line, --accent, --sage, --slab, ...), so it fits every client's portal. It goes in once, after login.
   var PAGE_CSS = [
     // Messages from your website: a short inbox
-    ".fp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px;overflow:hidden}",
+    ".fp{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}.fp > :first-child{border-top:0}",
     ".fp .vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}",
     ".fp .ic{width:16px;height:16px;flex:none;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}",
-    ".fp-hd{display:flex;flex-wrap:wrap;gap:2px 16px;align-items:baseline;justify-content:space-between;padding:18px 22px 14px}",
-    ".fp-hd h2{font:700 22px/1.2 var(--slab);margin:0}",
-    ".fp-hd p{margin:0;color:var(--muted);font-size:14px}",
-    ".fp-test{margin:0 22px 14px;padding:10px 14px;border-radius:12px;background:var(--stone);font-size:14.5px;line-height:1.45}",
+    ".fp-test{margin:16px 22px 14px;padding:10px 14px;border-radius:12px;background:var(--stone);font-size:14.5px;line-height:1.45}",
     // Select all, and what to do with the ticked rows
     ".fp-bar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;min-height:44px;padding:4px 22px 4px 18px;border-top:1px solid var(--line);background:#faf8f4}",
     ".fp-bar.on{background:var(--accent-soft)}",
     ".fp-sel{display:inline-flex;align-items:center;gap:10px;font-size:13.5px;color:var(--muted);cursor:pointer;margin-right:auto}.fp-bar.on .fp-sel{color:var(--ink);font-weight:600}",
-    ".fp input[type=checkbox]{width:17px;height:17px;margin:0;accent-color:var(--accent);cursor:pointer}",
+    ".fp input[type=checkbox]{width:20px;height:20px;margin:0;accent-color:var(--accent);cursor:pointer}",
     ".fp-list{list-style:none;margin:0;padding:0}",
     // one row: tick, who and what (opens it), the actions
     ".fp-row{display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;column-gap:12px;padding:0 22px 0 18px;border-top:1px solid var(--line);transition:background .12s}",
@@ -593,7 +618,7 @@
     ".fp-l1 b{font-size:15.5px;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.fp-row.fresh .fp-l1 b{font-weight:650}",
     ".fp-kind{font-size:12.5px;color:var(--muted);white-space:nowrap}",
     ".fp-clip{display:inline-flex;align-items:center;gap:3px;font-size:12.5px;color:var(--muted)}.fp-clip .ic{width:14px;height:14px}",
-    ".fp-bad{font-size:12px;font-weight:600;color:#b4361c;white-space:nowrap}",
+    ".fp-bad{font-size:12.5px;font-weight:600;color:#b4361c;white-space:nowrap}",
     ".fp-l1 time{margin-left:auto;padding-left:8px;font-size:13px;color:var(--muted);white-space:nowrap}.fp-row.fresh .fp-l1 time{color:var(--ink);font-weight:600}",
     ".fp-l2{display:block;padding-left:18px;font-size:14px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}",
     ".fp-want{color:var(--ink);font-weight:500}",
@@ -615,7 +640,7 @@
     ".fp-files a{display:inline-flex;align-items:center;gap:8px;min-height:40px;padding:4px 12px 4px 4px;border:1px solid var(--line);border-radius:10px;font-size:13.5px;color:var(--ink);text-decoration:none;background:var(--card)}",
     ".fp-files a:hover{border-color:var(--accent)}",
     ".fp-files img{width:52px;height:38px;object-fit:cover;border-radius:7px;background:var(--stone)}",
-    ".fp-files .doc{display:inline-grid;place-items:center;width:52px;height:38px;border-radius:7px;background:var(--stone);font:500 11px/1 var(--mono)}",
+    ".fp-files .doc{display:inline-grid;place-items:center;width:52px;height:38px;border-radius:7px;background:var(--stone);font:500 12.5px/1 var(--mono)}",
     ".fp-when{margin:0;font-size:12.5px;color:var(--soft)}",
     ".fp-none{margin:0;padding:14px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}",
     ".fp-more{margin:0;padding:8px 22px 10px;border-top:1px solid var(--line)}",
@@ -631,50 +656,123 @@
     ".fp-to small{font-size:13px;line-height:1.45}",
     ".fp-to .err{margin:0;color:#b4361c;font-size:14px}",
     ".fp button:focus-visible,.fp a:focus-visible,.fp input:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}",
-    "@media (min-width:1800px){.fp-hd h2{font-size:24px}.fp-l1 b{font-size:16.5px}.fp-l2{font-size:15px}}",
-    "@media (min-width:2400px){.fp-hd h2{font-size:27px}.fp-hd p,.fp-ans,.fp-test,.fp-l2{font-size:16px}.fp-l1 b{font-size:18px}.fp-kind,.fp-l1 time,.fp-to,.fp-sel{font-size:14.5px}.fp-b{font-size:15px;min-height:42px}.fp-i{width:42px;height:42px}}",
-    "@media (max-width:560px){.fp-hd{padding:16px 16px 12px}.fp-hd h2{font-size:20px}.fp-test{margin-inline:16px}.fp-bar{padding-inline:14px 16px}",
+    "@media (min-width:1800px){.fp-l1 b{font-size:16.5px}.fp-l2{font-size:15px}}",
+    "@media (min-width:2400px){.fp-ans,.fp-test,.fp-l2{font-size:16px}.fp-l1 b{font-size:18px}.fp-kind,.fp-l1 time,.fp-to,.fp-sel{font-size:14.5px}.fp-b{font-size:15px;min-height:42px}.fp-i{width:42px;height:42px}}",
+    "@media (max-width:560px){.fp-test{margin-inline:16px}.fp-bar{padding-inline:14px 16px}",
     "  .fp-row{grid-template-columns:auto minmax(0,1fr);padding:0 16px 0 14px}.fp-main{padding-bottom:4px}.fp-kind{display:none}",
     "  .fp-acts{grid-column:2;padding:0 0 10px 12px;margin-left:-2px}span.fp-i{display:none}.fp-b{min-height:40px}.fp-i{width:40px;height:40px}",
     "  .fp-body{grid-column:1/-1;padding-left:0}.fp-ans{grid-template-columns:minmax(0,1fr);gap:0}.fp-ans dd{margin-bottom:8px}.fp-to,.fp-none,.fp-more{padding-left:16px;padding-right:16px}}",
-    // Let's talk, in the header beside Help and Log out
-    ".head-acts .talk{background:var(--sage);color:#fff;margin-right:8px;padding:0 13px}.head-acts .talk:hover{background:#4d5e42}",
-    "@media (max-width:640px){.head-acts .talk{display:none}}",   // on a phone the welcome has its own Let's talk button
+    // (Let's talk is one button, in the header beside Help and Log out: their page styles those three)
     // Your shop: the card around the shop manager (shop-manager.css styles the manager itself)
-    ".rq:not([hidden]):has(+ .sp:not([hidden])),.edit:has(+ .rq[hidden] + .sp:not([hidden])){margin-bottom:16px}",
-    ".sp{background:var(--card);border-radius:18px;box-shadow:0 0 0 1px var(--line),0 10px 26px -20px rgba(36,34,31,.3);margin:0 0 36px}",
-    ".sp-hd{display:flex;gap:12px 16px;align-items:center;justify-content:space-between;padding:18px 22px 14px}",
-    ".sp-hd h2{font:700 22px/1.2 var(--slab);margin:0}",
-    ".sp-hd p{margin:2px 0 0;color:var(--muted);font-size:14.5px}",
-    ".sp-add[hidden]{display:none}",   // the manager has its own Add an item
-    ".sp .swm{border-width:1px 0 0;border-radius:0}",
+    ".sp{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:clip}",
+    ".sp .swm{border:0;border-radius:0}",
     ".sp .ic{fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}",
-    ".sp-none{margin:0;padding:16px 22px 18px;border-top:1px solid var(--line);color:var(--muted);font-size:14.5px}",
-    ".sp-foot{margin:0;padding:12px 22px 14px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.45;color:var(--soft)}",
-    "@media (min-width:1800px){.sp-hd h2{font-size:24px}}",
-    "@media (min-width:2400px){.sp-hd h2{font-size:27px}.sp-hd p{font-size:16px}.sp-foot{font-size:14px}}",
-    "@media (max-width:720px){.sp-hd{flex-wrap:wrap;padding:16px 16px 12px}.sp-hd h2{font-size:20px}.sp-none,.sp-foot{padding-left:16px;padding-right:16px}}",
-    // The header's links to each part of the page ([data-portal-nav]); the part on screen is underlined
-    ".sw-nav{border-top:1px solid var(--line)}",
-    ".sw-nav .nav-in{max-width:1180px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:4px;min-height:50px;overflow-x:auto;scrollbar-width:none}",
-    ".sw-nav .nav-in::-webkit-scrollbar{display:none}",
-    // faded at an edge with more links to slide to
-    ".sw-nav .nav-in.more{-webkit-mask-image:linear-gradient(90deg,#000 85%,transparent);mask-image:linear-gradient(90deg,#000 85%,transparent)}",
-    ".sw-nav .nav-in.less{-webkit-mask-image:linear-gradient(90deg,transparent,#000 15%);mask-image:linear-gradient(90deg,transparent,#000 15%)}",
-    ".sw-nav .nav-in.more.less{-webkit-mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent);mask-image:linear-gradient(90deg,transparent,#000 15%,#000 85%,transparent)}",
-    ".sw-nav a{position:relative;display:inline-flex;align-items:center;gap:7px;height:50px;padding:0 11px;font:600 14.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--muted);text-decoration:none;white-space:nowrap}",
-    ".sw-nav a:hover,.sw-nav a.on{color:var(--ink)}",
-    ".sw-nav a.on::after{content:\"\";position:absolute;left:11px;right:11px;bottom:-1px;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}",
-    ".sw-nav a:focus-visible{outline:3px solid var(--accent);outline-offset:-3px;border-radius:8px}",
-    ".sw-nav .n{font-size:12px;font-weight:600;color:var(--muted);background:var(--stone);border-radius:999px;padding:4px 7px}",
-    ".sw-nav .ask{font-size:12px;font-weight:600;color:#fff;background:var(--accent);border-radius:999px;padding:4px 8px}",
+    ".sp-none{margin:0;padding:16px 22px 18px;color:var(--muted);font-size:15px}",
+
+    /* ---- The pages of their portal ([data-page]) ---- */
+    "html.pp-on{scroll-padding-top:124px}",   // room for the header when the browser scrolls to something
+    "[data-page][hidden]{display:none}",
+    "[data-page] h1:focus{outline:none}",     // a new page's heading takes the focus so a screen reader says it; no ring
+    "html.pp-wide main.wrap{max-width:1180px}",
+    // the header's links: the page on screen is underlined. Then "Need changes?" and Edit my website
+    ".sw-nav .nav-in{display:flex;align-items:center;gap:2px;min-height:58px}",
+    ".sw-nav .pp-l{position:relative;display:inline-flex;align-items:center;gap:8px;height:58px;padding:0 14px;border-radius:8px;font:500 15.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--muted);text-decoration:none;white-space:nowrap}",
+    ".sw-nav .pp-l:hover,.sw-nav .pp-l[aria-current]{color:var(--ink)}",
+    ".sw-nav .pp-l[aria-current]::after{content:\"\";position:absolute;left:14px;right:14px;bottom:0;height:3px;border-radius:3px 3px 0 0;background:var(--accent)}",
+    // a count beside a page's name; orange when it is waiting on them
+    ".pp-n{display:inline-grid;place-items:center;min-width:22px;height:22px;padding:0 7px;border-radius:999px;background:var(--stone);color:var(--ink);font:500 12.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;font-variant-numeric:tabular-nums}",
+    ".pp-n.hot{background:var(--accent);color:#fff}.pp-n[hidden]{display:none}",
+    ".pp-vh{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}",   // words for a screen reader only
     ".sw-nav .nav-fill{flex:1}",
-    ".sw-nav a.nav-edit{height:36px;padding:0 15px 0 13px;border-radius:999px;background:var(--accent);color:#fff}",
-    ".sw-nav a.nav-edit:hover{background:var(--accent-hi,var(--accent));color:#fff}",
-    ".sw-nav .nav-edit svg{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:2.2;stroke-linecap:round;stroke-linejoin:round}",
-    "@media (min-width:2400px){.sw-nav .nav-in{max-width:1400px}.sw-nav a{font-size:16px}}",
-    "@media (max-width:1060px){.sw-nav .nav-fill,.sw-nav .nav-edit{display:none}}",   // the Edit mode card is right under the welcome
-    "@media (max-width:720px){.sw-nav .nav-in{padding:0 8px;gap:0}.sw-nav a{height:46px;padding:0 10px;font-size:14px}}",
+    ".sw-nav .nav-ask{margin-right:12px;font-size:14.5px;color:var(--muted);white-space:nowrap}",
+    ".sw-nav .nav-edit{display:inline-flex;align-items:center;gap:8px;height:40px;padding:0 16px 0 14px;border-radius:10px;font:600 15px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;text-decoration:none;white-space:nowrap;cursor:pointer}",
+    ".sw-nav .nav-edit{background:var(--accent);border:1px solid var(--accent);color:#fff}.sw-nav .nav-edit:hover{background:#a94816}",
+    ".sw-nav .ic,.pp-tabs .ic,.pp-back .ic,.pp-rows .ic{flex:none;width:18px;height:18px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}",
+    ".sw-nav a:focus-visible,.sw-nav button:focus-visible,.pp-tabs a:focus-visible,.pp-back:focus-visible,.pp-rows a:focus-visible,.pp-btn:focus-visible,.pp-link:focus-visible{outline:3px solid var(--accent-hi);outline-offset:2px}",
+    // a page: the link back to Home, its heading with one line under it, then its parts
+    ".pp-back{display:inline-flex;align-items:center;gap:4px;min-height:36px;margin:22px 0 6px -6px;padding:0 10px 0 4px;border-radius:8px;color:var(--muted);font-size:15px;text-decoration:none}",
+    ".pp-back:hover{color:var(--ink);background:var(--stone)}",
+    ".pp-h{display:flex;align-items:flex-end;gap:16px;margin:0 0 16px}.pp-h > div{flex:1;min-width:0}",
+    ".pp-h h1,.pp-h h2{margin:0;font-family:var(--slab);font-weight:700;letter-spacing:-.005em;text-wrap:balance}",
+    ".pp-h h1{font-size:30px;line-height:1.15}",
+    ".pp-h h2{display:flex;align-items:center;gap:10px;font-size:23px;line-height:1.2}",
+    ".pp-h p{margin:4px 0 0;color:var(--muted);font-size:15.5px}",
+    ".pp-sec{margin:40px 0 0}",
+    ".pp-link{padding:6px 0;border:0;background:none;font:inherit;font-size:15px;color:var(--accent-text);text-decoration:underline;text-underline-offset:3px;white-space:nowrap;cursor:pointer}.pp-link[hidden]{display:none}",
+    ".pp-wait{margin:0;color:var(--muted);font-size:15.5px}",
+    // Home's lists: what needs them, and each page with where it stands
+    ".pp-card{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}",
+    ".pp-rows{list-style:none;margin:0;padding:0}.pp-rows > li + li{border-top:1px solid var(--line)}",
+    ".pp-row{display:flex;align-items:center;gap:14px;min-height:68px;padding:14px 18px;color:inherit;text-decoration:none}",
+    "a.pp-row:hover{background:#faf8f5}a.pp-row > .ic{color:#8a8377}",
+    ".pp-ic{flex:none;display:grid;place-items:center;width:40px;height:40px;border-radius:11px;background:var(--accent-soft);color:var(--accent-text)}",
+    ".pp-ic.sage{background:var(--sage-soft);color:#44563a}.pp-ic.stone{background:var(--stone);color:var(--ink)}",
+    ".pp-t{flex:1;min-width:0}.pp-t b{display:block;font-size:16px;font-weight:600}.pp-t span{display:block;color:var(--muted);font-size:15px;overflow-wrap:anywhere}",
+    ".pp-v{color:var(--muted);font-size:15px;white-space:nowrap}",
+    ".pp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:42px;padding:0 18px;border:1px solid var(--accent);border-radius:10px;background:var(--accent);color:#fff;font:600 15px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;white-space:nowrap;text-decoration:none;cursor:pointer}",
+    ".pp-btn:hover{background:#a94816}",
+    ".pp-btn.plain{background:var(--card);border-color:#cfc8bd;color:var(--ink);font-weight:500}.pp-btn.plain:hover{background:var(--card);border-color:var(--ink)}",
+    // a phone or a small tablet: the pages become a bar along the bottom, like an app
+    ".pp-tabs{display:none}",
+    ".sw-nav.no-ask .nav-ask{display:none}",
+    "@media (max-width:1100px){.sw-nav .pp-l{padding:0 10px}.sw-nav .pp-l[aria-current]::after{left:10px;right:10px}}",
+    "@media (max-width:860px){.sw-nav .pp-l,.sw-nav .nav-ask{display:none}",
+    "  html.pp-on body{padding-bottom:calc(65px + env(safe-area-inset-bottom,0px))}",
+    "  .pp-tabs{position:fixed;left:0;right:0;bottom:0;z-index:20;display:flex;padding:4px 4px calc(4px + env(safe-area-inset-bottom,0px));background:var(--card);border-top:1px solid var(--line);box-shadow:0 -8px 20px -16px rgb(36 34 31 / .5)}",
+    "  .pp-tabs a{position:relative;flex:1 1 0;min-width:0;display:grid;justify-items:center;align-content:center;gap:3px;min-height:56px;padding:6px 2px;border-radius:10px;color:var(--muted);font:500 12.5px/1.1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;text-decoration:none}",
+    "  .pp-tabs a[aria-current]{color:var(--accent-text)}.pp-tabs .ic{width:22px;height:22px}",
+    "  .pp-tabs .pp-n{position:absolute;top:3px;left:calc(50% + 6px);min-width:18px;height:18px;padding:0 5px}",
+    "  .sp{--swm-bottom:calc(65px + env(safe-area-inset-bottom,0px))}}",   // the shop's Save bar stays above the pages' bar
+    "@media (max-width:640px){.sw-nav .nav-edit{padding:0 12px 0 10px;font-size:14.5px}}",
+    "@media (max-width:560px){.pp-back{margin-top:14px}.pp-h h1{font-size:25px}.pp-h h2{font-size:21px}.pp-sec{margin-top:32px}",
+    "  .pp-row{gap:12px;padding:13px 14px}li.pp-row{flex-wrap:wrap}li.pp-row .pp-t{flex:1 1 calc(100% - 60px)}li.pp-row .pp-btn{margin-left:52px}",
+    "  a.pp-row{display:grid;grid-template-columns:40px minmax(0,1fr) 18px;grid-template-areas:\"ic t ch\" \"ic v ch\";gap:0 12px}",
+    "  a.pp-row .pp-ic{grid-area:ic}a.pp-row .pp-t{grid-area:t}a.pp-row .pp-v{grid-area:v;white-space:normal}a.pp-row > .ic{grid-area:ch}a.pp-row:has(.pp-v) .pp-t span{display:none}}",
+    "@media (min-width:1800px){html.pp-wide main.wrap{max-width:1320px}.sw-nav .pp-l{font-size:16.5px}.pp-h h1{font-size:33px}.pp-h h2{font-size:25px}.pp-h p,.pp-t span,.pp-v{font-size:16px}.pp-t b{font-size:17px}}",
+    "@media (min-width:2400px){html.pp-wide main.wrap{max-width:1480px}.sw-nav .pp-l{font-size:17.5px}.sw-nav .nav-ask{font-size:16px}.sw-nav .nav-edit{height:44px;font-size:16.5px}.pp-n{font-size:13.5px}",
+    "  .pp-h h1{font-size:37px}.pp-h h2{font-size:28px}.pp-h p,.pp-t span,.pp-v,.pp-back,.pp-link,.pp-wait{font-size:17.5px}.pp-t b{font-size:18.5px}.pp-row{min-height:76px;padding:16px 22px}.pp-btn{min-height:46px;font-size:16.5px}}",
+    // Website visitors, the card on Home: the numbers, the change from the 4 weeks before, each number's four weeks
+    ".wv{background:var(--card);border:1px solid var(--line);border-radius:16px}",
+    ".wv-say{margin:0;padding:18px 22px 14px;font-size:17px;line-height:1.4;color:var(--muted)}",
+    ".wv-say b{color:var(--ink);font-weight:700;white-space:nowrap}.wv-say b.out{color:var(--accent-text)}",
+    ".wv-nums{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line)}",
+    ".wv-nums > li{display:grid;grid-template-rows:1fr auto;min-width:0;padding:16px 22px 18px}.wv-nums > li + li{border-left:1px solid var(--line)}",
+    ".wv-hd{display:grid;align-content:start;justify-items:start}",
+    ".wv-n{font:700 30px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--ink);font-variant-numeric:tabular-nums}",
+    ".wv-l{margin-top:7px;font-size:14px;font-weight:650;line-height:1.25;color:var(--ink)}",
+    ".wv-s{margin-top:1px;font-size:13px;line-height:1.35;color:var(--soft)}",
+    // the change tag: green and an arrow up for more, red and an arrow down for fewer (the arrow is drawn, not typed)
+    ".wv-tag{display:inline-flex;align-items:baseline;gap:5px;margin-top:8px;border-radius:7px;font-size:13px;font-weight:600;line-height:1.35;color:var(--muted)}",
+    ".wv-tag.up{padding:2px 8px;color:#276a40;background:#e8f1e3}.wv-tag.down{padding:2px 8px;color:#a8321c;background:#fbebe5}",
+    ".wv-tag.up::before,.wv-tag.down::before{content:\"\";flex:none;border-style:solid;transform:translateY(-1px)}",
+    ".wv-tag.up::before{border-width:0 4px 6px;border-color:transparent transparent currentColor}.wv-tag.down::before{border-width:6px 4px 0;border-color:currentColor transparent transparent}",
+    // a column per week with its number on top; the quiet gray is 3:1 on white, and a column shows its dates on hover
+    ".wv-cols{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:2px;margin-top:6px}",
+    ".wv-col{position:relative;display:grid;justify-items:center;gap:6px;min-width:0}",
+    ".wv-col-in{width:100%;height:86px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;border-bottom:1px solid var(--line)}",
+    ".wv-bar{flex:none;width:min(24px,62%);border-radius:4px 4px 0 0;background:#99938a}",
+    ".wv-col-v{font-size:13px;line-height:14px;color:var(--muted);font-variant-numeric:tabular-nums}.wv-col-k{font-size:12.5px;line-height:1.2;color:var(--muted);white-space:nowrap}",
+    ".wv-col.hot .wv-bar{background:var(--accent)}.wv-col.hot .wv-col-v{color:var(--ink);font-weight:600}.wv-col.hot .wv-col-k{color:var(--ink)}",
+    ".wv-col:hover::after{content:attr(data-tip);position:absolute;bottom:calc(100% + 6px);left:50%;transform:translateX(-50%);z-index:3;padding:6px 10px;border-radius:8px;background:var(--ink);color:#fff;font-size:12.5px;line-height:1.3;white-space:nowrap}",
+    ".wv-col:first-child:hover::after{left:0;transform:none}.wv-col:last-child:hover::after{left:auto;right:0;transform:none}",
+    ".wv-key{display:flex;flex-wrap:wrap;gap:4px 16px;margin:0;padding:0 22px 14px;font-size:12.5px;line-height:1.4;color:var(--muted)}",
+    ".wv-key span{display:inline-flex;align-items:center;gap:6px}.wv-key i{width:10px;height:10px;border-radius:3px 3px 0 0;background:#99938a}.wv-key .hot i{background:var(--accent)}",
+    // worth knowing: one plain sentence with a small picture beside it
+    ".wv-know{list-style:none;margin:0;padding:14px 22px;border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px 24px}",
+    ".wv-know li{display:flex;align-items:center;gap:10px;min-width:0;font-size:14px;line-height:1.4;color:var(--muted)}.wv-know b{color:var(--ink);font-weight:650}",
+    ".wv-ic{flex:none;width:30px;height:30px;display:grid;place-items:center;border-radius:9px;background:var(--stone);color:var(--ink)}",
+    ".wv-ic .ic{width:16px;height:16px;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}",
+    ".wv-f{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:0 22px;padding:9px 0 11px;border-top:1px dashed var(--line);font-size:12.5px;line-height:1.4;color:var(--soft)}",
+    ".wv-f .ga{display:inline-flex;align-items:center;gap:7px}.wv-f svg{flex:none;width:13px;height:13px}",
+    ".wv-f .sample{flex:none;font:400 12.5px/1 system-ui,-apple-system,\"Segoe UI\",Roboto,sans-serif;color:var(--accent-text);border:1px solid var(--accent-soft);border-radius:999px;padding:4px 9px}",
+    // a phone: one number per row, the number on the left, its weeks on the right and its change tag under both
+    "@media (max-width:760px){.wv-say{padding:16px 16px 14px}.wv-nums{grid-template-columns:minmax(0,1fr)}.wv-nums > li{padding:14px 16px}.wv-nums > li + li{border-left:0;border-top:1px solid var(--line)}",
+    "  .wv-nums.cols > li{grid-template-columns:minmax(0,.6fr) minmax(0,1fr);grid-template-rows:auto 1fr auto;column-gap:16px}.wv-nums.cols .wv-hd{display:contents}",
+    "  .wv-nums.cols .wv-n{grid-area:1/1}.wv-nums.cols .wv-l{grid-area:2/1}.wv-nums.cols .wv-tag{grid-area:3/1/auto/-1;justify-self:start}.wv-nums.cols .wv-cols{grid-area:1/2/span 2;align-self:end;margin-top:0}",
+    "  .wv-s{display:none}.wv-col-in{height:74px}.wv-key{padding:0 16px 12px}.wv-know{grid-template-columns:minmax(0,1fr);padding:12px 16px}.wv-f{margin:0 16px}}",
+    // a wide screen: the words grow with the rest of the page (a column's number keeps its 14px line, which its height counts on)
+    "@media (min-width:1800px){.wv-say{font-size:19px}.wv-n{font-size:34px}.wv-l,.wv-know li{font-size:15.5px}.wv-s,.wv-tag,.wv-col-v{font-size:14.5px}.wv-col-k,.wv-key,.wv-f,.wv-f .sample{font-size:13.5px}.wv-col-in{height:100px}}",
+    "@media (min-width:2400px){.wv-say{font-size:20.5px}.wv-n{font-size:38px}.wv-l,.wv-know li{font-size:17px}.wv-s,.wv-tag{font-size:16px}.wv-col-v{font-size:15.5px}.wv-col-k,.wv-key,.wv-f,.wv-f .sample{font-size:14.5px}.wv-col-in{height:112px}}",
     // a social site's logo before its name ([data-brand])
     "[data-brand]{display:inline-flex;align-items:center;gap:8px}",
     ".sw-logo{flex:none;width:18px;height:18px}.sw-logo svg{display:block;width:100%;height:100%}"
@@ -876,16 +974,11 @@
   function picCount() { return st.notes.reduce(function (n, x) { return n + x.pics.length; }, 0); }
 
   function render() {
-    // On their own page, "Sent" is only ever the message in the middle. However that message is closed
-    // (Done, Esc, a tap outside), the page starts fresh: no leftover "Sent" bar at the bottom.
-    if (MODE === "hub" && st.sent && !els.veil) {
-      st.notes.forEach(function (x) { x.pics.forEach(picDel); if (x.shot) picDel(x.shot); });
-      st.notes = []; st.sent = false; st.sentNotes = st.sentPics = 0; save();
-    }
-    var n = st.notes.length;
+    var n = st.notes.length, left = waiting().length;
     els.frame.className = "frame" + (picking ? " picking" : "");
-    // on their own page with nothing written yet, only the slim "logged in" bar shows, so the boxes stay clear
-    var quiet = MODE === "hub" && !st.sent && !n && !picking && !(els.note && st.notes[active]);
+    // Their own page keeps the bar away: what still has to be sent is listed under "Needs you" ([data-needs]).
+    // A page without that list gets the bar for it.
+    var quiet = MODE === "hub" && (!left || !!document.querySelector("[data-needs]"));
     els.dock.className = "dock " + MODE + (picking ? " picking" : "") + (quiet ? " quiet" : "") + (els.bare ? " bare" : "");
     if (els.spacer) els.spacer.style.height = quiet && els.bare ? "0px" : "150px";
     els.btns.textContent = "";
@@ -899,11 +992,9 @@
       els.btns.append(
         dockBtn("pencil", "Write it without tapping", "second", function () { stopPicking(); addNote(null, "Something else"); }),
         dockBtn("x", "Cancel", "second", function () { stopPicking(); }));
-    } else if (MODE === "hub" && !(els.note && st.notes[active])) {
-      els.say.append(
-        h("b", { text: n ? plural(n, "note") + " ready" : "Tap a box to add something." }),
-        h("span", { text: n ? "Add more, or send them to " + TO + " when you're done." : "Or tap Edit mode to point at things on your website." }));
-      els.btns.append(dockBtn("send", "Send to " + TO, n ? "go" : "go off", function () { reviewFrom = null; if (st.notes.length) openReview(); else toast("Tap a box first. Then you can send it."); }, n));
+    } else if (MODE === "hub") {
+      els.say.append(h("b", { text: plural(left, "note") + " not sent yet" }), h("span", { text: "Check " + (left === 1 ? "it" : "them") + " over, then send to " + TO + "." }));
+      els.btns.append(dockBtn("send", "Send to " + TO, "go", function () { openReview(); }, left));
     } else if (els.note && st.notes[active]) {
       // one thing at a time: while a note is open, the bar only points at it
       els.say.append(h("b", { text: "You're writing note " + (active + 1) + "." }), h("span", { text: "Type what you'd like, then tap Save note." }));
@@ -915,10 +1006,18 @@
       els.btns.append(
         dockBtn("note", "Add a note", "main", startPicking),
         dockBtn("photo", "Add photos", "second", function () { addNote(null, "Photos for the site", null, true); }),
-        dockBtn("send", "Send to " + TO, n ? "go" : "go off", function () { reviewFrom = null; if (st.notes.length) openReview(); else toast("Add a note first. Then you can send it."); }, n));
+        dockBtn("send", "Send to " + TO, n ? "go" : "go off", function () { if (st.notes.length) openReview(); else toast("Add a note first. Then you can send it."); }, n));
     }
     els.btns.className = "btns n" + els.btns.children.length;
     placePins();
+    if (MODE === "hub") drawHome();
+  }
+  // Notes still to send that aren't open right now: written in Edit mode, or photos left on the Photos page.
+  function waiting() { return st.notes.filter(function (x, i) { return i !== active && (x.text || x.pics.length); }); }
+  // Notes that are done with (sent, cancelled, or cleared for a new list): off the list, their photos off this device.
+  function dropNotes(list) {
+    list.forEach(function (x) { x.pics.forEach(picDel); if (x.shot) picDel(x.shot); });
+    st.notes = st.notes.filter(function (x) { return list.indexOf(x) < 0; }); save();
   }
   function dockBtn(ic, text, kind, fn, count) {
     var b = h("button", { class: "db " + kind, type: "button", onclick: fn }, [icon(ic), h("span", { text: text })]);
@@ -932,7 +1031,7 @@
     if (st.sent) return;
     var base = host.getBoundingClientRect();
     st.notes.forEach(function (n, i) {
-      if (!n.path || n.page !== location.pathname) return;
+      if (MODE === "hub" || !n.path || n.page !== location.pathname) return;   // pins are for Edit mode on the website; their own page has none
       var node = nodeAt(n.path); if (!node) return;
       var r = node.getBoundingClientRect(); if (!r.width && !r.height) return;
       var pin = h("button", { class: "pin" + (i === active ? " on" : "") + (n.id === lastPin ? " drop" : ""), type: "button", "aria-label": "Note " + (i + 1) + ". Tap to open it.", text: String(i + 1),
@@ -968,7 +1067,8 @@
       note.path = pathOf(target); note.on = label && target.hasAttribute("data-note-box") ? label : describe(target);
       if (target.hasAttribute("data-note-ask")) note.ask = target.getAttribute("data-note-ask");
       if (target.hasAttribute("data-note-hint")) note.hint = target.getAttribute("data-note-hint");
-      if (target.hasAttribute("data-note-fields")) { note.fields = target.getAttribute("data-note-fields").split("|"); note.vals = {}; note.extra = ""; }
+      if (target.hasAttribute("data-note-title")) note.name = target.getAttribute("data-note-title");
+      if (target.hasAttribute("data-note-fields")) { note.fields = target.getAttribute("data-note-fields").split("|"); note.typed = {}; note.extra = ""; }
       if (target.hasAttribute("data-note-now")) {
         note.now = {};
         target.getAttribute("data-note-now").split("|").forEach(function (p) { var k = p.indexOf("="); if (k > 0) note.now[p.slice(0, k)] = p.slice(k + 1); });
@@ -989,102 +1089,105 @@
     return note;
   }
 
+  // A note, open. In Edit mode on the website it sits beside its numbered pin (a sheet on a phone) and is saved to
+  // the list. On their own page there is nothing to point at, so it is one calm box in the middle, named for what it
+  // sends ("Send a new logo"), with Cancel and "Send to Stray Wolf": it goes straight away, no list and no second step.
   function openNote(i, wantPhotos) {
     if (st.notes[i] && st.notes[i].pg && photosBox()) return openPhotos();   // the Photos box's note lives on the Photos page
     remember(); closePanels();
-    active = i; panel = "note";
-    var note = st.notes[i], phone = isPhone();
-    var text = h("textarea", { id: "swn-text", placeholder: note.hint || "For example: Change the price to $32.", onkeydown: function (e) { if (e.key === "Escape") saveNote(); } });
+    var note = st.notes[i], phone = isPhone(), hub = MODE === "hub", typed = note.typed || {};
+    var text = h("textarea", { id: "swn-text", placeholder: hub ? !note.fields && note.hint || null
+      : note.photos ? "Anything else about these photos? (optional)" : note.fields ? "Anything else? (You can leave this empty.)" : note.hint || "For example: Change the price to $32." });
     text.value = note.fields ? note.extra || "" : note.text;
-    // A box can ask for a few named things, one line each (like Facebook, Instagram...).
-    // "Label" or "Label=example text"
-    // A list of social pages (any field named for a site, like Instagram) shows every row with a logo, and a link box.
+    if (!hub) { text.addEventListener("keydown", function (e) { if (e.key === "Escape") saveNote(); }); if (note.fields || note.photos) text.style.minHeight = "70px"; }
+    text.addEventListener("paste", function (e) { var f = e.clipboardData && e.clipboardData.files; if (f && f.length) { e.preventDefault(); addPictures(f); } });
+    // A box can ask for a few named things, one line each ("Label" or "Label=example text"): its name above a box that
+    // starts with what the site says today (data-note-now), so they fix it instead of typing it all again.
+    // A list of social pages (any line named for a site, like Instagram) shows each with its logo.
     var social = (note.fields || []).some(function (raw) { return raw.indexOf("=") < 0 && brandOf(raw); });
     var fieldEls = (note.fields || []).map(function (raw, k) {
-      var f = raw.split("=")[0], ex = raw.split("=")[1];
+      var f = raw.split("=")[0], ex = raw.split("=")[1], now = (note.now && note.now[f]) || "";
       var b = !ex && brandOf(f), kind = !ex && !social && FIELD_KINDS[f.toLowerCase()];
-      var inp = h("input", social ? { type: "text", id: "swn-f" + k, inputmode: "url", autocapitalize: "off", autocomplete: "off", placeholder: ex || (b ? b.ph : "Paste the link") }
-                             : { type: "text", id: "swn-f" + k, inputmode: kind ? kind.mode : "text", autocapitalize: kind && kind.mode !== "text" ? "off" : null, autocomplete: "off",
-                                 placeholder: ex || (kind ? kind.ph : "Type it here") });
-      inp.value = (note.vals && note.vals[f]) || "";
-      // Already on their site: show it, with a Change button. Only a tap on Change opens the box,
-      // filled in with what's there now, so they fix it instead of typing it all again.
-      var now = note.now && note.now[f], slot = inp, fe = { name: f, input: inp, now: now || "" };
-      if (now) {
-        var cur = h("div", { class: "cur" }), ed = h("div", { class: "ed" });
-        var open = function (on, focus) {
-          fe.editing = on; cur.hidden = on; ed.hidden = !on;
-          if (on && !inp.value) inp.value = now;
-          if (!on) inp.value = "";
-          if (on && focus) { inp.focus(); try { inp.select(); } catch (e) {} }
-        };
-        cur.append(icon("check"), h("span", social ? { class: "val", title: now, text: now }   // a link stays on one line (… if it's long)
-          : { class: "val" }, social ? null : now.replace(/([@\/?])/g, "$1\u0001").split("\u0001").reduce(function (a, p, i) { if (i) a.push(h("wbr")); a.push(p); return a; }, [])), h("button", { class: "chg", type: "button", text: "Change", "aria-label": "Change " + f, onclick: function () { open(true, true); } }));
-        ed.append(inp, h("button", { class: "undo", type: "button", text: "Undo", "aria-label": "Keep " + f + " as it is", onclick: function () { open(false); } }));
-        slot = h("div", { class: "fv" }, [cur, ed]);
-        open(!!inp.value && inp.value !== now);
-      }
-      fe.row = h("div", { class: social ? "field brand" : "field" }, [
-        h(now ? "span" : "label", { class: "lb", for: now ? null : "swn-f" + k }, social ? [brandLogo(b, "logo"), (b && b.name) || f] : [f]), slot]);
-      return fe;
+      var inp = h("input", { type: "text", id: "swn-f" + k, inputmode: social ? "url" : kind ? kind.mode : "text", autocapitalize: social || (kind && kind.mode !== "text") ? "off" : null, autocomplete: "off",
+        placeholder: ex || (social ? (b ? b.ph : "Paste the link") : kind ? kind.ph : "Type it here") });
+      inp.value = f in typed ? typed[f] : now;
+      return { name: f, input: inp, now: now, row: h("div", { class: "field" }, [
+        h("label", { class: "lb", for: "swn-f" + k }, [social ? brandLogo(b, "logo") : null, (social && b && b.name) || f, note.now && !now ? h("em", { text: "Not on your website yet" }) : null]), inp]) };
     });
-    var hasNow = fieldEls.some(function (f) { return f.now; });
-    if (note.fields) { text.placeholder = "Anything else? (You can leave this empty.)"; text.style.minHeight = "70px"; }
-    text.addEventListener("paste", function (e) { var f = e.clipboardData && e.clipboardData.files; if (f && f.length) { e.preventDefault(); addPictures(f); } });
+    var fields = note.fields ? h("div", { class: "fields" }, fieldEls.map(function (f) { return f.row; })) : null;
+    var tip = social ? h("p", { class: "tip" }, [icon("help"), h("span", { text: "Not sure where to find it? Open your page, then copy the address from the top of the screen." })]) : null;
     var thumbs = h("div", { class: "thumbs" });
     var drop = h("button", { class: "add-ph" + (note.photos ? " big" : ""), type: "button", onclick: function () { els.file.click(); } }, [
-      icon("photo"), h("div", {}, [h("b", { text: dropTitle(note, phone) }), h("span", { text: phone ? "From your photos, or take a new one" : "Click to choose, or drag them here from your computer" })])]);
+      icon(hub ? "upload" : "photo"), h("div", {}, [h("b", { text: dropTitle(note, phone) }),
+        h("span", { text: phone ? "From your photos, or take a new one" : hub ? "or drag it here from your computer" : "Click to choose, or drag them here from your computer" })]),
+      hub ? h("span", { class: "pick", text: "Choose" }) : null]);
     // Ideas for what to send ("A shed on a finished gravel pad"): one tap puts the words on a photo.
     var ideas = note.photos && note.ideas && note.ideas.length ? h("div", { class: "ideas" }, [
       h("p", {}, [h("b", { text: "Need ideas?" }), " These would help most. Tap one to label a photo with it."]),
       h("div", { class: "chips" }, note.ideas.map(function (idea) {
         return h("button", { class: "chip", type: "button", text: idea, onclick: function () { useIdea(note, idea); } });
       }))]) : null;
-
-    if (note.photos) { text.placeholder = "Anything else about these photos? (optional)"; text.style.minHeight = "70px"; }
-    var card = h("div", { class: "card note" + (social || hasNow || note.photos ? " wide" : "") + (note.photos ? " photos" : "") + (phone ? " sheet" : ""), role: "dialog", tabindex: "-1", "aria-label": "Note " + (i + 1) + ", about " + short(note.on, 60) }, [
-      h("div", { class: "dropcover", "aria-hidden": "true" }, [icon("photo"), h("b", { text: "Drop your photos here" })]),
-      h("div", { class: "hd" }, [
-        h("span", { class: "num", text: String(i + 1) }),
-        h("div", { class: "grow" }, [h("h2", { text: note.text || note.pics.length ? "Your note" : "New note" })]),
-        h("button", { class: "xbtn", type: "button", "aria-label": "Close and keep this note", onclick: saveNote }, [icon("x")])
-      ]),
-      h("div", { class: "bd" }, [
-        h("div", { class: "where" }, [h("span", { text: "About:" }), h("b", { text: note.on })]),
-        h("label", { class: "q", for: note.fields ? "swn-f0" : "swn-text", text: note.ask || "What would you like changed?" }),
-        social ? h("p", { class: "tip" }, [icon("help"), h("span", { text: "Not sure where to find it? Open your page, then copy the address from the top of the screen." })]) : null,
-        note.fields ? h("div", { class: "fields" + (!social && !hasNow && fieldEls.some(function (f) { return f.name.length > 11; }) ? " stack" : "") }, fieldEls.map(function (f) { return f.row; })) : null,
-        note.photos ? drop : null, note.photos ? thumbs : null, ideas,
-        text, note.photos ? null : thumbs, note.photos || note.fields ? null : drop
-      ]),
-      h("div", { class: "ft" }, [
-        h("button", { class: "b danger", type: "button", onclick: function () { removeNote(active); } }, [icon("trash"), h("span", { text: "Delete" })]),
-        h("button", { class: "b main push", type: "button", onclick: saveNote }, [icon("check"), h("span", { text: note.photos ? "Save photos" : "Save note" })])
-      ])
-    ]);
+    // the same parts either way: the lines, the photos (first for a box that is about photos), the words
+    var body = function (words) { return [tip, fields, note.photos ? drop : null, note.photos ? thumbs : null, ideas, words, note.photos ? null : thumbs, note.photos || note.fields ? null : drop]; };
+    var card;
+    if (hub) {
+      var title = note.name || note.on, optional = h("em", { text: "You can leave this empty" });
+      var progress = h("div", { class: "bar", hidden: true }, [h("i")]), err = h("p", { class: "err", hidden: true, role: "alert" });
+      var sendBtn = h("button", { class: "b main", type: "button", onclick: function () { sendNote(sendBtn, progress, err); } }, [h("span", { text: "Send to " + TO })]);
+      card = h("div", { class: "card note ask" + (note.photos ? " photos" : ""), role: "dialog", "aria-label": title }, [
+        h("div", { class: "dropcover", "aria-hidden": "true" }, [icon("upload"), h("b", { text: "Drop it here" })]),
+        h("div", { class: "hd" }, [
+          h("div", { class: "grow" }, [h("h2", { text: title }), note.ask ? h("p", { text: note.ask }) : null]),
+          h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { cancelNote(); } }, [icon("x")])]),
+        h("div", { class: "bd" }, body(h("div", { class: "field" }, [
+          h("label", { class: "lb", for: "swn-text" }, note.fields ? ["Anything else?", optional] : note.photos ? ["Anything " + TO + " should know?", optional] : ["What would you like?"]), text]))),
+        h("div", { class: "ft" }, [progress, err,
+          document.querySelector("[data-requests]") ? h("span", { class: "say", text: "Track it under Requests." }) : null,
+          h("button", { class: "b plain", type: "button", text: "Cancel", onclick: function () { cancelNote(); } }), sendBtn])
+      ]);
+    } else {
+      card = h("div", { class: "card note" + (social || note.now || note.photos ? " wide" : "") + (note.photos ? " photos" : "") + (phone ? " sheet" : ""), role: "dialog", tabindex: "-1", "aria-label": "Note " + (i + 1) + ", about " + short(note.on, 60) }, [
+        h("div", { class: "dropcover", "aria-hidden": "true" }, [icon("photo"), h("b", { text: "Drop your photos here" })]),
+        h("div", { class: "hd" }, [
+          h("span", { class: "num", text: String(i + 1) }),
+          h("div", { class: "grow" }, [h("h2", { text: note.text || note.pics.length ? "Your note" : "New note" })]),
+          h("button", { class: "xbtn", type: "button", "aria-label": "Close and keep this note", onclick: saveNote }, [icon("x")])]),
+        h("div", { class: "bd" }, [
+          h("div", { class: "where" }, [h("span", { text: "About:" }), h("b", { text: note.on })]),
+          h("label", { class: "q", for: note.fields ? "swn-f0" : "swn-text", text: note.ask || "What would you like changed?" })].concat(body(text))),
+        h("div", { class: "ft" }, [
+          h("button", { class: "b danger", type: "button", onclick: function () { removeNote(active); } }, [icon("trash"), h("span", { text: "Delete" })]),
+          h("button", { class: "b main push", type: "button", onclick: saveNote }, [icon("check"), h("span", { text: note.photos ? "Save photos" : "Save note" })])])
+      ]);
+    }
     // Files dragged anywhere over the note: the whole card lights up and takes them.
     var depth = 0;
     card.addEventListener("dragenter", function (e) { if (!hasFiles(e)) return; e.preventDefault(); depth++; card.classList.add("dropping"); });
     card.addEventListener("dragover", function (e) { if (!hasFiles(e)) return; e.preventDefault(); e.dataTransfer.dropEffect = "copy"; });
     card.addEventListener("dragleave", function () { if (--depth <= 0) { depth = 0; card.classList.remove("dropping"); } });
     card.addEventListener("drop", function (e) { if (!hasFiles(e)) return; e.preventDefault(); e.stopPropagation(); depth = 0; card.classList.remove("dropping"); addPictures(e.dataTransfer.files); });
+    var first = fieldEls.length ? fieldEls[0].input : hub && note.photos ? drop : text;
+    panel = "note";
+    if (hub) veil(card, { close: cancelNote, focus: phone ? card : first });   // phones: no keyboard popping up yet, but focus is in the box
+    else layer.appendChild(card);
+    active = i;
     els.note = { card: card, text: text, thumbs: thumbs, drop: drop, fields: fieldEls };
-    layer.appendChild(card);
-    els.dock.hidden = phone;
     drawThumbs(note, thumbs, true);
     render();
+    if (hub) return;
+    els.dock.hidden = phone;
     if (phone && note.path) {               // keep the spot in view above the sheet
       var node = nodeAt(note.path);
       if (node) { var r = node.getBoundingClientRect(); window.scrollBy({ top: r.top - window.innerHeight * 0.18, behavior: reduceMotion ? "auto" : "smooth" }); }
     }
     placeNoteCard();
     if (wantPhotos) els.file.click();
-    else if (!phone) { var first = fieldEls.length ? fieldEls[0].input : text; try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
+    else if (!phone) { try { first.focus({ preventScroll: true }); } catch (e) { first.focus(); } }
     else { try { card.focus({ preventScroll: true }); } catch (e) {} }   // phones: no keyboard popping up yet, but focus is in the note
   }
   // Big screens: the note box sits next to its pin. Phones: it's a sheet at the bottom.
   function placeNoteCard() {
-    if (!els.note || panel !== "note") return;
+    if (!els.note || panel !== "note" || els.veil) return;   // on their own page the box sits in the middle
     var card = els.note.card, note = st.notes[active];
     if (isPhone()) { card.classList.add("sheet"); card.style.cssText = ""; return; }
     card.classList.remove("sheet");
@@ -1128,6 +1231,7 @@
         onclick: function () { note.showCaps = true; save(); drawThumbs(note, box, true); var f = box.querySelector(".cap"); if (f) f.focus(); } }));
   }
   function dropTitle(note, phone) {
+    if (MODE === "hub" && !note.pg) return note.pics.length ? "Add another" : phone ? "Tap to choose a file" : "Choose a file";   // a box on their page (their logo)
     if (note.pics.length) return "Add more photos";
     return note.photos ? (phone ? "Tap to choose photos" : "Choose photos, or drop them here") : "Add photos";
   }
@@ -1140,23 +1244,45 @@
     note.caps[free] = idea; note.showCaps = true; save();
     if (els.note) { drawThumbs(note, els.note.thumbs, true); var f = els.note.thumbs.querySelector('[data-id="' + free + '"] .cap'); if (f) { f.focus(); f.classList.add("flash"); } }
   }
+  // What they typed, into the note: every changed line ("Email: new@x.com (was old@x.com)"), then anything else.
+  function readNote(note) {
+    if (!els.note) return;
+    if (!note.fields) { note.text = els.note.text.value.trim(); return; }
+    note.extra = els.note.text.value.trim(); note.typed = {};
+    var lines = [];
+    els.note.fields.forEach(function (f) {
+      var v = f.input.value.trim();
+      if (v === f.now) return;   // left as it is
+      note.typed[f.name] = v;
+      lines.push(f.name.replace(/[?:.]+$/, "") + ": " + (v || "take this off") + (f.now ? " (was " + f.now + ")" : ""));
+    });
+    note.text = lines.concat(note.extra ? [note.extra] : []).join("\n");
+  }
   function saveNote() {
     var note = st.notes[active];
-    if (note && els.note && note.fields) {
-      note.extra = els.note.text.value.trim();
-      var lines = [];
-      els.note.fields.forEach(function (f) {
-        var v = f.input.value.trim(), name = f.name.replace(/[?:.]+$/, "");
-        if (f.now) { if (!f.editing || !v || v === f.now) v = ""; }   // left as it is
-        note.vals[f.name] = v;
-        if (v) lines.push(name + ": " + v + (f.now ? " (was " + f.now + ")" : ""));
-      });
-      note.text = lines.concat(note.extra ? [note.extra] : []).join("\n");
-    } else if (note && els.note) note.text = els.note.text.value.trim();
+    if (note) readNote(note);
     var kept = note && (note.text || note.pics.length);
     if (note && !kept) st.notes.splice(active, 1);                    // an empty note is dropped
     closePanels(); save(); render();
     if (kept) toast(st.notes.length === 1 ? "Note saved. Add another, or tap Send to " + TO + "." : "Note saved.");
+  }
+  // On their own page: Cancel, the X or Esc closes the box and nothing is kept. A slip outside the box (outside =
+  // true) only closes it while it is still empty, so what they typed is never thrown away by accident.
+  function cancelNote(outside) {
+    var note = st.notes[active]; if (!note || busy) return;
+    readNote(note);
+    if (outside && (note.text || note.pics.length)) return;
+    dropNotes([note]); closePanels(); render();
+  }
+  // "Send to Stray Wolf" in that box: this one note goes now.
+  function sendNote(btn, progress, err) {
+    var note = st.notes[active]; if (!note || busy) return;
+    readNote(note); save();
+    if (!note.text && !note.pics.length) {
+      err.textContent = note.photos ? "Choose a file first." : note.fields ? "Change a line first, or tap Cancel." : "Type it first.";
+      err.hidden = false; return;
+    }
+    send(btn, progress, err, [note]);
   }
   // Delete is one tap, with Undo for a few seconds. Its photos are only thrown away once Undo is gone.
   function removeNote(i, inReview) {
@@ -1194,7 +1320,17 @@
       if (b && b.isConnected) try { b.focus({ preventScroll: true }); } catch (x) {}
     }, 0);
   }
-  function still() { document.documentElement.classList.toggle("swn-still", !!(els.veil || els.lb || panel === "photos")); }
+  // While a box, a bigger photo or the Photos page is over the page, the page behind doesn't scroll, and is out of
+  // reach for the keyboard and a screen reader too. Only what this put out of reach comes back.
+  var behind = [];
+  function still() {
+    var over = !!(els.veil || els.lb || panel === "photos");
+    document.documentElement.classList.toggle("swn-still", over);
+    if (over === behind.length > 0) return;
+    if (over) behind = [].filter.call(document.body.children, function (el) { return el !== host && !el.inert; });
+    behind.forEach(function (el) { el.inert = over; });
+    if (!over) behind = [];
+  }
   function topModal() { return els.lb ? els.lb.firstChild : els.veil ? els.veil.firstChild : panel === "photos" && els.note ? els.note.card : null; }
   function trapTab(e) {
     var box = topModal(); if (e.key !== "Tab" || !box) return;
@@ -1300,7 +1436,8 @@
 
   /* ----- the review list and sending ----- */
   // A centered box over a dimmed page (a sheet from the bottom on phones). opts.focus: what to put focus
-  // on first (default: the box itself, so it reads its name). opts.close: what Esc or a tap outside does.
+  // on first (default: the box itself, so it reads its name). opts.close: what Esc or a tap outside does (it is
+  // handed true for a tap outside).
   function veil(card, opts) {
     opts = opts || {};
     remember();
@@ -1308,7 +1445,7 @@
     if (!toastUndo) clearToast();                        // a big message replaces a small one (but keeps an Undo)
     card.setAttribute("aria-modal", "true"); card.setAttribute("tabindex", "-1");
     els.veilClose = opts.close || function () { closePanels(); render(); };
-    els.veil = h("div", { class: "veil", onclick: function (e) { if (e.target === els.veil && !busy) els.veilClose(); } }, [card]);
+    els.veil = h("div", { class: "veil", onclick: function (e) { if (e.target === els.veil && !busy) els.veilClose(true); } }, [card]);
     layer.appendChild(els.veil);
     still();
     try { (opts.focus || card).focus({ preventScroll: true }); } catch (x) {}
@@ -1329,8 +1466,9 @@
           h("div", { class: "s" + (note.text ? "" : " empty"), text: note.text || "(photos only)" }),
           note.pics.length ? th : null,
           h("div", { class: "acts" }, [
-            here ? h("button", { class: "b quiet", type: "button", onclick: function () { openNote(i); } }, [icon("pencil"), h("span", { text: "Change" })])
-                 : h("button", { class: "b quiet", type: "button", onclick: function () { if (!note.hub) lsSet("on", "1"); location.href = note.page; } }, [icon("arrow"), h("span", { text: note.hub ? "Go to your portal" : "Go to that page" })]),
+            !here ? h("button", { class: "b quiet", type: "button", onclick: function () { if (!note.hub) lsSet("on", "1"); location.href = note.page; } }, [icon("arrow"), h("span", { text: note.hub ? "Go to your portal" : "Go to that page" })])
+              : MODE === "hub" ? null   // on their own page a box sends or cancels, so a note left over is only sent or deleted
+              : h("button", { class: "b quiet", type: "button", onclick: function () { openNote(i); } }, [icon("pencil"), h("span", { text: "Change" })]),
             h("button", { class: "b danger", type: "button", onclick: function () { removeNote(i, true); } }, [icon("trash"), h("span", { text: "Delete" })])
           ])
         ])
@@ -1343,21 +1481,23 @@
     veil(h("div", { class: "card", role: "dialog", "aria-label": "Ready to send" }, [
       h("div", { class: "hd" }, [
         h("div", { class: "grow" }, [h("h2", { text: "Ready to send?" }), h("p", { text: plural(n, "note") + (pics ? " and " + plural(pics, "photo") : "") + ". Check them over, then tap Send." })]),
-        h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { if (!busy) backFromReview(); } }, [icon("x")])
+        h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { if (!busy) els.veilClose(); } }, [icon("x")])
       ]),
       h("div", { class: "bd" }, [list, h("div", { class: "calm" }, [icon("check"), h("span", { text: "Your website stays exactly as it is until " + TO + " makes the change." })])]),
       h("div", { class: "ft", style: "flex-direction:column;align-items:stretch" }, [progress, err,
         h("div", { style: "display:flex;gap:10px;flex-wrap:wrap" }, [
-          h("button", { class: "b plain", type: "button", text: reviewFrom === "photos" ? "Keep adding photos" : "Keep adding notes", onclick: function () { if (!busy) backFromReview(); } }),
+          h("button", { class: "b plain", type: "button", text: MODE === "hub" ? "Not now" : "Keep adding notes", onclick: function () { if (!busy) els.veilClose(); } }),
           h("span", { class: "push" }), sendBtn])])
-    ]), { close: backFromReview });
+    ]));
     els.dock.hidden = isPhone();
   }
 
-  function send(btn, progress, err) {
-    if (busy || !st.notes.length) return;
+  function send(btn, progress, err, list) {
+    list = list || st.notes.slice();
+    if (busy || !list.length) return;
     busy = true; btn.disabled = true; err.hidden = true;
-    var token = getToken(), total = picCount(), doneN = 0, label = btn.lastChild;
+    var token = getToken(), total = list.reduce(function (n, x) { return n + x.pics.length; }, 0), doneN = 0, label = btn.lastChild;
+    var safe = MODE === "hub" ? "Nothing is lost. " : "Your notes are safe on this device. ";
     var bar = progress.firstChild;
     var step = function (t, frac) { label.textContent = t; if (total) { progress.hidden = false; bar.style.width = Math.round(frac * 100) + "%"; } };
     var failWith = function (d) {
@@ -1365,13 +1505,13 @@
       err.textContent = "";
       if (d.status === 401) {
         setToken(null);
-        err.append("Your login timed out. Your notes are safe on this device. ", h("a", { href: LOGIN_URL, text: "Log in again" }), " and then tap Send.");
-      } else err.textContent = (d.status === 0 ? "Your internet seems to be off." : "That didn't go through.") + " Your notes are safe on this device. Tap Try again in a minute.";
+        err.append("Your login timed out. " + safe, h("a", { href: LOGIN_URL, text: "Log in again" }), " and then tap Send.");
+      } else err.textContent = (d.status === 0 ? "Your internet seems to be off. " : "That didn't go through. ") + safe + "Tap Try again in a minute.";
       err.hidden = false;
     };
     if (!token && !DEMO) { failWith({ status: 401 }); return; }
     step(total ? "Sending photo 1 of " + total + "…" : "Sending…", 0.02);
-    var ids = []; st.notes.forEach(function (n) { n.pics.forEach(function (id) { ids.push(id); }); });
+    var ids = []; list.forEach(function (n) { n.pics.forEach(function (id) { ids.push(id); }); });
     var keys = {};
     ids.reduce(function (p, id) {
       return p.then(function (stop) {
@@ -1393,7 +1533,7 @@
       if (stop) return failWith(stop);
       step("Sending notes…", total / (total + 1));
       // the pictures of the spots: best effort, a failed one just leaves that note without a picture
-      return st.notes.reduce(function (p, n) {
+      return list.reduce(function (p, n) {
         return p.then(function () {
           if (!n.shot) return;
           return picGet(n.shot).then(function (rec) {
@@ -1406,7 +1546,7 @@
       }, Promise.resolve()).then(function () { return null; });
     }).then(function (stop) {
       if (stop) return failWith(stop);
-      var body = { notes: st.notes.map(function (n) {
+      var body = { notes: list.map(function (n) {
         var sent = n.pics.filter(function (id) { return keys[id]; }), caps = n.caps || {};
         var said = sent.map(function (id) { return caps[id] || ""; });
         var lines = said.map(function (c, k) { return c ? "Photo " + (k + 1) + ": " + c : ""; }).filter(Boolean);
@@ -1423,24 +1563,21 @@
       return go.then(function (d) {
         if (!d.ok) return failWith(d);
         busy = false;
-        st.sent = true; st.sentNotes = body.notes.length; st.sentPics = total; save();
         heads_up(body.notes.length, total);
+        if (MODE === "hub") return sentHub(list);
+        st.sent = true; st.sentNotes = body.notes.length; st.sentPics = total; save();
         showSent();
       });
     });
   }
+  // Edit mode: a box in the middle says it went, and the bar keeps saying so until they start new notes.
   function showSent() {
     panel = "sent";
-    var done = function () {
-      if (MODE !== "hub") { closePanels(); render(); return; }
-      var back = reviewFrom === "photos"; reviewFrom = null; newList(true);
-      loadRequests();                               // what they just sent joins "Your requests"
-      if (back) openPhotos();                       // back to the Photos page, where the new ones now show as sent
-    };
+    var done = function () { closePanels(); render(); };
     var doneBtn = h("button", { class: "b main wide", type: "button", text: "Done", onclick: done });
     veil(h("div", { class: "card", role: "dialog", "aria-label": "Sent" }, [
       h("div", { class: "bd center", style: "padding-top:26px;gap:8px" }, [
-        h("div", { class: "done-ic pop" }, [icon("check")]),
+        h("div", { class: "done-ic" }, [icon("check")]),
         h("h2", { text: "Sent!" }),
         h("p", { text: TO + " has your " + (st.sentNotes === 1 ? "note" : plural(st.sentNotes, "note")) + (st.sentPics ? " and " + plural(st.sentPics, "photo") : "") + "." }),
         h("p", { text: "You'll hear back soon. Nothing on your website changes until " + TO + " makes the update." })
@@ -1449,9 +1586,17 @@
     ]), { focus: doneBtn, close: done });
     render();
   }
+  // Their own page: what was sent leaves this device's list and joins Your requests, and one line says so. The
+  // Photos page stays open, ready for more.
+  function sentHub(list) {
+    var photos = panel === "photos";
+    dropNotes(list);
+    if (photos) els.note.fresh(); else { closePanels(); render(); }
+    toast("Sent to " + TO + "." + (document.querySelector("[data-requests]") ? " Track it under Requests." : ""));
+    loadRequests();
+  }
   function newList(quietly) {
-    st.notes.forEach(function (n) { n.pics.forEach(picDel); if (n.shot) picDel(n.shot); });
-    st.notes = []; st.sent = false; st.sentNotes = st.sentPics = 0; save(); closePanels(); render();
+    dropNotes(st.notes.slice()); st.sent = false; st.sentNotes = st.sentPics = 0; save(); closePanels(); render();
     if (!quietly) toast("Ready for new notes.");
   }
   // A plain email saying "new notes came in". Best effort; the notes are already safely stored.
@@ -1467,33 +1612,32 @@
   /* ----- help, and turning notes off ----- */
   function showHelp(first) {
     panel = "help";
-    var gotIt = h("button", { class: "b main wide", type: "button", text: first ? "Got it. Let's start." : "Got it", onclick: function () { st[MODE === "edit" ? "intro" : "introHub"] = true; save(); tuckAway(this.closest(".card")); } });
-    var step = function (n, ic, title, text) { return h("li", {}, [h("div", { class: "circ" }, [icon(ic), h("i", { text: String(n) })]), h("div", {}, [h("b", { text: title }), h("span", { text: text })])]); };
+    var gotIt = h("button", { class: "b main wide", type: "button", text: first ? "Got it. Let's start." : "Got it", onclick: function () { els.veilClose(); } });
+    var step = function (n, ic, title, text) { return h("li", {}, [h("div", { class: "circ" }, [icon(ic), n ? h("i", { text: String(n) }) : null]), h("div", {}, [h("b", { text: title }), h("span", { text: text })])]); };
     veil(h("div", { class: "card help", role: "dialog", "aria-label": "How this works" }, [
       h("div", { class: "hd" }, [
-        h("div", { class: "grow" }, [h("h2", { text: first ? (MODE === "edit" ? "You're in Edit mode. Here's how it works." : "Welcome! Here's how it works.") : "How this works" }), h("p", { text: MODE === "edit" ? "Leave notes for " + TO + " right on your own website." : "This is your Client Portal for sending " + TO + " what you need." })]),
-        h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { closePanels(); render(); } }, [icon("x")])
+        h("div", { class: "grow" }, [h("h2", { text: first ? (MODE === "edit" ? "You're in Edit mode. Here's how it works." : "Welcome! Here's how your portal works.") : "How this works" }), h("p", { text: MODE === "edit" ? "Leave notes for " + TO + " right on your own website." : "Everything for your website, in one place." })]),
+        h("button", { class: "xbtn", type: "button", "aria-label": "Close", onclick: function () { els.veilClose(); } }, [icon("x")])
       ]),
-      h("div", { class: "bd" }, [
+      h("div", { class: "bd", tabindex: "0" }, [
         MODE === "edit" ? h("ol", { class: "steps" }, [
           step(1, "note", "Tap “Add a note”", "It's the orange button at the bottom of the screen."),
           step(2, "tap", "Tap right where you want the note", "On a price, a sentence, a picture. Anything. The note goes exactly there."),
           step(3, "pencil", "Say what you'd like", "Type it in your own words. Add photos if you have them."),
           step(4, "send", "Tap “Send to " + TO + "”", "Do this once you've added all your notes.")
-        ]) : h("ol", { class: "steps" }, [
-          step(1, "tap", "Tap a box", "Each box is one thing " + TO + " needs, like your logo or photos."),
-          step(2, "photo", "Type it, or add photos", "Then tap Save note."),
-          step(3, "pencil", "Want something changed on your website?", "Tap Edit mode. You'll go to your website and can tap the part you mean."),
-          step(4, "send", "Tap “Send to " + TO + "”", "Do this once you're done.")
+        ]) : h("ul", { class: "steps" }, [
+          step(0, "home", "Home shows what needs you", "A question from " + TO + ", or new messages from your website."),
+          step(0, "list", "Each part of your website has its own page", "Pick one in the row at the top. On a phone it's the bar at the bottom."),
+          step(0, "check", "Some things you change yourself", "Where a box says Edit, change it and tap Save. Your website shows it within a minute."),
+          step(0, "pencil", "Want something else changed?", "Tap Edit my website, then tap the part you mean. " + TO + " makes the change.")
         ]),
-        h("div", { class: "calm" }, [icon("check"), h("span", { text: "You can't break anything. Your website stays exactly as it is until " + TO + " makes the change." })])
+        h("div", { class: "calm" }, [icon("check"), h("span", { text: MODE === "edit" ? "You can't break anything. Your website stays exactly as it is until " + TO + " makes the change."
+          : "Made a mistake? Every change you save yourself can be undone from that page's list of changes." })])
       ]),
       h("div", { class: "ft" }, [gotIt])
     ]), { focus: gotIt });
     els.dock.hidden = isPhone();
   }
-  // "Got it": the steps shrink down into the bar at the bottom ("Edit mode is on" / "You're logged in"),
-  // so it's clear where they went and that the mode is still on. Help in that bar brings them back.
   /* ----- downloads: a photo, all the photos of a part (one .zip), the shop list (.csv) ----- */
   // A file is named from its words ("Homepage, top photo" -> homepage-top-photo.jpg). Several photos come as
   // one .zip, stored as they are (photos are already compressed). Photos are read from this site or from the
@@ -1616,20 +1760,14 @@
   }
 
   /* ----- the Photos page ----- */
-  // Opened by the Photos box (data-photos-page) or <portal>#photos. Three parts: add new photos
-  // (one note, sent like any other), every photo they've sent with its status: "On your
-  // site" / "Approved" / "Received" / "Not used", and the photos on their site now. Back (or the browser's Back) returns to the portal;
+  // Opened by the Photos box (data-photos-page) or <portal>#photos. Three parts: add new photos (sent from here, and
+  // the page stays open for more), every photo they've sent with its status: "On your site" / "Approved" /
+  // "Received" / "Not used", and the photos on their site now. Back (or the browser's Back) returns to the portal;
   // photos they added stay saved on this device until they send them.
-  var reviewFrom = null;
   function photosBox() { return MODE === "hub" ? document.querySelector("[data-photos-page]") : null; }
-  // Let's talk: the box on their page that books a time. Its booking page opens in a new tab; with none set,
-  // the page goes to the box, and a tap there starts a note with the times that work.
-  function talkBox() { return MODE === "hub" ? document.querySelector("[data-booking-url]") : null; }
-  function letsTalk() {
-    var box = talkBox(); if (!box) return;
-    var book = (box.getAttribute("data-booking-url") || "").trim();
-    if (book) window.open(book, "_blank", "noopener"); else goToPart(box);
-  }
+  // Let's talk: the booking page set on their page (data-booking-url, on any element) opens in a new tab.
+  function bookingUrl() { var el = MODE === "hub" && document.querySelector("[data-booking-url]"); return el ? (el.getAttribute("data-booking-url") || "").trim() : ""; }
+  function letsTalk() { if (bookingUrl()) window.open(bookingUrl(), "_blank", "noopener"); }
   // "Builders page" on a page button reads "Builders"; "Homepage" stays as it is.
   function shortPage(pg) { return pg.replace(/\s+page$/i, "") || pg; }
   function sitePhotos() {
@@ -1647,27 +1785,35 @@
   function openPhotos(fromHistory) {
     var box = photosBox(); if (!box || busy) return;
     remember(); closePanels();
-    var i = -1; st.notes.forEach(function (n, k) { if (n.pg) i = k; });
-    if (i < 0) { var made = makeNote(box, box.getAttribute("data-area") || "Photos"); made.pg = true; made.photos = true; st.notes.push(made); save(); i = st.notes.length - 1; }
-    active = i; panel = "photos";
-    var note = st.notes[i], phone = isPhone();
+    panel = "photos";
+    var phone = isPhone(), note;   // note: the photos being added, set by fresh() below
     if (!fromHistory && location.hash !== "#photos") { try { history.pushState({ swnPhotos: 1 }, "", "#photos"); } catch (x) {} }
 
     // 1. new photos
     var thumbs = h("div", { class: "thumbs" });
     var drop = h("button", { class: "add-ph big", type: "button", onclick: function () { els.file.click(); } }, [
-      icon("photo"), h("div", {}, [h("b", { text: dropTitle(note, phone) }), h("span", { text: phone ? "From your photos, or take a new one" : "Click to choose, or drag them here from your computer" })])]);
-    var text = h("textarea", { id: "swn-text", placeholder: "Anything else about these photos? (optional)", oninput: function () { note.text = this.value.trim(); save(); } });
-    text.value = note.text || ""; text.style.minHeight = "70px";
+      icon("photo"), h("div", {}, [h("b"), h("span", { text: phone ? "From your photos, or take a new one" : "Click to choose, or drag them here from your computer" })])]);
+    var text = h("textarea", { id: "swn-text", placeholder: box.getAttribute("data-note-hint") || "", oninput: function () { note.text = this.value.trim(); save(); } });
     text.addEventListener("paste", function (e) { var f = e.clipboardData && e.clipboardData.files; if (f && f.length) { e.preventDefault(); addPictures(f); } });
-    var sendBtn = h("button", { class: "b go", type: "button", onclick: function () {
+    var progress = h("div", { class: "bar", hidden: true }, [h("i")]), err = h("p", { class: "err", hidden: true, role: "alert" });
+    var sendBtn = h("button", { class: "b main", type: "button", onclick: function () {
       note.text = text.value.trim(); save();
       if (!note.pics.length && !note.text) { toast("Add a photo first. Then you can send it."); return; }
-      reviewFrom = "photos"; closePanels(); openReview();
+      send(sendBtn, progress, err, [note]);
     } }, [icon("send"), h("span", { text: "Send to " + TO })]);
     var addSec = h("section", { class: "pg-sec add", "aria-label": "Send new photos" }, [
       h("div", { class: "pg-hd" }, [h("h2", { text: "Send new photos" })]),
-      drop, thumbs, text, h("div", { class: "pg-act" }, [sendBtn])]);
+      drop, thumbs, h("div", { class: "field" }, [h("label", { class: "lb", for: "swn-text" }, ["Anything " + TO + " should know about them?", h("em", { text: "You can leave this empty" })]), text]),
+      progress, err, h("div", { class: "pg-act" }, [sendBtn])]);
+    // The photos being added: the ones already on this device, or a new empty batch (at the start, and after each send).
+    var fresh = function () {
+      var i = -1; st.notes.forEach(function (x, k) { if (x.pg) i = k; });
+      if (i < 0) { var made = makeNote(box, box.getAttribute("data-area") || "Photos"); made.pg = true; made.photos = true; st.notes.push(made); save(); i = st.notes.length - 1; }
+      active = i; note = st.notes[i];
+      text.value = note.text || ""; sendBtn.disabled = false; sendBtn.lastChild.textContent = "Send to " + TO; progress.hidden = true; err.hidden = true;
+      drawThumbs(note, thumbs, true); refreshDrop(note);
+      loadSent(sentGrid, sentSum, sentNone, sentDl);
+    };
 
     // 2. what they've sent, and which of those are on the site
     var sentSum = h("p", { class: "pg-sub", text: "Loading…" }), sentGrid = h("div", { class: "pg-grid", hidden: true }), sentNone = h("p", { class: "pg-none", hidden: true });
@@ -1719,9 +1865,9 @@
 
     var page = h("div", { class: "pg note photos", role: "dialog", "aria-modal": "true", "aria-label": "Your photos" }, [
       h("div", { class: "dropcover", "aria-hidden": "true" }, [icon("photo"), h("b", { text: "Drop your photos here" })]),
-      h("div", { class: "pg-top" }, [h("div", { class: "pg-top-in" }, [
-        h("button", { class: "pg-back", type: "button", onclick: backFromPhotos }, [icon("arrow"), h("span", { text: phone ? "Back" : "Back to your portal" })]),
-        h("h1", { text: "Your photos" })])]),
+      h("div", { class: "pg-top" }, [
+        h("button", { class: "pg-back", type: "button", onclick: backFromPhotos }, [icon("back"), h("span", { text: pageOn ? pageName(pageOn) : "Back" })]),
+        h("h1", { text: "Your photos" }), h("p", { text: "Send " + TO + " new photos, and see the ones on your website." })]),
       h("div", { class: "pg-in" }, [addSec, sentSec, siteSec])
     ]);
     var depth = 0;
@@ -1730,13 +1876,12 @@
     page.addEventListener("dragleave", function () { if (--depth <= 0) { depth = 0; page.classList.remove("dropping"); } });
     page.addEventListener("drop", function (e) { if (!hasFiles(e)) return; e.preventDefault(); e.stopPropagation(); depth = 0; page.classList.remove("dropping"); addPictures(e.dataTransfer.files); });
 
-    els.note = { card: page, text: text, thumbs: thumbs, drop: drop, fields: [], page: true };
+    els.note = { card: page, text: text, thumbs: thumbs, drop: drop, fields: [], page: true, fresh: fresh };
     layer.appendChild(page);
     els.dock.hidden = true;
     els.scrollWas = document.documentElement.style.overflow; document.documentElement.style.overflow = "hidden";
-    drawThumbs(note, thumbs, true);
+    fresh();
     render(); still();
-    loadSent(sentGrid, sentSum, sentNone, sentDl);
     try { page.querySelector(".pg-back").focus({ preventScroll: true }); } catch (x) {}
   }
   // Leaving the page (Back, Esc, or Send): an empty photos note is dropped, the rest stays saved.
@@ -1746,21 +1891,16 @@
     if (note && note.pg && !note.text && !note.pics.length) { st.notes.splice(active, 1); }
     save();
     document.documentElement.style.overflow = els.scrollWas || "";
-    if (location.hash === "#photos") { try { history.replaceState(null, "", location.pathname + location.search); } catch (x) {} }
+    if (location.hash === "#photos") { try { history.replaceState(null, "", location.pathname + location.search + pageHash()); } catch (x) {} }
   }
   function backFromPhotos() {
     var note = st.notes[active];
-    if (note && note.pics.length) closedToast = "Your photos are saved. Tap Send when you're ready.";
+    if (note && note.pics.length) closedToast = "Your photos are saved on this device. Open Photos again to send them.";
     if (history.state && history.state.swnPhotos && location.hash === "#photos") { history.back(); return; }   // the browser's Back closes it
     photosClosed();
   }
   var closedToast = "";
   function photosClosed() { closePanels(); render(); if (closedToast) toast(closedToast); closedToast = ""; }
-  function backFromReview() {
-    var back = reviewFrom === "photos" && MODE === "hub"; reviewFrom = null;
-    closePanels(); render();
-    if (back) openPhotos();
-  }
   // "Swap this one" on a photo of their site: the words go in the new photos' box, ready to add a photo.
   function askSwap(which) {
     var t = els.note && els.note.page && els.note.text; if (!t) return;
@@ -1855,15 +1995,28 @@
     return c.toDataURL("image/jpeg", .8);
   }
 
-  // A few headline numbers from Google Analytics for their page ([data-stats]). The notes service
-  // asks GA4 and sends them back; with no numbers (or an older service) the card just stays hidden.
-  // Same words as the admin's Analytics tab (admin-cockpit/analytics-wording.md), so client and Jeremy match.
+  // The Website visitors card on Home ([data-stats]): a few numbers from Google Analytics, in the same words as the
+  // admin's Analytics page so the client and Stray Wolf read the same thing. SW Core asks Google and sends the
+  // numbers back; with none (or an older service) the card stays hidden. The whole card is drawn here, so every
+  // site shows the same one: a page holds only the heading, the [data-stat="range"] line and an empty box.
   var MON = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  var WEEKDAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
   function shortDate(d) { return MON[d.getUTCMonth()] + " " + d.getUTCDate(); }
+  function gaLogo() {
+    var ns = "http://www.w3.org/2000/svg", s = document.createElementNS(ns, "svg");
+    s.setAttribute("viewBox", "0 0 24 24"); s.setAttribute("aria-hidden", "true");
+    [["rect", { x: 16, y: 2, width: 6, height: 20, rx: 3, fill: "#F9AB00" }], ["rect", { x: 9, y: 9, width: 6, height: 13, rx: 3, fill: "#E37400" }], ["circle", { cx: 4.5, cy: 18.5, r: 3.5, fill: "#E37400" }]]
+      .forEach(function (part) { var e = document.createElementNS(ns, part[0]), k; for (k in part[1]) e.setAttribute(k, part[1][k]); s.appendChild(e); });
+    return s;
+  }
   function loadStats() {
-    var box = document.querySelector("[data-stats]"); if (!box) return;
+    // .stats: a page from before the card was drawn here; what it holds is replaced
+    var sec = document.querySelector("[data-stats]"), box = sec && sec.querySelector(".wv, .stats"); if (!box) return;
     var got = DEMO ? Promise.resolve({ ok: true, sample: true, days: 28, visitors: 109, visitorsPrev: 91, visitorsChange: 20, calls: 8, callsPrev: 4, callsChange: 100,
-                                       leads: 3, leadsPrev: 0, leadsChange: 0, source: "Google", daily: { start: new Date(Date.now() - 28 * 864e5).toISOString().slice(0, 10) } })
+                                       leads: 3, leadsPrev: 0, leadsChange: 0, source: "Google", daily: { start: new Date(Date.now() - 28 * 864e5).toISOString().slice(0, 10),
+                                         visitors: [3, 3, 3, 3, 5, 2, 3, 3, 4, 4, 3, 5, 2, 4, 4, 4, 4, 4, 6, 2, 4, 5, 5, 5, 4, 7, 3, 5],
+                                         calls: [0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 1, 0, 0],
+                                         leads: [0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0] } })
                    : api("/api/stats", { token: getToken(), body: { site: SITE } });
     got.then(function (d) {
       if (!d || !d.ok || d.visitors == null) return;
@@ -1871,137 +2024,323 @@
       // say the period in plain words: 28 days = "4 weeks"
       var days = d.days || 28, span = days % 7 === 0 ? (days / 7) + " weeks" : days + " days";
       // no-break spaces keep "the 4 weeks before" together when the line wraps
-      var before = ("the " + span + " before").replace(/ /g, "\u00a0");
-      // ▲ 4 more than the 4 weeks before / ▼ 3 fewer than the 4 weeks before / Same as the 4 weeks before / None in the 4 weeks before
-      var change = function (now, prev, pct) {
+      var before = ("the " + span + " before").replace(/ /g, " ");
+      // the days themselves, when the service sends them and they make whole weeks: they draw the columns and name the busiest day
+      var start = d.daily && d.daily.start ? new Date(d.daily.start + "T00:00:00Z") : null;
+      if (start && isNaN(start)) start = null;
+      var daily = start && days % 7 === 0 && Array.isArray(d.daily.visitors) && d.daily.visitors.length === days ? d.daily : null;
+      var dayAt = function (i) { return new Date(start.getTime() + i * 864e5); };
+      // The change from the weeks before, as a small tag: "4 more than the 4 weeks before", "3 fewer than the 4 weeks
+      // before", "Same as the 4 weeks before" or "None in the 4 weeks before". The styles add a small arrow and the
+      // green or red; the words alone say it.
+      var tag = function (now, prev, pct) {
+        var dir = 0, words;
         if (typeof prev === "number") {
-          if (prev === 0) return now ? { t: "None in " + before } : { t: "Same as " + before };
-          var diff = now - prev;
-          return diff > 0 ? { t: "▲ " + n(diff) + " more than " + before, c: "up" } : diff < 0 ? { t: "▼ " + n(-diff) + " fewer than " + before, c: "down" } : { t: "Same as " + before };
-        }
-        if (typeof pct === "number" && pct !== 0) return pct > 0 ? { t: "▲ " + pct + "% more than " + before, c: "up" } : { t: "▼ " + -pct + "% fewer than " + before, c: "down" };
-        return null;
+          dir = prev ? now - prev : 0;
+          words = !prev ? (now ? "None in " : "Same as ") + before : dir ? n(Math.abs(dir)) + (dir > 0 ? " more than " : " fewer than ") + before : "Same as " + before;
+        } else if (typeof pct === "number" && pct !== 0) { dir = pct; words = Math.abs(pct) + "% " + (pct > 0 ? "more than " : "fewer than ") + before; }
+        else return null;
+        return h("span", { class: "wv-tag" + (dir > 0 ? " up" : dir < 0 ? " down" : ""), text: words });
       };
-      // nothing at all from the 4 weeks before (tracking is new): say it once in the footnote, not under every number
-      var fresh = [d.visitorsPrev, d.callsPrev, d.leadsPrev].every(function (p) { return p === 0; });
-      var put = function (k, now, prev, pct) {
-        var el = box.querySelector('[data-stat="' + k + '"]'); if (!el) return;
-        el.textContent = n(now);
-        var ch = fresh ? null : change(Number(now) || 0, prev, pct); if (!ch) return;
-        var slot = box.querySelector('[data-chg="' + k + '"]');
-        if (slot) { slot.textContent = ch.t; slot.className = ch.c || ""; }
-        else el.appendChild(h("small", { class: ch.c || "", text: ch.t }));
+      // nothing at all from the weeks before (tracking is new): say it once at the foot, not under every number
+      var fresh = [d.visitorsPrev, d.callsPrev, d.leadsPrev].every(function (x) { return x === 0; });
+      // One number's days as a column per week: its total on top, its first day under it, the last 7 days in orange.
+      // A column shows its dates on hover, and the label says the whole chart in words for a screen reader.
+      var weeks = function (vals, word, label) {
+        var list = [], most = 1, i;
+        for (i = 0; i < days; i += 7) list.push({ from: dayAt(i), to: dayAt(i + 6), v: (vals || []).slice(i, i + 7).reduce(function (a, b) { return a + (Number(b) || 0); }, 0) });
+        list.forEach(function (w) { most = Math.max(most, w.v); });
+        return h("div", { class: "wv-cols", role: "img", "aria-label": label + ", week by week: " + list.map(function (w, k) { return n(w.v) + (k === list.length - 1 ? " in the last 7 days" : " in the week of " + shortDate(w.from)); }).join(", ") + "." },
+          list.map(function (w, k) {
+            return h("div", { class: "wv-col" + (k === list.length - 1 ? " hot" : ""), "data-tip": shortDate(w.from) + " – " + shortDate(w.to) + ": " + plural(w.v, word) }, [
+              h("span", { class: "wv-col-in" }, [h("span", { class: "wv-col-v", text: n(w.v) }), h("span", { class: "wv-bar", style: "height:calc((100% - 19px) * " + (w.v ? Math.max(.05, w.v / most) : 0).toFixed(3) + ")" })]),
+              h("span", { class: "wv-col-k", text: shortDate(w.from) })]);
+          }));
       };
-      put("visitors", d.visitors, d.visitorsPrev, d.visitorsChange);
-      put("calls", d.calls, d.callsPrev, d.callsChange);
-      put("leads", d.leads, d.leadsPrev, d.leadsChange);
-      // the period, with real dates when the service sends the daily numbers
-      var r = box.querySelector('[data-stat="range"]');
-      if (r) {
-        var t = "Last " + span;
-        if (d.daily && d.daily.start) { var s0 = new Date(d.daily.start + "T00:00:00Z"); if (!isNaN(s0)) t += " · " + shortDate(s0) + " – " + shortDate(new Date(s0.getTime() + (days - 1) * 864e5)); }
-        r.textContent = t;
+      var one = function (k, label, about, word) {
+        var now = Number(d[k]) || 0;
+        return h("li", {}, [h("div", { class: "wv-hd" }, [h("b", { class: "wv-n", text: n(now) }), h("span", { class: "wv-l", text: label }), h("span", { class: "wv-s", text: about }), fresh ? null : tag(now, d[k + "Prev"], d[k + "Change"])]),
+          daily ? weeks(daily[k], word, label) : null]);
+      };
+      // one short line above the numbers: "109 people visited your website. 11 reached out."
+      var v = Number(d.visitors) || 0, out = (Number(d.calls) || 0) + (Number(d.leads) || 0);
+      var say = h("p", { class: "wv-say" }, [h("b", { text: n(v) + (v === 1 ? " person" : " people") }), " visited your website. ", out ? h("b", { class: "out", text: n(out) + " reached out." }) : "Nobody reached out yet."]);
+      // Worth knowing, in plain sentences: the busiest day of the week (two when they tie, none when more do), where
+      // most visits started, and how many visitors reached out. A line is [picture, parts]; [words] stand out.
+      var lines = [];
+      if (daily && v) {
+        var byDay = [0, 0, 0, 0, 0, 0, 0]; daily.visitors.forEach(function (x, i) { byDay[(dayAt(i).getUTCDay() + 6) % 7] += Number(x) || 0; });
+        var top = Math.max.apply(null, byDay), names = WEEKDAYS.filter(function (w, i) { return byDay[i] === top; }).map(function (w) { return w + "s"; });
+        if (names.length < 3) lines.push(["calendar", [[names.join(" and ")], names.length > 1 ? " were your busiest days." : " were your busiest day."]]);
       }
-      // one short line above the numbers: "109 people visited. 11 reached out."
-      var sum = box.querySelector('[data-stat="summary"]');
-      if (sum) {
-        var out = (Number(d.calls) || 0) + (Number(d.leads) || 0), v = Number(d.visitors) || 0;
-        sum.textContent = "";
-        sum.append(h("b", { text: n(v) + (v === 1 ? " person" : " people") }), " visited. ");
-        if (out) sum.append(h("b", { class: "out", text: n(out) + " reached out." }));
-        else sum.append("Nobody reached out yet.");
-      }
-      var src = box.querySelector('[data-stat="note"]');
-      if (fresh && src && !/compare/.test(src.textContent)) src.textContent += " · Nothing earlier to compare yet";
-      if (d.sample) { var note = box.querySelector(".stats-f"); if (note && !note.querySelector(".sample")) note.appendChild(h("span", { class: "sample", text: "Sample" })); }
-      box.hidden = false;
+      if (d.source) lines.push(["search", d.source === "Typed it in" ? ["Most people ", ["typed your address in"], " or used a bookmark."] : ["Most people found you on ", [d.source], "."]]);
+      if (out && Math.round(v / out) > 1) lines.push(["person", ["About ", ["1 in " + Math.round(v / out)], " visitors reached out."]]);
+      var know = lines.length ? h("ul", { class: "wv-know", "aria-label": "Worth knowing" }, lines.map(function (l) {
+        return h("li", {}, [h("span", { class: "wv-ic" }, [icon(l[0])]), h("span", {}, l[1].map(function (part) { return typeof part === "string" ? part : h("b", { text: part[0] }); }))]);
+      })) : null;
+      var key = daily ? h("p", { class: "wv-key" }, [h("span", {}, [h("i"), "One week, from the date under it"]), h("span", { class: "hot" }, [h("i"), "The last 7 days"])]) : null;
+      var foot = h("p", { class: "wv-f" }, [h("span", { class: "ga" }, [gaLogo(), "From Google Analytics" + (fresh ? " · Nothing earlier to compare yet" : "")]), d.sample ? h("span", { class: "sample", text: "Sample" }) : null]);
+      // the period, with real dates when the service sends the days
+      var range = sec.querySelector('[data-stat="range"]');
+      if (range) range.textContent = "Last " + span + (start ? " · " + shortDate(start) + " – " + shortDate(dayAt(days - 1)) : "");
+      box.className = "wv";
+      box.replaceChildren.apply(box, [say, h("ul", { class: "wv-nums" + (daily ? " cols" : "") }, [one("visitors", "Visitors", "Different people who opened your website", "visitor"),
+        one("calls", "Phone calls", "Tapped your number on the website", "phone call"), one("leads", "Form requests", "Filled in and sent your form", "form request")]), key, know, foot].filter(Boolean));
+      sec.hidden = false;
     });
   }
 
-  // The header's links ([data-portal-nav] in their page's header): one for each part of the page marked
-  // data-nav="Label" (with an id), in page order, leaving out a part that is hidden (no requests yet, no shop).
-  // Requests says when a question is waiting for them, the shop how many items it has. The part on screen is
-  // underlined as they scroll; on a phone the row slides sideways to keep it in view. A click scrolls there
-  // without changing the address (#photos opens the Photos page). The Edit mode card ([data-edit-mode]) gets
-  // a button at the end, which opens Edit mode the same way.
-  var navParts = [], navSig = "";
-  function drawNav() {
-    var nav = document.querySelector("[data-portal-nav]"); if (!nav) return;
-    var parts = [].filter.call(document.querySelectorAll("[data-nav]"), function (el) { return !el.closest("[hidden]"); });
-    var asks = reqs.filter(function (r) { return r.status === "question"; }).length, open = reqs.filter(function (r) { return !reqClosed(r); }).length;
-    var extra = function (el) {
-      if (el.matches("[data-requests]")) return asks ? h("span", { class: "ask", text: asks === 1 ? "1 question" : asks + " questions", title: TO + " asked you something. Answer it under Your requests." })
-        : open ? h("span", { class: "n", text: String(open), title: plural(open, "request") + " still open" }) : null;
-      if (el.matches("[data-form-portal]") && fpNew()) return h("span", { class: "n", text: String(fpNew()), title: plural(fpNew(), "new message") + " from your website" });
-      if (el.matches("[data-shop-portal]") && spShop) return h("span", { class: "n", text: String(spShop.items.length), title: plural(spShop.items.length, "item") + " in your shop" });
-      return null;
-    };
-    var edit = document.querySelector("[data-edit-mode]");
-    var sig = parts.map(function (el) { var x = extra(el); return el.getAttribute("data-nav") + (x ? x.textContent : ""); }).join("|") + (edit ? "|edit" : "");
-    if (sig === navSig) return spy();
-    navSig = sig;
-    var row = h("div", { class: "nav-in", onscroll: function () { navMore(row); } });
-    navParts = parts.map(function (el) {
-      var a = h("a", { href: "#" + (el.id || ""), onclick: function (e) { e.preventDefault(); goToPart(el); } }, [h("span", { text: el.getAttribute("data-nav") }), extra(el)]);
-      row.appendChild(a);
-      return { el: el, a: a };
+  // The pages of their portal. Their page is cut into pages: each <section id="shop" data-page="Shop"> is one, and
+  // the first is Home. One shows at a time. The header ([data-portal-nav]) gets a link to each, a phone gets the same
+  // links as a bar along the bottom, and every page but Home starts with a link back to it. The address says which
+  // page is open (/portal/#shop), so Back, Forward, Reload and a saved link all work; an address naming something
+  // inside a page (#hours) opens that page there. The Shop and Messages pages are left out for a client with no
+  // shop, or with the website's form off. After the links the header asks "Need changes?" beside "Edit my website"
+  // (the page's own [data-edit-mode] card, again).
+  //   On a page:  data-page-short="Info"   its name in the phone's bar, when the full one is too long
+  //               data-page-about="Items, prices and photos"   its line in Home's list
+  //               data-page-wide   a wider page, for the shop's table
+  //   On Home:    [data-needs], a list: what is waiting on them (a question from Stray Wolf, new messages, notes and
+  //               photos not sent yet), with how many in [data-needs-n]
+  //               [data-glance], a list: the other pages, each with where it stands ("5 showing · 1 sold out")
+  var PAGE_ICON = { home: "home", messages: "mail", shop: "bag", info: "globe", requests: "list" };
+  var pageAll = [], pageOn = null, pageTitle = "", pageTabs = null, navSig = "", homeSig = "";
+  var asked = {};   // messages, shop, requests: 1 once the service has answered, -1 when it couldn't be reached
+  function pageName(p) { return p.getAttribute("data-page"); }
+  // What a page holds decides its icon, its count and its line on Home. The first page is Home.
+  function pageKind(p) {
+    return p === pageAll[0] ? "home" : p.querySelector("[data-form-portal]") ? "messages" : p.querySelector("[data-shop-portal]") ? "shop"
+      : p.querySelector("[data-requests]") ? "requests" : p.querySelector("[data-info], [data-note-box]") ? "info" : "";
+  }
+  function pageOfKind(kind) { return pageAll.filter(function (p) { return pageKind(p) === kind; })[0] || null; }
+  // Is this page theirs? The shop and the website's form answer a moment after login. Until then a page is offered
+  // if it was last time (remembered on this device), so the links don't jump around as the answers come in.
+  function pageHas(p) {
+    var part = p.querySelector("[data-form-portal], [data-shop-portal]"), kind = pageKind(p);
+    return !part || (asked[kind] > 0 ? !part.hidden : (lsGet("pages") || "").split(",").indexOf(kind) >= 0);
+  }
+  // The page an address names: "#shop" is that page, "#hours" the page holding it (and that spot on it), "#photos"
+  // the page with the Photos box. null: it names nothing of theirs.
+  function pageAt(hash) {
+    var el = null;
+    try { el = hash === "#photos" ? photosBox() : hash.length > 1 ? document.getElementById(decodeURIComponent(hash.slice(1))) : null; } catch (x) {}
+    var page = el && el.closest("[data-page]");
+    return page && pageHas(page) ? { page: page, spot: el !== page && hash !== "#photos" ? el : null } : null;
+  }
+  // Put a page on screen. moved: they asked for it just now, so it starts at its top and its heading takes the
+  // focus (a screen reader says where they are). The browser's Back and Forward keep their own place.
+  function showPage(page, moved) {
+    var change = page !== pageOn;
+    pageOn = page;
+    pageAll.forEach(function (x) { x.hidden = x !== page; });
+    document.title = (page === pageAll[0] ? "" : pageName(page) + " · ") + pageTitle;
+    document.documentElement.classList.toggle("pp-wide", page.hasAttribute("data-page-wide"));
+    drawNav();
+    if (!moved || !change) return;
+    window.scrollTo(0, 0);
+    var hd = page.querySelector("h1"); if (hd) { hd.setAttribute("tabindex", "-1"); hd.focus({ preventScroll: true }); }
+  }
+  function goPage(page, spot) {
+    var hash = "#" + (spot || page).id;
+    if (location.hash !== hash) { try { history.pushState(null, "", hash); } catch (x) {} }
+    showPage(page, true);
+    if (spot) spot.scrollIntoView({ block: "start" });
+  }
+  // The address decides which page shows: at the start, and after the browser's Back or Forward.
+  function route() {
+    var at = pageAt(location.hash) || { page: pageAll[0] };
+    if (at.page === pageOn) return;
+    showPage(at.page);
+    if (at.spot) at.spot.scrollIntoView({ block: "start" });
+  }
+  // The address after a page of ours (the Photos page) closes: the page under it.
+  function pageHash() { return pageOn && pageOn !== pageAll[0] ? "#" + pageOn.id : ""; }
+  function pagesStart() {
+    pageAll = [].slice.call(document.querySelectorAll("[data-page]"));
+    if (!pageAll.length) return;
+    pageTitle = document.title;
+    document.documentElement.classList.add("pp-on");
+    pageAll.slice(1).forEach(function (page) {
+      page.insertBefore(h("a", { class: "pp-back", href: "#" + pageAll[0].id }, [icon("back"), h("span", { text: pageName(pageAll[0]) })]), page.firstChild);
     });
-    if (edit) row.append(h("span", { class: "nav-fill" }), h("a", { class: "nav-edit", href: edit.getAttribute("href") || "/", "data-edit-mode": edit.getAttribute("data-edit-mode") || "", title: "Open your website to point at what you'd like changed" }, [icon("pencil"), h("span", { text: "Edit my website" })]));
-    nav.textContent = ""; nav.appendChild(row); nav.hidden = !navParts.length;
-    headRoom(); spy(true);
+    document.body.appendChild(pageTabs = h("nav", { class: "pp-tabs", "aria-label": "Portal pages" }));
+    // Any link on their page to one of the pages, or to something on one, goes there without loading anything.
+    document.addEventListener("click", function (e) {
+      var a = e.target.closest && e.target.closest('a[href^="#"]');
+      if (!a || e.defaultPrevented || e.button || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+      var at = pageAt(a.getAttribute("href")); if (!at) return;
+      e.preventDefault(); goPage(at.page, at.spot);
+    });
+    window.addEventListener("popstate", route);
+    window.addEventListener("resize", fitNav);
+    route();
   }
-  // Leave room for the header when the browser scrolls to a part (Tab, Find on page, our links).
-  function headRoom() { var hd = document.querySelector("[data-portal-nav]"); hd = hd && hd.closest("header"); if (hd) document.documentElement.style.scrollPaddingTop = (hd.offsetHeight + 12) + "px"; }
-  function goToPart(el) {
-    var hd = document.querySelector("[data-portal-nav]").closest("header"), off = hd ? hd.offsetHeight + 12 : 12;
-    window.scrollTo({ top: Math.max(0, el.getBoundingClientRect().top + window.scrollY - off), behavior: reduceMotion ? "auto" : "smooth" });
-    if (!el.hasAttribute("tabindex")) el.setAttribute("tabindex", "-1");   // so Tab carries on from there
-    el.focus({ preventScroll: true });
+  // The small count beside a page's name: new messages, items in the shop, requests still open (orange when
+  // Stray Wolf asked them something). Spelled out for a screen reader ("Messages, 2 new messages") and on hover.
+  function pageCount(page) {
+    var kind = pageKind(page), n = 0, words = "", hot = false;
+    if (kind === "messages") { n = fpNew(); words = n === 1 ? " new message" : " new messages"; }
+    else if (kind === "shop" && spShop) { n = spShop.items.length; words = (n === 1 ? " item" : " items") + " in your shop"; }
+    else if (kind === "requests") {
+      var asks = reqs.filter(function (r) { return r.status === "question"; }).length;
+      hot = asks > 0; n = asks || reqs.filter(function (r) { return !reqClosed(r); }).length;
+      words = asks ? (asks === 1 ? " question" : " questions") + " for you" : (n === 1 ? " request" : " requests") + " still open";
+    }
+    return n ? h("span", { class: "pp-n" + (hot ? " hot" : ""), title: n + words }, [h("span", { class: "pp-vh", text: ", " }), String(n), h("span", { class: "pp-vh", text: words })]) : null;
   }
-  // Underline the part on screen: the last one whose top has passed under the header (the last part at the very bottom).
-  var navOn = null;
-  function spy(force) {
-    if (!navParts.length) return;
-    var hd = document.querySelector("[data-portal-nav]").closest("header"), line = (hd ? hd.offsetHeight : 0) + 40, on = navParts[0];
-    navParts.forEach(function (p) { if (p.el.getBoundingClientRect().top <= line) on = p; });
-    if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 4) on = navParts[navParts.length - 1];
-    if (on === navOn && !force) return;
-    navOn = on;
-    navParts.forEach(function (p) { p.a.classList.toggle("on", p === on); if (p === on) p.a.setAttribute("aria-current", "location"); else p.a.removeAttribute("aria-current"); });
-    var row = on.a.parentNode;
-    if (row.scrollWidth > row.clientWidth) row.scrollLeft = Math.max(0, on.a.offsetLeft - 40);   // a narrow screen: keep it in view
-    navMore(row);
+  function pageLink(page, cls, name, withIcon) {
+    var a = h("a", { class: cls, href: "#" + page.id }, [withIcon ? icon(PAGE_ICON[pageKind(page)] || "list") : null, h("span", { text: name }), pageCount(page)]);
+    if (page === pageOn) a.setAttribute("aria-current", "page");
+    return a;
   }
-  function navMore(row) { row.classList.toggle("more", row.scrollLeft + row.clientWidth < row.scrollWidth - 2); row.classList.toggle("less", row.scrollLeft > 2); }
+  // The header's links and the phone's bar, drawn again whenever a page comes or goes, the page on screen changes,
+  // or a count does. Every part that loads or changes calls this, so Home's lists follow from here too.
+  function drawNav() {
+    if (!pageAll.length) return;
+    var want = (pageAt(location.hash) || { page: pageAll[0] }).page;
+    if (want !== pageOn) { showPage(want); return; }   // the part the address was waiting for has arrived (or theirs is gone)
+    var has = pageAll.filter(pageHas), edit = document.querySelector("[data-edit-mode]:not(.nav-edit)");
+    var sig = has.map(function (page) { var n = pageCount(page); return page.id + (page === pageOn ? "*" : "") + (n ? n.className + n.textContent : ""); }).join("|");
+    if (sig !== navSig) {
+      navSig = sig;
+      lsSet("pages", has.map(pageKind).join(","));
+      var nav = document.querySelector("[data-portal-nav]");
+      if (nav) {
+        var row = h("div", { class: "nav-in" }, has.map(function (page) { return pageLink(page, "pp-l", pageName(page)); }));
+        row.appendChild(h("span", { class: "nav-fill" }));
+        if (edit) row.append(h("span", { class: "nav-ask", text: "Need changes?" }),
+          h("a", { class: "nav-edit", href: edit.getAttribute("href") || "/", "data-edit-mode": edit.getAttribute("data-edit-mode") || "", title: "Open your website to point at what you'd like changed" }, [icon("pencil"), h("span", { text: "Edit my website" })]));
+        nav.replaceChildren(row); nav.hidden = false; fitNav();
+      }
+      pageTabs.replaceChildren.apply(pageTabs, has.map(function (page) { return pageLink(page, "", page.getAttribute("data-page-short") || pageName(page), true); }));
+    }
+    pageWait();
+    drawHome();
+  }
+  // The white row lets go of what it can do without when it runs short of room: "Need changes?" first, then their
+  // name beside their logo (their page hides the name while the links are .snug).
+  function fitNav() {
+    var nav = document.querySelector("[data-portal-nav]");
+    if (!nav || nav.hidden) return;
+    nav.classList.remove("no-ask", "snug");
+    if (nav.scrollWidth > nav.clientWidth) nav.classList.add("no-ask");
+    if (nav.scrollWidth > nav.clientWidth) nav.classList.add("snug");
+  }
+  // The page on screen says so while its part is still on its way, or didn't come.
+  function pageWait() {
+    var part = pageOn.querySelector("[data-form-portal], [data-shop-portal], [data-requests]"), line = pageOn.querySelector(".pp-wait");
+    if (!part || !part.hidden) { if (line) line.remove(); return; }
+    if (!line) pageOn.appendChild(line = h("p", { class: "pp-wait", role: "status" }));
+    line.textContent = asked[pageKind(pageOn)] < 0 ? "This didn't load. Check your internet, then reload this page." : "Loading…";
+  }
+  // Where a page stands, in a few words, for Home's list.
+  function pageStands(page) {
+    var kind = pageKind(page), count = function (list, test) { return list.filter(test).length; };
+    if (kind === "messages" && asked.messages > 0) { var fresh = fpNew(), all = fpList().length; return fresh ? fresh + " new" : all ? plural(all, "message") : "No messages yet"; }
+    if (kind === "shop" && spShop) {
+      var sold = count(spShop.items, function (x) { return x.show === "sold"; });
+      return count(spShop.items, function (x) { return x.show === "live"; }) + " showing" + (sold ? " · " + sold + " sold out" : "");
+    }
+    if (kind === "requests" && asked.requests > 0) {
+      var asks = count(reqs, function (r) { return r.status === "question"; }), open = count(reqs, function (r) { return !reqClosed(r); });
+      return asks ? plural(asks, "question") + " for you" : open ? open + " open" : reqs.length ? "Nothing open" : "Nothing sent yet";
+    }
+    if (kind === "info" && infoNow && infoNow.hours && window.SWInfo) {
+      var day = SWInfo.hoursOn(infoNow, SWInfo.now(infoNow.tz).date);
+      return day.closed ? "Closed today" : "Open today, " + SWInfo.span(day);
+    }
+    return "";
+  }
+  // What is waiting on them, most pressing first: each question from Stray Wolf, new messages from their website,
+  // and anything written or added but not sent yet.
+  function needRows() {
+    var rows = [], inbox = pageOfKind("messages");
+    reqs.filter(function (r) { return r.status === "question"; }).forEach(function (r) {
+      var q = r.msgs && r.msgs.length ? r.msgs[r.msgs.length - 1] : null;
+      rows.push({ ic: "help", b: TO + " has a question", t: short(q && q.by === "sw" ? q.text : r.text, 140), go: "Answer", main: true, fn: function () { answerRequest(r); } });
+    });
+    var fresh = fpForm && fpForm.state === "on" ? fpList().filter(function (l) { return l.status !== "replied"; }) : [];
+    if (fresh.length && inbox && pageHas(inbox)) {
+      var who = fresh.slice(0, 2).map(fpWho), rest = fresh.length - who.length;
+      rows.push({ ic: "mail", tone: "sage", b: plural(fresh.length, "new message") + " from your website",
+        t: rest ? who.join(", ") + " and " + rest + " more" : who.join(" and "), go: "Read", fn: function () { goPage(inbox); } });
+    }
+    var left = waiting();
+    if (left.length) {
+      var pics = left.reduce(function (n, x) { return n + x.pics.length; }, 0), onlyPics = left.every(function (x) { return !x.text; }), one = (onlyPics ? pics : left.length) === 1;
+      rows.push({ ic: "send", tone: "stone", b: (onlyPics ? plural(pics, "photo") : plural(left.length, "note")) + " not sent yet",
+        t: "Saved on this device. Check " + (one ? "it" : "them") + " over, then send " + (one ? "it" : "them") + " to " + TO + ".", go: "Review", fn: function () { openReview(); } });
+    }
+    return rows;
+  }
+  // Home's two lists: "Needs you", and every other page with where it stands. Drawn again only when something in
+  // them changed, so a button being pressed keeps the focus.
+  function drawHome() {
+    var needs = document.querySelector("[data-needs]"), glance = document.querySelector("[data-glance]");
+    if (!pageAll.length || (!needs && !glance)) return;
+    var rows = needRows(), others = pageAll.slice(1).filter(pageHas);
+    // until the service has said what's new, an empty list doesn't claim that nothing is; nor when it couldn't be reached
+    var due = function (kind, part) { return !!asked[kind] || !document.querySelector(part); }, known = due("requests", "[data-requests-list]") && due("messages", "[data-form-portal]");
+    var down = asked.requests < 0 || asked.messages < 0;
+    var sig = [known, down].concat(rows.map(function (r) { return r.b + r.t; }), others.map(function (page) { return page.id + pageStands(page); })).join("|");
+    if (sig === homeSig) return;
+    homeSig = sig;
+    var row = function (ic, tone, b, t, end) { return [h("span", { class: "pp-ic" + (tone ? " " + tone : "") }, [icon(ic)]), h("span", { class: "pp-t" }, [h("b", { text: b }), t ? h("span", { text: t }) : null])].concat(end); };
+    if (needs) {
+      needs.replaceChildren.apply(needs, rows.length ? rows.map(function (r) {
+        return h("li", { class: "pp-row" }, row(r.ic, r.tone, r.b, r.t, [h("button", { class: "pp-btn" + (r.main ? "" : " plain"), type: "button", text: r.go, onclick: r.fn })]));
+      }) : [h("li", { class: "pp-row" }, down ? row("help", "stone", "This didn't load.", "Check your internet, then reload this page.", [])
+        : known ? row("check", "sage", "Nothing needs you right now.", "", []) : row("check", "stone", "Checking what's new…", "", []))]);
+      var n = document.querySelector("[data-needs-n]");
+      if (n) { n.hidden = !rows.length; n.replaceChildren(String(rows.length), h("span", { class: "pp-vh", text: rows.length === 1 ? " thing" : " things" })); }
+    }
+    if (glance) glance.replaceChildren.apply(glance, others.map(function (page) {
+      var kind = pageKind(page), stands = pageStands(page);
+      return h("li", {}, [h("a", { class: "pp-row", href: "#" + page.id }, row(PAGE_ICON[kind] || "list", kind === "messages" ? "sage" : "stone", pageName(page), page.getAttribute("data-page-about"),
+        [stands ? h("span", { class: "pp-v", text: stands }) : null, icon("chev")]))]);
+    }));
+  }
+  // "Answer" on Home: the Requests page, with that question's answer box open and ready to type in.
+  function answerRequest(r) {
+    var page = pageOfKind("requests"); if (!page) return;
+    reqOpen = r.batch + ":" + r.n; reqDraft = "";
+    goPage(page); drawRequests();
+    var field = page.querySelector("[data-requests-list] textarea");
+    if (field) { field.scrollIntoView({ block: "center" }); field.focus({ preventScroll: true }); }
+  }
 
   // "Your requests" on their page ([data-requests]): what they've asked for and where each one stands.
   // The status is the one Stray Wolf picks in the admin, in the client's words. Only Stray Wolf changes
   // it, with one exception: answering a question hands the request back ("Working on it").
-  // With nothing sent yet (or an older service) the card stays hidden.
+  // With nothing sent yet the list says so. "See all" ([data-requests-all]) can sit anywhere on the page.
   var REQ_WORDS = { "new": "Received", working: "Working on it", question: TO + " has a question", done: "Done", declined: "Not doing this one" };
   var REQ_SHOWN = 3;
   var reqs = [], reqAll = false, reqOpen = null, reqDraft = "";   // their requests; whether all are listed; the one being answered, and the answer so far
   function loadRequests() {
     if (!document.querySelector("[data-requests-list]")) return;
     var got = DEMO ? Promise.resolve(demoRequests()) : api("/api/my-requests", { token: getToken() });
-    got.then(function (d) { if (d && d.ok && Array.isArray(d.requests)) { reqs = d.requests; drawRequests(); } });
+    got.then(function (d) {
+      asked.requests = d && d.status === 0 ? -1 : 1;
+      if (d && d.ok && Array.isArray(d.requests)) reqs = d.requests;
+      if (asked.requests > 0) drawRequests(); else drawNav();
+    });
   }
   function reqClosed(r) { return r.status === "done" || r.status === "declined"; }
   // "Home page", "About page", or the portal box it came from ("Contact info")
   function reqWhere(r) { return /portal/i.test(r.title || "") ? r.on || "Your portal" : !r.title || r.title === "Home" ? "Home page" : /\bpage$/i.test(r.title) ? r.title : r.title + " page"; }
   function drawRequests() {
     var box = document.querySelector("[data-requests]"), list = box && box.querySelector("[data-requests-list]"); if (!list) return;
-    if (!reqs.length) { box.hidden = true; drawNav(); return; }
     // questions first (they are waiting on the client), then open ones, then finished ones; newest first in each
     var rank = function (r) { return r.status === "question" ? 0 : reqClosed(r) ? 2 : 1; }, when = function (r) { return String((reqClosed(r) && r.statusAt) || r.at || ""); };
     var sorted = reqs.slice().sort(function (a, b) { return rank(a) - rank(b) || (when(a) < when(b) ? 1 : when(a) > when(b) ? -1 : 0); });
     var few = Math.max(REQ_SHOWN, sorted.filter(function (r) { return r.status === "question"; }).length);
-    var more = box.querySelector("[data-requests-all]");
+    var more = document.querySelector("[data-requests-all]");
     if (more) {
       more.hidden = sorted.length <= few; more.textContent = reqAll ? "Show fewer" : "See all " + sorted.length;
       more.onclick = function () { reqAll = !reqAll; drawRequests(); };
     }
     list.textContent = "";
+    if (!reqs.length) list.appendChild(h("li", { class: "rq-none", text: "Nothing yet. What you send " + TO + " shows up here, with where it stands." }));
     (reqAll ? sorted : sorted.slice(0, few)).forEach(function (r) {
       var last = r.msgs && r.msgs.length ? r.msgs[r.msgs.length - 1] : null;
       var words = (REQ_WORDS[r.status] || REQ_WORDS["new"]) + (r.status === "done" && r.statusAt ? " " + dayWord(r.statusAt) : "");
@@ -2068,7 +2407,8 @@
   // delete it (one tap, with Undo). A tap on the row opens every answer and file. Tick rows (or Select all) to mark
   // or delete several at once. Each message was also emailed to them, so this is the copy they can come back to
   // (kept a year), and "Emails go to" is where those emails go, theirs to change. Stray Wolf switches the form on
-  // in the admin and never reads these. Form off, or an older service: no card.
+  // in the admin and never reads these. Its page has the heading; the line under it
+  // ([data-form-count]) says how many. Form off: no Messages page.
   var FP_SHOWN = 6;
   // the form and its messages; all shown; rows opened; rows ticked; rows deleted but still undoable; "Emails go to" being changed (and what's typed)
   var fpForm = null, fpLeads = [], fpAll = false, fpOpen = {}, fpPick = {}, fpGone = {}, fpEditTo = false, fpTyped = null;
@@ -2076,16 +2416,12 @@
   function fpNew() { return fpForm && fpForm.state === "on" ? fpList().filter(function (l) { return l.status !== "replied"; }).length : 0; }
   function formCall(path, body) { return DEMO ? Promise.resolve(demoFormCall(path, body || {})) : api("/api/my-form" + path, { token: getToken(), body: body || {} }); }
   function loadForm() {
-    formCall("").then(function (d) { if (d && d.ok && d.form) { fpForm = d.form; fpLeads = Array.isArray(d.leads) ? d.leads : []; drawForm(); } });
-  }
-  // The card goes under the boxes of what's on their site (under the shop or Your requests on an older page),
-  // unless the page placed its own.
-  function formBox() {
-    var box = document.querySelector("[data-form-portal]"); if (box) return box;
-    var after = document.querySelector(".boxes") || document.querySelector("[data-shop-portal]") || document.querySelector("[data-requests]"); if (!after) return null;
-    box = h("section", { class: "fp", id: "messages", "data-nav": "Messages", "data-form-portal": true, hidden: true, "aria-labelledby": "fp-h" });
-    after.parentNode.insertBefore(box, after.nextSibling);
-    return box;
+    if (!document.querySelector("[data-form-portal]")) return;
+    formCall("").then(function (d) {
+      asked.messages = d && d.status === 0 ? -1 : 1;
+      if (d && d.ok && d.form) { fpForm = d.form; fpLeads = Array.isArray(d.leads) ? d.leads : []; }
+      drawForm();
+    });
   }
   function fpWho(l) { return l.name || l.email || l.phone || "Someone"; }
   function fpTrouble(d, what) { return d.status === 401 ? "Your login timed out. Log in again to " + what + "." : d.status === 0 ? d.error : d.error || "That didn't " + what + ". Try again in a minute."; }
@@ -2098,13 +2434,13 @@
   function fpWant(details) { var w = details.filter(function (f) { return /type|service|interest|looking for|what/i.test(f[0]); })[0]; return w ? w[1] : ""; }
 
   function drawForm() {
-    var box = formBox(); if (!box) return;
+    var box = document.querySelector("[data-form-portal]"); if (!box) return;
     if (!fpForm || fpForm.state === "off") { box.hidden = true; drawNav(); return; }
     box.className = "fp"; box.textContent = "";
     var all = fpList(), n = fpNew();
     Object.keys(fpPick).forEach(function (id) { if (!all.some(function (l) { return l.id === id; })) delete fpPick[id]; });
-    box.appendChild(h("div", { class: "fp-hd" }, [h("h2", { id: "fp-h", text: "Messages from your website" }),
-      h("p", { text: all.length ? (n ? n + " new · " : "") + plural(all.length, "message") + ". Each one was also emailed to you." : "What people send with the form on your website. Each one is also emailed to you." })]));
+    var count = document.querySelector("[data-form-count]");
+    if (count) count.textContent = all.length ? (n ? n + " new · " : "") + plural(all.length, "message") + ". Each one was also emailed to you." : "What people send with the form on your website. Each one is also emailed to you.";
     if (fpForm.state === "test") box.appendChild(h("p", { class: "fp-test", text: TO + " is testing your website's form, so messages aren't coming to you yet. Once it's switched on, they'll be emailed to you and listed here." }));
     if (!all.length) box.appendChild(h("p", { class: "fp-none", text: fpForm.state === "on" ? "No messages yet. When someone fills in the form on your website, it shows up here and in your email." : "Nothing here yet." }));
     else {
@@ -2268,7 +2604,7 @@
       infoFiles().then(function (ok) {
         if (!ok) return;
         infoNow = d.info; if (DEMO) infoDemo = SWInfoEditor.demo(d.info);
-        SWInfoEditor.fill(document, infoNow);
+        SWInfoEditor.fill(document, infoNow); drawNav();
       });
     });
   }
@@ -2283,11 +2619,11 @@
   }
   function openInfo(box) {
     var names = function (part) { return Object.keys(infoPairs(infoBox(part), "data-note-fields")); };
-    SWInfoEditor.open(box.getAttribute("data-info"), { info: infoNow, mode: "portal", name: NAME, typed: infoTyped(),
+    SWInfoEditor.open(box.getAttribute("data-info"), { info: infoNow, mode: "portal", name: NAME, typed: infoTyped(), back: pageOn ? pageName(pageOn) : "",
       title: (infoBox("hours") && infoBox("hours").getAttribute("data-area")) || "", socials: names("social"),
       fields: names("contact").map(function (k) { return k.toLowerCase(); }).filter(function (k) { return /^(phone|email|address|area)$/.test(k); }),
       call: function (path, body) { return infoDemo ? infoDemo.call(path, body) : api("/api/my-info" + path, { token: getToken(), body: body }); },
-      onChange: function (info) { infoNow = info; SWInfoEditor.fill(document, info); } });
+      onChange: function (info) { infoNow = info; SWInfoEditor.fill(document, info); drawNav(); } });
   }
 
   // "Your shop" on their page ([data-shop-portal]): what their website sells (kit/shop draws it there). It is the shop
@@ -2295,14 +2631,14 @@
   // fetched only for a client who has a shop. Search, prices typed in the row, up to 5 photos an item found on their
   // own website, sales, options, many items at once, and Changes with Undo. Every Buy button opens the item's own
   // checkout link, so no payment ever comes through here. Stray Wolf starts the shop, imports into it and picks its
-  // kind of checkout in the admin. No shop: no card.
-  var SHOP_FILES = "2";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
+  // kind of checkout in the admin. No shop: no Shop page.
+  var SHOP_FILES = "3";   // bump with every change to shop-manager.js or .css, so browsers and phones fetch the new copy
   var spShop = null, spMgr = null, spDemo = null, spPics = {};
   function loadShop() {
     var box = document.querySelector("[data-shop-portal]"); if (!box || spMgr) return;
     (DEMO ? Promise.resolve({ ok: true, shop: demoShop(), today: new Date().toLocaleDateString("en-CA") }) : api("/api/my-shop", { token: getToken() })).then(function (d) {
-      if (!d || !d.ok || !d.shop || !Array.isArray(d.shop.items)) return;
-      [].forEach.call(box.querySelectorAll("[data-shop-add], [data-shop-form]"), function (el) { el.hidden = true; });
+      asked.shop = d && d.status === 0 ? -1 : 1;
+      if (!d || !d.ok || !d.shop || !Array.isArray(d.shop.items)) { drawNav(); return; }
       spShop = d.shop; box.hidden = false; drawNav();
       // SW Core before 2.2 sends no date with the shop, and the manager needs its newer calls.
       if (!d.today) { shopNote(box, "Your shop is getting an update. Check back in a few minutes."); return; }
@@ -2319,7 +2655,7 @@
       .then(function (r) { return r[0] && r[1] && !!window.SWShopManager; });
   }
   function mountShop(box, d) {
-    if (DEMO) spDemo = SWShopManager.demo(d.shop, demoPic);
+    if (DEMO) spDemo = SWShopManager.demo(JSON.parse(JSON.stringify(d.shop)), demoPic);   // its own copy, as the service's is
     var photos = h("button", { class: "swm-btn plain", type: "button", title: "Every item's photos in one .zip file, each named after its item", onclick: function () { shopPhotos(this); } },
       [icon("download", 15), h("span", { text: "Photos" })]);
     spMgr = SWShopManager.mount(box.querySelector("[data-shop-list]") || box, { mode: "portal", shop: d.shop, today: d.today, site: SITE, name: NAME,
@@ -2376,23 +2712,6 @@
     });
   }
 
-  function tuckAway(card) {
-    var to = els.stripLbl, v = els.veil;
-    var finish = function () {
-      closePanels(); render();
-      if (to && to.animate && !reduceMotion) to.animate([{ transform: "scale(1)" }, { transform: "scale(1.12)", offset: .35 }, { transform: "scale(1)" }], { duration: 650, easing: "ease-out" });
-    };
-    if (!card || !card.animate || reduceMotion || !to) return finish();
-    if (els.dock) els.dock.hidden = false;             // the bar has to be on screen to shrink into it
-    var a = card.getBoundingClientRect(), b = to.getBoundingClientRect();
-    if (!b.width) return finish();
-    var dx = (b.left + b.width / 2) - (a.left + a.width / 2), dy = (b.top + b.height / 2) - (a.top + a.height / 2);
-    card.style.pointerEvents = "none";
-    if (v) v.animate([{ backgroundColor: "rgba(24,22,20,.55)" }, { backgroundColor: "rgba(24,22,20,0)" }], { duration: 520, easing: "ease-in", fill: "forwards" });
-    card.animate([{ transform: "none", opacity: 1, borderRadius: "18px" },
-                  { transform: "translate(" + dx + "px," + dy + "px) scale(.06)", opacity: .2, borderRadius: "60px" }],
-                 { duration: 520, easing: "cubic-bezier(.5,0,.75,0)", fill: "forwards" }).onfinish = finish;
-  }
   function goEdit(url) {
     if (!url || url === "soon") { toast("Your mockup isn't ready yet. " + TO + " will let you know when it is."); return; }
     lsSet("on", "1"); location.href = url;
@@ -2424,13 +2743,13 @@
     var helpBtn = h("button", { type: "button", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]);
     var strip = MODE === "edit"
       ? h("div", { class: "strip" }, [h("div", { class: "strip-in" }, [
-          els.stripLbl = h("span", { class: "lbl" }, [h("span", { class: "dot" }), h("span", { text: "Edit mode is on" })]),
+          h("span", { class: "lbl" }, [h("span", { class: "dot" }), h("span", { text: "Edit mode is on" })]),
           h("span", { class: "sub", text: "· Your website isn't changing" }),
           h("span", { class: "gap" }), helpBtn,
           h("button", { type: "button", onclick: exitEdit }, [icon("power"), h("span", { class: "lg", text: "Exit edit mode" }), h("span", { class: "sm", text: "Exit" })])
         ])])
       : h("div", { class: "strip hub" }, [h("div", { class: "strip-in" }, [
-          els.stripLbl = h("span", { class: "lbl" }, [icon("lock"), h("span", { class: "lg", text: "You're logged in" }), h("span", { class: "sm", text: "Logged in" })]),
+          h("span", { class: "lbl" }, [icon("lock"), h("span", { class: "lg", text: "You're logged in" }), h("span", { class: "sm", text: "Logged in" })]),
           h("span", { class: "sub", text: "· Only you can see this page" }),
           h("span", { class: "gap" }), helpBtn,
           h("button", { type: "button", onclick: askLogOut }, [icon("power"), h("span", { text: "Log out" })])
@@ -2443,8 +2762,8 @@
     if (slot) {
       els.bare = true;
       slot.textContent = "";
-      if (talkBox()) slot.appendChild(h("button", { class: "talk", type: "button", "data-talk": "", title: "Pick a time to talk with " + TO + " about your website" }, [icon("calendar"), h("span", { text: "Let's talk" })]));
-      slot.append(els.stripLbl = h("button", { type: "button", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]),
+      if (bookingUrl()) slot.appendChild(h("button", { class: "talk", type: "button", "data-talk": "", title: "Pick a time to talk with " + TO + " about your website" }, [icon("calendar"), h("span", { text: "Let's talk" })]));
+      slot.append(h("button", { type: "button", onclick: function () { showHelp(false); } }, [icon("help"), h("span", { text: "Help" })]),
                   h("button", { type: "button", onclick: askLogOut }, [icon("power"), h("span", { text: "Log out" })]));
     }
     els.dock = h("div", { class: "dock " + MODE }, [strip, h("div", { class: "dock-main" }, [h("div", { class: "dock-in" }, [els.say, els.btns])])]);
@@ -2472,8 +2791,8 @@
       if (ib) { e.preventDefault(); openInfo(ib); return; }
       // Boxes made for notes (like on the welcome page) open a note with one tap, no "Add a note" first.
       var box = !picking && !st.sent && !els.note && !els.veil && e.target.closest && e.target.closest("[data-note-box]");
-      // A booking page set on the box (Let's talk, later a Google Calendar schedule) opens that instead of a note.
-      if (box && box === talkBox() && (box.getAttribute("data-booking-url") || "").trim()) { e.preventDefault(); letsTalk(); return; }
+      // A box that carries the booking page (an older page's Let's talk box) opens that instead of a note.
+      if (box && (box.getAttribute("data-booking-url") || "").trim()) { e.preventDefault(); letsTalk(); return; }
       if (box && box === photosBox()) { e.preventDefault(); openPhotos(); return; }   // the Photos box opens the Photos page
       if (box) { e.preventDefault(); addNote(box, box.getAttribute("data-area") || null, e); return; }
       if (!picking) return;
@@ -2490,7 +2809,7 @@
       if (e.key !== "Escape") return;
       if (els.lb) closeLb();
       else if (picking) stopPicking();
-      else if (panel && !busy) { if (panel === "note") saveNote(); else if (panel === "photos") backFromPhotos(); else if (els.veil && els.veilClose) els.veilClose(); else { closePanels(); render(); } }
+      else if (panel && !busy) { if (panel === "photos") backFromPhotos(); else if (els.veil && els.veilClose) els.veilClose(); else if (panel === "note") saveNote(); else { closePanels(); render(); } }
     });
     document.addEventListener("keydown", trapTab);
     window.addEventListener("pagehide", function () { if (toastAfter) clearToast(); });   // a deleted note's photos go, even if they leave before Undo runs out
@@ -2503,11 +2822,7 @@
 
     if (MODE === "hub" && st.sent) newList(true);   // sent last time: their page starts fresh, no leftover "Sent" bar
     render();
-    if (MODE === "hub") {
-      addCss(document, PAGE_CSS); paintBrands(); loadStats(); loadRequests(); loadShop(); loadInfo(); loadForm(); dropOnBoxes(); drawNav();
-      var spyTick = false; window.addEventListener("scroll", function () { if (spyTick) return; spyTick = true; requestAnimationFrame(function () { spyTick = false; spy(); }); }, { passive: true });
-      window.addEventListener("resize", function () { headRoom(); spy(true); });
-    }
+    if (MODE === "hub") { addCss(document, PAGE_CSS); paintBrands(); pagesStart(); loadStats(); loadRequests(); loadShop(); loadInfo(); loadForm(); dropOnBoxes(); }
     if (photosBox()) {
       window.addEventListener("popstate", function () {
         if (location.hash === "#photos") { if (panel !== "photos" && !els.veil && !busy) openPhotos(true); }
@@ -2688,7 +3003,9 @@
   /* Tooltips on the Client Portal page (not on the website itself). Hover (after a moment) or keyboard focus on
      anything with a title, or a button that is only an icon, shows a short dark label under it: the browser's own
      title box is slow and never shows for the keyboard. Esc or moving away closes it, and the pointer can rest on the
-     label (WCAG 1.4.13). A tap on an (i) (.swm-i, the shop) shows its words on a phone. Same as the admin's. */
+     label (WCAG 1.4.13). A tap on an (i) (.swm-i, the shop) shows its words on a phone. Like the admin's, and one
+     thing more: after a press, hover waits for the pointer to move, so what a click just opened under a resting
+     pointer shows no label (and Esc goes to the page, not to a label nobody asked for). */
   function tooltips() {
     if (window.__swTips) return; window.__swTips = 1;
     addCss(document, ".sw-tip{position:fixed;z-index:2147483000;max-width:260px;padding:6px 9px;border-radius:7px;background:#24221f;color:#f6f5f2;" +
@@ -2718,7 +3035,11 @@
       tip.onpointerenter = function () { clearTimeout(gone); }; tip.onpointerleave = function () { gone = setTimeout(hide, 120, true); };
       requestAnimationFrame(function () { if (tip) tip.classList.add("on"); });
     }
-    document.addEventListener("pointerover", function (e) { if (e.pointerType === "touch") return; var n = find(e); if (!n || n === at) { if (n) clearTimeout(gone); return; } clearTimeout(wait); wait = setTimeout(function () { show(n); }, 350); });
+    var moved = true;   // false from a press until the pointer moves again
+    function over(e) { if (e.pointerType === "touch") return; var n = find(e); if (!n || n === at) { if (n) clearTimeout(gone); return; } clearTimeout(wait); wait = setTimeout(function () { show(n); }, 350); }
+    document.addEventListener("pointerdown", function () { moved = false; clearTimeout(wait); }, true);
+    document.addEventListener("pointermove", function (e) { if (!moved) { moved = true; over(e); } }, true);
+    document.addEventListener("pointerover", function (e) { if (moved) over(e); });
     document.addEventListener("pointerout", function (e) { var n = find(e); if (!n) return; var to = e.relatedTarget; if (to && (n.contains(to) || (tip && tip.contains(to)))) return; clearTimeout(wait); gone = setTimeout(hide, 120, true); });
     document.addEventListener("focusin", function (e) { var n = find(e), t = (e.composedPath ? e.composedPath()[0] : e.target); if (n && n === t && t.matches(":focus-visible")) show(n); else if (at && at !== n) hide(); });
     document.addEventListener("focusout", function (e) { if ((e.composedPath ? e.composedPath()[0] : e.target) === at) hide(); });

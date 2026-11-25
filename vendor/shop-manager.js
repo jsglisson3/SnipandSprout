@@ -32,7 +32,7 @@
   var MAX = { photos: 5, desc: 3000, name: 100, cat: 60, alt: 200, options: 3, choices: 20, perCall: 8 };
   var SVG = "http://www.w3.org/2000/svg";
   var P = {
-    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4.5"/><path d="M12 8h.01"/>', plus: '<path d="M12 5v14M5 12h14"/>', chev: '<path d="m6 9 6 6 6-6"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>', alert: '<path d="M12 3.5 2.5 20h19z"/><path d="M12 10v4.5"/><path d="M12 17.3h.01"/>', info: '<circle cx="12" cy="12" r="9"/><path d="M12 16v-4.5"/><path d="M12 8h.01"/>', plus: '<path d="M12 5v14M5 12h14"/>', chev: '<path d="m6 9 6 6 6-6"/>',
     hist: '<path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l3 2"/>', up: '<path d="M12 15V3"/><path d="m7 8 5-5 5 5"/><path d="M5 21h14"/>',
     down: '<path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M5 21h14"/>', star: '<path d="m12 3 2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/>',
     tag: '<path d="M3 12V4a1 1 0 0 1 1-1h8l9 9-9 9z"/><circle cx="7.5" cy="7.5" r="1.5"/>', eye: '<path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
@@ -117,9 +117,10 @@
 
     /* ---------- the frame: drawn once; each part repaints itself ---------- */
     var root = el("div", { class: "swm", "data-mode": you ? "portal" : "admin" });
-    var sum = el("span", { class: "swm-sum" }), coBadge = opts.checkout || el("span", { class: "swm-co" });
+    var sum = el("span", { class: "swm-sum" }), saved = el("span", { class: "swm-saved-at" }), coBadge = opts.checkout || el("span", { class: "swm-co" });
     var acts = el("div", { class: "swm-acts" });
-    var top = el("div", { class: "swm-top" }, [opts.who || null, el("div", { class: "swm-top-t" }, [sum]), coBadge, acts]);
+    var top = el("div", { class: "swm-top" }, [opts.who || null, el("div", { class: "swm-top-t" }, [sum, saved,
+      el("p", { class: "swm-live" }, [el("i", { "aria-hidden": "true" }), "Changes you save here go live on " + whose + " within a minute."])]), coBadge, acts]);
     var banner = el("div", { class: "swm-banner", hidden: true, role: "status" });
     var find = el("input", { type: "search", class: "swm-find-in", autocomplete: "off", placeholder: "Search items", "aria-label": "Search items" });
     var catSel = el("select", { class: "swm-sel", "aria-label": "Category" });
@@ -129,7 +130,7 @@
     var table = el("table", { class: "swm-t" }), tbody = el("tbody"), none = el("p", { class: "swm-none", hidden: true });
     var headCk = el("input", { type: "checkbox", class: "swm-ck", "aria-label": "Select every item shown" });
     table.appendChild(el("thead", {}, [el("tr", {}, [el("th", { class: "c-ck", scope: "col" }, [headCk]), el("th", { scope: "col", text: "Item" }), el("th", { scope: "col", class: "c-pr", text: "Price" }),
-      el("th", { scope: "col", class: "c-st", text: you ? "On your website" : "On the website" })])]));
+      el("th", { scope: "col", class: "c-st", text: "Status", title: "Showing: on " + whose + " with its Buy button. Sold out: on " + whose + ", no Buy button. Hidden: not on " + whose + "." })])]));
     table.appendChild(tbody);
     var left = el("div", { class: "swm-left" }, [table, none]);
     var ed = el("section", { class: "swm-ed", hidden: true, "aria-label": "Item" });
@@ -154,13 +155,13 @@
     /* ---------- the list ---------- */
     function counts() {
       var n = { all: shop.items.length, live: 0, sold: 0, hidden: 0, sale: 0, tagged: 0, nophoto: 0, nolink: 0 };
-      shop.items.forEach(function (x) { n[x.show]++; if (saleOn(x, today)) n.sale++; if (x.tag) n.tagged++; if (!(x.photos || []).length) n.nophoto++; if (!x.link) n.nolink++; });
+      shop.items.forEach(function (x) { n[x.show]++; if (saleOn(x, today)) n.sale++; if (x.tag) n.tagged++; if ((x.photos || []).length < 2) n.nophoto++; if (!x.link) n.nolink++; });
       return n;
     }
-    var CHIPS = [["all", "All"], ["live", you ? "Showing on your website" : "Showing on the website"], ["sold", "Sold out"], ["hidden", "Hidden"], ["sale", "On sale"],
-      ["tagged", "New or Featured"], ["nophoto", "No photos yet"], ["nolink", "No checkout link yet"]];
+    var CHIPS = [["all", "All"], ["live", "Showing"], ["sold", "Sold out"], ["hidden", "Hidden"], ["sale", "On sale"],
+      ["tagged", "New or Featured"], ["nophoto", "Needs photos"], ["nolink", "No checkout link"]];
     function fits(x, chip) {
-      return chip === "all" || (chip === "sale" ? saleOn(x, today) : chip === "tagged" ? !!x.tag : chip === "nophoto" ? !(x.photos || []).length : chip === "nolink" ? !x.link : x.show === chip);
+      return chip === "all" || (chip === "sale" ? saleOn(x, today) : chip === "tagged" ? !!x.tag : chip === "nophoto" ? (x.photos || []).length < 2 : chip === "nolink" ? !x.link : x.show === chip);
     }
     function shownItems() {
       var q = st.q.trim(), list = shop.items.filter(function (x) {
@@ -176,8 +177,8 @@
     function reorderable() { return st.sort === "order" && st.chip === "all" && !st.cat && !st.q.trim(); }
     function paintTop() {
       var n = counts(), c = kind();
-      sum.textContent = plural(n.all, "item", "items") + ": " + [n.live + " showing", n.sold ? n.sold + " sold out" : "", n.hidden + " hidden"].filter(Boolean).join(", ")
-        + (shop.updated ? " · saved " + ago(shop.updated) + (shop.by === "client" ? (you ? " by you" : " by " + (opts.name || "the client") + " in their portal") : you ? " by Stray Wolf" : "") : "");
+      fill(sum, [plural(n.all, "item", "items"), n.live + " showing", n.sold ? n.sold + " sold out" : "", n.hidden ? n.hidden + " hidden" : ""].filter(Boolean).map(function (t) { return el("span", { text: t }); }));
+      saved.textContent = shop.updated ? "Saved " + ago(shop.updated) + (shop.by === "client" ? (you ? " by you" : " by " + (opts.name || "the client") + " in their portal") : you ? " by Stray Wolf" : "") : "";
       if (!opts.checkout) { fill(coBadge, [ico("lock", 13), c.badge]); coBadge.title = c.tip; }
       changesBtn.disabled = !(shop.history || []).length;
       exportBtn.disabled = !shop.items.length;
@@ -207,7 +208,7 @@
     }
     function thumb(x) {
       var p = (x.photos || [])[0];
-      return p ? el("span", { class: "swm-th" }, [photoImg(picPath(p.key), "")]) : el("span", { class: "swm-th is-empty", title: "No photos yet" }, [ico("photo", 16)]);
+      return p ? el("span", { class: "swm-th" }, [photoImg(picPath(p.key), "")]) : el("span", { class: "swm-th is-empty", title: "No photos" }, [ico("photo", 16)]);
     }
     function flag(x) {
       return x.tag === "featured" ? el("span", { class: "swm-flag" }, [ico("star", 12, 2.2), "Featured"]) : x.tag === "new" ? el("span", { class: "swm-flag is-new", text: "New" }) : null;
@@ -218,8 +219,9 @@
       (x.options || []).forEach(function (o) { bits.push(plural(o.choices.length, o.name.toLowerCase().replace(/s$/, ""), o.name.toLowerCase().replace(/s?$/, "s"))); });
       var out = el("small", {}, [bits.filter(Boolean).join(" · ")]);
       if (bits.filter(Boolean).length) out.appendChild(document.createTextNode(" · "));
-      out.appendChild(n ? document.createTextNode(plural(n, "photo", "photos")) : el("span", { class: "swm-warn", text: "No photos yet" }));
-      if (!x.link) { out.appendChild(document.createTextNode(" · ")); out.appendChild(el("span", { class: "swm-warn", text: "No checkout link" })); }
+      out.appendChild(n > 1 ? document.createTextNode(n + " photos")
+        : el("span", { class: "swm-warn", title: n ? "Items with two or more photos sell better. Open it to add more." : "It shows on " + whose + " with no picture. Open it to add photos." }, [ico("alert", 13), n ? "Only 1 photo" : "No photos"]));
+      if (!x.link) { out.appendChild(document.createTextNode(" · ")); out.appendChild(el("span", { class: "swm-warn" }, [ico("alert", 13), "No checkout link"])); }
       return out;
     }
     function whenWords(s) {
@@ -250,16 +252,17 @@
       };
       var nameBtn = el("button", { class: "swm-name-b", type: "button", text: x.name, title: "Open " + x.name, onclick: function () { openItem(x.id); } });
       var grip = drag ? el("button", { class: "swm-grip", type: "button", draggable: "true", "aria-label": "Move " + x.name + ": drag, or use the up and down arrow keys", title: "Drag to change the order on " + whose }, [ico("grip", 14)]) : null;
-      var tr = el("tr", { class: [x.id === st.open ? "is-open" : "", picked ? "is-picked" : "", x.show === "hidden" ? "is-dim" : ""].join(" ").trim() || null, "data-id": x.id }, [
+      var tr = el("tr", { class: [x.id === st.open ? "is-open" : "", picked ? "is-picked" : ""].join(" ").trim() || null, "data-id": x.id }, [
         el("td", { class: "c-ck" }, [ck]),
         el("td", { class: "c-it" }, [el("div", { class: "swm-name" }, [grip, thumb(x), el("div", { class: "swm-name-t" }, [el("div", { class: "swm-name-l" }, [nameBtn, flag(x)]), metaLine(x)])])]),
-        el("td", { class: "c-pr" }, [el("div", { class: "swm-pbox" }, [el("span", { "aria-hidden": "true", text: "$" }), price]),
-          on ? el("small", { class: "swm-sale-w" }, [ico("tag", 12), (x.sale.pct ? x.sale.pct + "% off: " : "Sale: ") + money(shownPrice(x, today)) + (x.sale.ends ? " until " + dayWords(x.sale.ends) : "")])
+        el("td", { class: "c-pr" }, [el("div", { class: "swm-pbox" + (on ? " is-was" : "") }, [el("span", { "aria-hidden": "true", text: "$" }), price]),
+          on ? el("small", { class: "swm-sale-w" }, [el("b", { text: "Sale " + money(shownPrice(x, today)) }),
+              x.sale.pct || x.sale.ends ? el("span", { text: [x.sale.pct ? x.sale.pct + "% off" : "", x.sale.ends ? "ends " + dayWords(x.sale.ends) : ""].filter(Boolean).join(" · ") }) : null])
             : x.sale ? el("small", { class: "swm-muted", text: "Sale ended " + dayWords(x.sale.ends) }) : priceFrom(x) ? el("small", { class: "swm-muted", text: "Prices vary by choice" }) : null,
           shop.checkout !== "generic" && x.sqPrice != null && x.sqPrice !== x.price ? el("small", { class: "swm-warn" }, ["Square charges " + money(x.sqPrice) + " ",
             el("button", { class: "swm-link-b", type: "button", text: "Use " + money(x.sqPrice), "aria-label": "Use Square's price, " + money(x.sqPrice) + ", for " + x.name,
               onclick: function () { save("/prices", { prices: [{ id: x.id, price: dollarsIn(x.sqPrice) }] }); } })]) : null]),
-        el("td", { class: "c-st" }, [stSel])]);
+        el("td", { class: "c-st" }, [el("span", { class: "swm-state-w is-" + x.show }, [stSel])])]);
       if (grip) rowDrag(tr, grip, x);
       tr.ondblclick = function (e) { if (!/INPUT|SELECT|BUTTON/.test(e.target.tagName)) openItem(x.id); };
       return tr;
@@ -476,8 +479,8 @@
         var list = d.photos.concat(st.pending), room = MAX.photos - list.length;
         var grid = el("div", { class: "swm-ph", role: "list", "aria-label": "Photos, the first is the main one" });
         list.forEach(function (p, i) { grid.appendChild(tile(p, i, list.length, paint)); });
-        if (room > 0) grid.appendChild(el("button", { type: "button", class: "swm-ph-add" + (list.length ? "" : " is-first"), onclick: function () { pickFiles(paint); } },
-          [ico("photo", list.length ? 18 : 24), el("span", { text: list.length ? "Add" : "Add photos" }), list.length ? null : el("small", { text: "Pick from " + whose + ", or upload. Up to 5." })]));
+        if (room > 0) grid.appendChild(el("div", { class: "swm-ph-slot", role: "listitem" }, [el("button", { type: "button", class: "swm-ph-add" + (list.length ? "" : " is-first"), onclick: function () { pickFiles(paint); } },
+          [ico("photo", list.length ? 18 : 24), el("span", { text: list.length ? "Add" : "Add photos" }), list.length ? null : el("small", { text: "Pick from " + whose + ", or upload. Up to 5." })])]));
         dropFiles(grid, paint);
         var sel = list[Math.min(st.sel, list.length - 1)];
         var alt = sel ? input("swm-alt", sel.alt || "", { maxlength: String(MAX.alt), class: "swm-noedit-not", oninput: function () { sel.alt = alt.value; if (!sel.local && !sel.pick) changed(); auto.hidden = true; } }) : null;
