@@ -141,12 +141,12 @@ ul,ol{ padding:0; list-style:none; }
 .nav__links a.nav__shop:hover, .nav__links a.nav__shop[aria-current="page"]{ background:#20241d; }
 /* the open-now line, as a pill */
 /* her social pages: small round badges in each brand's own colours (.ic-ig and the rest, with the footer's), the shape of the header's pills */
-.nav__social{ display:flex; align-items:center; gap:7px; }
-.nav__links a.nav__soc{ display:grid; place-items:center; width:24px; height:24px; padding:0; border-radius:50%; box-shadow:0 1px 2px rgb(52 44 30 / .16); transition:transform .2s var(--ease), box-shadow .2s var(--ease); }
-.nav__links a.nav__soc::after{ display:none; }
+.nav__social{ display:flex; align-items:center; gap:8px; }
+.nav__links a.nav__soc{ display:grid; place-items:center; width:20px; height:20px; padding:0; border-radius:50%; box-shadow:0 1px 2px rgb(52 44 30 / .16); transition:transform .2s var(--ease), box-shadow .2s var(--ease); }
+.nav__links a.nav__soc::after{ inset:-2px; height:auto; background:none; transform:none; }   /* no underline: the space around a badge that still takes a tap (24px) */
 .nav__links a.nav__soc:hover{ transform:translateY(-1px); box-shadow:0 6px 12px -6px rgb(52 44 30 / .5); }
-.nav__soc svg{ width:12px; height:12px; }
-.nav__soc.ic-google svg{ width:14px; height:14px; }
+.nav__soc svg{ width:10px; height:10px; }
+.nav__soc.ic-google svg{ width:12px; height:12px; }
 .nav__links a{ white-space:nowrap; }
 .nav__links .open{ padding:7px 14px 7px 12px; border-radius:999px; background:rgb(255 253 249 / .6); border:1px solid rgb(44 48 39 / .1); font-size:.875rem; font-weight:500; line-height:1.2; white-space:nowrap; }
 

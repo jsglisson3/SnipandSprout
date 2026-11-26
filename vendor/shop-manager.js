@@ -649,7 +649,7 @@
       choicePaint = function () { var p = draftPrice(); Array.prototype.forEach.call(choices.querySelectorAll(".swm-ch-price"), function (i) { i.placeholder = p != null ? dollarsIn(p) : "Same"; }); };
       var ADDS = [
         ["sale", "Sale price", "A lower price, with the regular one crossed out.", function () { return !d.sale; }, function () { sale.on(); }],
-        ["choices", function () { return d.options.length ? "More choices" : "Choices"; }, "Like size, color or flavor. Each can have its own price.", function () { return d.options.length < MAX.options; },
+        ["choices", "Choices", "Like size, color or flavor. Each can have its own price.", function () { return !d.options.length; },
           function () { d.options.push({ name: "", choices: [{ name: "" }, { name: "" }] }); paintChoices(".swm-box:last-child .swm-opt-name"); }],
         ["when", "Date and time", "For a class, event, tour or appointment. Its button says Sign up.", function () { return d.kind !== "class"; }, function () { when.on(); }],
         ["badge", "Label", "A New or Featured label. Shows first on " + whose + ".", function () { return !d.tag; }, function () { badge.on(); }]];
@@ -724,23 +724,30 @@
       me.hidden = !d.tag; paint();
       return { el: me, on: function () { d.tag = "new"; me.hidden = false; paint(); seg.firstChild.focus(); } };
     }
-    /* Choices, like sizes, colors or flavors: up to 3 sets, each with up to 20 choices; a choice can have its own
-       price, and an empty price means the regular one (shown in grey). */
+    /* Choices, like sizes, colors or flavors: up to 3 lists, each with up to 20 choices; a choice can have its own
+       price, and an empty price means the regular one (shown in grey). Every box has its words on screen ("What do
+       buyers pick?", "Choices", "Price (optional)"), so the boxes carry no hover label that would cover the next row.
+       A second list (like Color as well as Size) is added from inside the last box, not from the buttons above. */
     function choiceBox(box, o, oi, paint) {
-      var d = st.draft, at = ".swm-box:nth-child(" + (oi + 1) + ") ", title = d.options.length > 1 ? "Choices " + (oi + 1) : "Choices";
-      var name = el("input", { id: "swm-opt-" + oi, class: "swm-opt-name", value: o.name, maxlength: "40", placeholder: "Size, color, flavor…", title: "What the choice is about, like Size", oninput: function () { o.name = name.value; me.querySelector(".swm-unadd").setAttribute("aria-label", removeWords()); } });
+      var d = st.draft, at = ".swm-box:nth-child(" + (oi + 1) + ") ", title = ["Choices", "Second list of choices", "Third list of choices"][oi];
       var removeWords = function () { return "Remove " + (o.name ? "the choices for " + o.name : "these choices"); };
+      var name = el("input", { id: "swm-opt-" + oi, class: "swm-opt-name", value: o.name, maxlength: "40", placeholder: oi ? "Color" : "Size", oninput: function () { o.name = name.value; me.querySelector(".swm-unadd").setAttribute("aria-label", removeWords()); } });
+      var ph = ["Small", "Large", "Medium"];
+      var addOne = function () { o.choices.push({ name: "" }); changed(); paint(at + "li:last-child input"); choicePaint(); };
+      var another = oi === d.options.length - 1 && d.options.length < MAX.options ? el("button", { class: "swm-link-b swm-add swm-another", type: "button", title: "For a second thing buyers pick, like Color as well as Size",
+        onclick: function () { d.options.push({ name: "", choices: [{ name: "" }, { name: "" }] }); changed(); paint(".swm-box:last-child .swm-opt-name"); } }, [ico("plus", 13), oi ? "Add another list" : "Add a second list, like Color"]) : null;
       var rows = o.choices.map(function (c, ci) {
-        var cn = el("input", { value: c.name, maxlength: "60", placeholder: ci === 0 ? "Small" : ci === 1 ? "Large" : "", "aria-label": (o.name || "Choice") + " " + (ci + 1), title: "One thing the buyer can pick, like Small", oninput: function () { c.name = cn.value; } });
-        var cp = el("input", { class: "swm-ch-price", value: c.priceText != null ? c.priceText : dollarsIn(c.price), inputmode: "decimal", "aria-label": "Price for " + (c.name || "choice " + (ci + 1)) + ", empty for the regular price", title: "This choice's own price. Leave it empty for the regular price.", oninput: function () { c.priceText = cp.value; } });
+        var cn = el("input", { value: c.name, maxlength: "60", placeholder: ph[ci] || "", "aria-label": "Choice " + (ci + 1), oninput: function () { c.name = cn.value; } });
+        var cp = el("input", { class: "swm-ch-price", value: c.priceText != null ? c.priceText : dollarsIn(c.price), inputmode: "decimal", "aria-label": "Price for choice " + (ci + 1) + ", empty for the regular price", oninput: function () { c.priceText = cp.value; } });
         return el("li", {}, [cn, el("div", { class: "swm-money is-sm" }, [el("span", { "aria-hidden": "true", text: "$" }), cp]),
-          el("button", { class: "swm-x", type: "button", "aria-label": "Take off " + (c.name || "this choice"), title: "Take off", onclick: function () { o.choices.splice(ci, 1); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("x", 12, 2.4)])]);
+          el("button", { class: "swm-x", type: "button", "aria-label": "Take off " + (c.name || "choice " + (ci + 1)), title: "Take this choice off", onclick: function () { o.choices.splice(ci, 1); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("x", 14, 2.4)])]);
       });
       var me = box("choices", title, removeWords(), [
-        el("div", { class: "swm-f" }, [el("label", { for: "swm-opt-" + oi, text: "What the buyer picks" }), name]),
+        el("div", { class: "swm-f" }, [el("label", { for: "swm-opt-" + oi, text: "What do buyers pick?" }), name]),
+        el("div", { class: "swm-opt-hd", "aria-hidden": "true" }, [el("span", { text: "Choices" }), el("span", { text: "Price (optional)" })]),
         el("ul", { class: "swm-opt" }, rows),
-        el("div", { class: "swm-ch-foot" }, [o.choices.length < MAX.choices ? el("button", { class: "swm-link-b swm-add", type: "button", title: "One more thing to pick from, up to " + MAX.choices, onclick: function () { o.choices.push({ name: "" }); changed(); paint(at + "li:last-child input"); choicePaint(); } }, [ico("plus", 13), "Add a choice"]) : null,
-          el("small", { class: "swm-muted", text: "An empty price means the regular price." })])],
+        el("div", { class: "swm-ch-foot" }, [o.choices.length < MAX.choices ? el("button", { class: "swm-link-b swm-add", type: "button", title: "Up to " + MAX.choices + " choices", onclick: addOne }, [ico("plus", 13), "Add a choice"]) : null, another]),
+        el("small", { class: "swm-muted", text: "A blank price means the regular price." })],
         function () { d.options.splice(oi, 1); paint(); });
       return me;
     }

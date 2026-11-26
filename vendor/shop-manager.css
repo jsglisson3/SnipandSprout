@@ -400,3 +400,8 @@
   .swm-pk{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
   .swm-pop{position:fixed;left:16px !important;right:16px;bottom:96px;width:auto}
 }
+
+.swm-opt-hd{display:flex;gap:8px;font-size:12.5px;color:var(--m-muted);margin-bottom:-6px}
+.swm-opt-hd span:first-child{flex:1}.swm-opt-hd span:last-child{width:120px;margin-right:32px}
+.swm-opt .swm-x{width:32px;height:32px;place-items:center;padding:0}
+.swm-ch-foot{justify-content:space-between}
